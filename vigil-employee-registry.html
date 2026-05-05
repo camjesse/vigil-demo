@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Employee & Credential Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090F;
+  --s1: #0C1018;
+  --s2: #101520;
+  --s3: #151C28;
+  --s4: #1A2232;
+  --border: #1E2D40;
+  --border2: #263648;
+  --accent: #00C2FF;
+  --a2: #FF6B35;
+  --a3: #00E5A0;
+  --purple: #9B6DFF;
+  --text: #C8DCF0;
+  --text2: #8AAAC4;
+  --muted: #4A6880;
+  --danger: #FF4545;
+  --warn: #FFB800;
+  --white: #E8F4FF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOPBAR */
+.topbar{
+  background:linear-gradient(90deg,#090E18,#0C1520);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  position:relative;z-index:50;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-shield{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,#00C2FF,#00E5A0);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.logo-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-module{font-size:11px;color:var(--muted);margin-left:4px;letter-spacing:.5px}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.company-badge{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2)}
+.user-dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;cursor:pointer}
+
+/* ALERT BANNER */
+.alert-banner{
+  background:linear-gradient(90deg,rgba(255,69,69,.12),rgba(255,184,0,.08));
+  border-bottom:1px solid rgba(255,69,69,.2);
+  padding:8px 24px;
+  display:flex;align-items:center;gap:16px;
+  font-size:11.5px;flex-shrink:0;
+}
+.alert-item{display:flex;align-items:center;gap:6px;cursor:pointer}
+.alert-item:hover{text-decoration:underline}
+.alert-dot{width:6px;height:6px;border-radius:50%}
+.alert-sep{color:var(--border2);margin:0 4px}
+
+/* MAIN AREA */
+.main-area{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR NAV */
+.sidenav{
+  width:200px;flex-shrink:0;
+  background:var(--s1);
+  border-right:1px solid var(--border);
+  padding:16px 0;
+  overflow-y:auto;
+}
+.nav-section{padding:0 10px;margin-bottom:8px}
+.nav-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:6px 8px 4px;font-weight:600}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:6px;
+  cursor:pointer;transition:all .12s;
+  font-size:12.5px;color:var(--muted);margin-bottom:1px;
+}
+.nav-item:hover{background:var(--s2);color:var(--text)}
+.nav-item.active{background:rgba(0,194,255,.1);color:var(--accent);font-weight:500}
+.nav-icon{font-size:13px;width:16px;text-align:center}
+.nav-badge{
+  margin-left:auto;font-size:9px;font-weight:700;
+  padding:2px 5px;border-radius:5px;
+}
+.nb-red{background:rgba(255,69,69,.2);color:var(--danger)}
+.nb-warn{background:rgba(255,184,0,.2);color:var(--warn)}
+.nb-blue{background:rgba(0,194,255,.2);color:var(--accent)}
+.nb-green{background:rgba(0,229,160,.2);color:var(--a3)}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* PANEL SYSTEM */
+.panel{display:none}
+.panel.active{display:block}
+
+/* PAGE HEADER */
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
+.page-sub{font-size:12px;color:var(--muted)}
+.page-actions{display:flex;gap:8px;align-items:center}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:8px;padding:14px;position:relative;overflow:hidden;
+}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat.blue::after{background:var(--accent)}
+.stat.green::after{background:var(--a3)}
+.stat.warn::after{background:var(--warn)}
+.stat.danger::after{background:var(--danger)}
+.stat.purple::after{background:var(--purple)}
+.stat-label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.stat.blue .stat-val{color:var(--accent)}
+.stat.green .stat-val{color:var(--a3)}
+.stat.warn .stat-val{color:var(--warn)}
+.stat.danger .stat-val{color:var(--danger)}
+.stat.purple .stat-val{color:var(--purple)}
+.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.stat-note.up{color:var(--a3)}
+.stat-note.dn{color:var(--danger)}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:600}
+.card-action{font-size:11px;color:var(--accent);cursor:pointer}
+.card-body{padding:16px}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+.tbl td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
+.tbl tr.selected td{background:rgba(0,194,255,.05)}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.chip.green{background:rgba(0,229,160,.15);color:var(--a3)}
+.chip.red{background:rgba(255,69,69,.15);color:var(--danger)}
+.chip.warn{background:rgba(255,184,0,.15);color:var(--warn)}
+.chip.blue{background:rgba(0,194,255,.15);color:var(--accent)}
+.chip.purple{background:rgba(155,109,255,.15);color:var(--purple)}
+.chip.gray{background:rgba(90,110,130,.2);color:var(--muted)}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:7px;font-size:12px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert.red{background:rgba(255,69,69,.08);border:1px solid rgba(255,69,69,.2);color:#FF8888}
+.alert.warn{background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.2);color:var(--warn)}
+.alert.green{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);color:var(--a3)}
+.alert.blue{background:rgba(0,194,255,.08);border:1px solid rgba(0,194,255,.2);color:var(--accent)}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-grid.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.form-label .required{color:var(--danger);margin-left:2px}
+.form-input{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:6px;padding:8px 11px;
+  font-size:12.5px;color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .15s;
+}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--s3)}
+.form-input::placeholder{color:var(--muted)}
+.form-input.error{border-color:var(--danger)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234A6880'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+.form-hint{font-size:10px;color:var(--muted);margin-top:2px}
+.form-error{font-size:10px;color:var(--danger);margin-top:2px;display:none}
+.form-error.show{display:block}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#00AADD;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(0,194,255,.35)}
+.btn-ghost:hover{background:rgba(0,194,255,.08)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warn{background:rgba(255,184,0,.15);color:var(--warn);border:1px solid rgba(255,184,0,.3)}
+.btn-green{background:var(--a3);color:#000}
+.btn-sm{padding:5px 11px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* SEARCH BAR */
+.search-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:7px;padding:8px 12px;
+  flex:1;max-width:360px;
+}
+.search-bar input{background:none;border:none;outline:none;font-size:12.5px;color:var(--text);font-family:'DM Sans',sans-serif;flex:1}
+.search-bar input::placeholder{color:var(--muted)}
+
+/* FILTERS */
+.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{
+  padding:5px 12px;border-radius:20px;
+  font-size:11px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);color:var(--muted);
+  background:transparent;transition:all .12s;
+  font-family:'DM Sans',sans-serif;
+}
+.filter-chip:hover{border-color:var(--accent);color:var(--accent)}
+.filter-chip.active{background:rgba(0,194,255,.1);border-color:var(--accent);color:var(--accent)}
+.filter-chip.danger.active{background:rgba(255,69,69,.1);border-color:var(--danger);color:var(--danger)}
+.filter-chip.warn.active{background:rgba(255,184,0,.1);border-color:var(--warn);color:var(--warn)}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--border);border-radius:3px;height:5px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+/* DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;backdrop-filter:blur(2px)}
+.drawer-overlay.open{display:block}
+.drawer{
+  position:fixed;right:0;top:0;bottom:0;
+  width:520px;background:var(--s1);
+  border-left:1px solid var(--border);
+  z-index:101;transform:translateX(100%);
+  transition:transform .25s ease;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-hdr{
+  padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.drawer-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.drawer-close{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted)}
+.drawer-close:hover{color:var(--text)}
+.drawer-body{flex:1;overflow-y:auto;padding:20px}
+.drawer-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+
+/* SECTION DIVIDER */
+.section-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--muted);font-weight:600;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* CREDENTIAL CARD */
+.cred-card{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:7px;padding:12px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+}
+.cred-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cred-body{flex:1}
+.cred-name{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.cred-detail{font-size:11px;color:var(--muted)}
+.cred-status{flex-shrink:0}
+
+/* EXPIRY INDICATOR */
+.expiry-bar{
+  height:3px;border-radius:2px;margin-top:5px;
+  background:var(--border);overflow:hidden;
+}
+.expiry-fill{height:100%;border-radius:2px}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;
+  font-size:12.5px;z-index:200;
+  transform:translateY(80px);opacity:0;
+  transition:all .25s ease;
+  display:flex;align-items:center;gap:10px;
+  min-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(0,229,160,.3)}
+.toast.error{border-color:rgba(255,69,69,.3)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:12px;margin-bottom:16px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* DETAIL ROW */
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted);flex-shrink:0;width:140px}
+.detail-val{color:var(--text);text-align:right;font-weight:500}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:12.5px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .12s;font-weight:500}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* PULSE ANIMATION */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulse{animation:pulse 2s infinite}
+
+/* LOADING OVERLAY */
+.loading-overlay{
+  position:fixed;inset:0;
+  background:rgba(7,9,15,.9);
+  z-index:300;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;
+  backdrop-filter:blur(4px);
+}
+.loading-spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-shield">🛡️</div>
+    <div>
+      <span class="logo-name">VIGIL</span>
+      <span class="logo-module">/ Employee & Credential Registry</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="company-badge">🚛 Northern Express Transport Ltd.</div>
+    <div class="user-dot" title="James Marchetti — HSE Manager">J</div>
+  </div>
+</div>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner" id="alertBanner">
+  <span style="color:var(--danger);font-weight:600;font-size:12px">⚠️ Action Required:</span>
+  <div class="alert-item" style="color:var(--danger)" onclick="setFilter('expired')">
+    <div class="alert-dot" style="background:var(--danger)"></div>
+    <span id="expiredCount">0</span> expired credentials
+  </div>
+  <span class="alert-sep">·</span>
+  <div class="alert-item" style="color:var(--warn)" onclick="setFilter('expiring')">
+    <div class="alert-dot" style="background:var(--warn)"></div>
+    <span id="expiringCount">0</span> expiring within 30 days
+  </div>
+  <span class="alert-sep">·</span>
+  <div class="alert-item" style="color:var(--danger)" onclick="setFilter('noncompliant')">
+    <div class="alert-dot" style="background:var(--danger)"></div>
+    <span id="noncompliantCount">0</span> workers non-compliant
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <button class="btn btn-warn btn-sm" onclick="notifyAll()">📧 Notify All</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportReport()">⬇ Export Report</button>
+  </div>
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+
+<!-- SIDEBAR -->
+<div class="sidenav">
+  <div class="nav-section">
+    <div class="nav-label">Registry</div>
+    <div class="nav-item active" onclick="showPanel('roster')">
+      <span class="nav-icon">👷</span> All Employees
+      <span class="nav-badge nb-blue" id="navTotal">0</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('alerts')">
+      <span class="nav-icon">⚠️</span> Compliance Alerts
+      <span class="nav-badge nb-red" id="navAlerts">0</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('expiring')">
+      <span class="nav-icon">📅</span> Expiring Soon
+      <span class="nav-badge nb-warn" id="navExpiring">0</span>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">By Role</div>
+    <div class="nav-item" onclick="filterByRole('Driver')">
+      <span class="nav-icon">🚛</span> Drivers
+      <span class="nav-badge nb-blue" id="navDrivers">0</span>
+    </div>
+    <div class="nav-item" onclick="filterByRole('Dispatcher')">
+      <span class="nav-icon">📡</span> Dispatchers
+    </div>
+    <div class="nav-item" onclick="filterByRole('Mechanic')">
+      <span class="nav-icon">🔧</span> Mechanics
+    </div>
+    <div class="nav-item" onclick="filterByRole('Supervisor')">
+      <span class="nav-icon">👔</span> Supervisors
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Credentials</div>
+    <div class="nav-item" onclick="showPanel('credlibrary')">
+      <span class="nav-icon">📋</span> Credential Types
+    </div>
+    <div class="nav-item" onclick="showPanel('dashboard')">
+      <span class="nav-icon">📊</span> Compliance Dashboard
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Settings</div>
+    <div class="nav-item" onclick="showPanel('settings')">
+      <span class="nav-icon">⚙️</span> Notifications
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT AREA -->
+<div class="content">
+
+<!-- ===== ROSTER PANEL ===== -->
+<div class="panel active" id="panel-roster">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Employee Roster</div>
+      <div class="page-sub">All workers · Credential status · Compliance tracking</div>
+    </div>
+    <div class="page-actions">
+      <div class="search-bar">
+        <span style="color:var(--muted);font-size:14px">🔍</span>
+        <input type="text" placeholder="Search by name, ID, or role..." id="searchInput" oninput="filterRoster()">
+      </div>
+      <button class="btn btn-primary" onclick="openDrawer('add')">+ Add Employee</button>
+    </div>
+  </div>
+
+  <div class="stats" id="statsRow"></div>
+
+  <div class="filter-row">
+    <button class="filter-chip active" onclick="setFilter('all')" id="filter-all">All Workers</button>
+    <button class="filter-chip danger" onclick="setFilter('expired')" id="filter-expired">🔴 Expired</button>
+    <button class="filter-chip warn" onclick="setFilter('expiring')" id="filter-expiring">🟡 Expiring Soon</button>
+    <button class="filter-chip" onclick="setFilter('compliant')" id="filter-compliant">🟢 Fully Compliant</button>
+    <button class="filter-chip" onclick="setFilter('noncompliant')" id="filter-noncompliant">Non-Compliant</button>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <select class="form-input form-select btn-sm" style="width:auto;padding:5px 28px 5px 10px" onchange="filterByRoleSelect(this.value)">
+        <option value="">All Roles</option>
+        <option>Driver</option>
+        <option>Dispatcher</option>
+        <option>Mechanic</option>
+        <option>Supervisor</option>
+        <option>HSE Coordinator</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title">Workers — <span id="rosterCount">0</span> shown</div>
+      <div style="display:flex;gap:8px">
+        <div class="card-action" onclick="exportReport()">⬇ Export CSV</div>
+        <div class="card-action" onclick="notifyAll()" style="color:var(--warn)">📧 Notify Non-Compliant</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Role</th>
+            <th>License Class</th>
+            <th>License</th>
+            <th>WHMIS</th>
+            <th>TDG</th>
+            <th>H2S Alive</th>
+            <th>Fall Protection</th>
+            <th>Compliance</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+    </div>
+    <div id="emptyState" class="empty" style="display:none">
+      <div class="empty-icon">👷</div>
+      <div class="empty-title">No employees found</div>
+      <div class="empty-sub">Try adjusting your search or filters</div>
+      <button class="btn btn-primary btn-sm" onclick="openDrawer('add')">+ Add First Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ALERTS PANEL ===== -->
+<div class="panel" id="panel-alerts">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Compliance Alerts</div>
+      <div class="page-sub">Expired credentials requiring immediate action</div>
+    </div>
+    <button class="btn btn-warn" onclick="notifyAll()">📧 Send All Notifications</button>
+  </div>
+  <div id="alertsList"></div>
+</div>
+
+<!-- ===== EXPIRING PANEL ===== -->
+<div class="panel" id="panel-expiring">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Expiring Within 30 Days</div>
+      <div class="page-sub">Proactive credential management — act before expiry</div>
+    </div>
+    <button class="btn btn-warn" onclick="notifyAll()">📧 Notify All</button>
+  </div>
+  <div id="expiringList"></div>
+</div>
+
+<!-- ===== DASHBOARD PANEL ===== -->
+<div class="panel" id="panel-dashboard">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Compliance Dashboard</div>
+      <div class="page-sub">Overall credential health across your workforce</div>
+    </div>
+    <button class="btn btn-ghost" onclick="exportReport()">⬇ Export Report</button>
+  </div>
+  <div id="dashboardContent"></div>
+</div>
+
+<!-- ===== CREDENTIAL LIBRARY PANEL ===== -->
+<div class="panel" id="panel-credlibrary">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Credential Type Library</div>
+      <div class="page-sub">All tracked credentials · Requirements by role · Renewal cycles</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Transportation — Required Credentials</div></div>
+    <div class="card-body" style="padding:0">
+      <table class="tbl">
+        <thead><tr><th>Credential</th><th>Applies To</th><th>Renewal Cycle</th><th>Issuing Body</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Driver's License</strong></td><td>All Drivers</td><td>5 years</td><td>Province (AAMVA)</td><td>Class must match vehicle operated</td></tr>
+          <tr><td><strong>Driver Abstract</strong></td><td>All Drivers</td><td>Annual</td><td>Provincial Registry</td><td>Clean abstract required — violations flagged</td></tr>
+          <tr><td><strong>Medical Certificate</strong></td><td>Commercial Drivers</td><td>1–3 years</td><td>Licensed Physician</td><td>Required for Class 1/2/3 operators</td></tr>
+          <tr><td><strong>Drug & Alcohol Test</strong></td><td>All Safety-Sensitive</td><td>Per policy</td><td>Accredited Lab</td><td>Pre-employment + random program</td></tr>
+          <tr><td><strong>WHMIS 2015</strong></td><td>All Workers</td><td>Annual (rec.)</td><td>Any approved provider</td><td>Mandatory under CCOHS</td></tr>
+          <tr><td><strong>First Aid / CPR</strong></td><td>All Workers</td><td>3 years</td><td>Red Cross / St. John Ambulance</td><td>Level based on site requirements</td></tr>
+          <tr><td><strong>H2S Alive</strong></td><td>Oil & Gas adjacent</td><td>3 years</td><td>Energy Safety Canada</td><td>Required for hydrocarbon sites</td></tr>
+          <tr><td><strong>TDG (Dangerous Goods)</strong></td><td>Hazmat Drivers</td><td>3 years</td><td>Transport Canada approved</td><td>Required if transporting dangerous goods</td></tr>
+          <tr><td><strong>Hours of Service Training</strong></td><td>All Drivers</td><td>As required</td><td>Internal / Transport Canada</td><td>ELD compliance awareness</td></tr>
+          <tr><td><strong>Defensive Driving</strong></td><td>All Drivers</td><td>3 years (rec.)</td><td>Any accredited provider</td><td>Insurance & WCB reduction benefit</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS PANEL ===== -->
+<div class="panel" id="panel-settings">
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Notification Settings</div>
+      <div class="page-sub">Configure when and how compliance alerts are sent</div>
+    </div>
+    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Alert Thresholds</div></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <div class="form-label">Early Warning (days before expiry)</div>
+          <input class="form-input" type="number" value="60" id="setting-early">
+          <div class="form-hint">Send first notification this many days before expiry</div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Urgent Warning (days before expiry)</div>
+          <input class="form-input" type="number" value="30" id="setting-urgent">
+          <div class="form-hint">Send urgent notification this many days before expiry</div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Critical Warning (days before expiry)</div>
+          <input class="form-input" type="number" value="14" id="setting-critical">
+        </div>
+        <div class="form-group">
+          <div class="form-label">Escalate to Management After (days overdue)</div>
+          <input class="form-input" type="number" value="3" id="setting-escalate">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <div class="form-label">Notify Worker</div>
+          <select class="form-input form-select"><option>Email + SMS</option><option>Email only</option><option>SMS only</option></select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Notify Supervisor</div>
+          <select class="form-input form-select"><option>Email only</option><option>Email + SMS</option><option>Dashboard only</option></select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Notify HSE Manager</div>
+          <select class="form-input form-select"><option>Email + Dashboard</option><option>Dashboard only</option><option>Email + SMS + Dashboard</option></select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Auto-Restrict Task Assignment When</div>
+          <select class="form-input form-select"><option>Any credential expired</option><option>Safety-critical credential expired</option><option>License expired</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Compliance Rules</div></div>
+    <div class="card-body">
+      <div class="alert blue">⚙️ These rules determine when a worker is flagged as non-compliant and restricted from safety-critical tasks.</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <div class="form-label">Driver License — Must Be Valid To</div>
+          <select class="form-input form-select"><option>Operate any vehicle</option><option>Operate Class 1/2/3 only</option></select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Medical Certificate — Commercial Drivers</div>
+          <select class="form-input form-select"><option>Required — blocks dispatch if expired</option><option>Required — warns only</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main-area -->
+</div><!-- /app -->
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hdr">
+    <div class="drawer-title" id="drawerTitle">Add Employee</div>
+    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer" id="drawerFooter"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--accent)">Loading Registry</div>
+  <div style="font-size:12px;color:var(--muted)" id="loadingMsg">Connecting to Vigil API…</div>
+</div>
+
+<!-- API ERROR BANNER -->
+<div id="apiErrorBanner" style="display:none;position:fixed;top:56px;left:0;right:0;z-index:400;background:rgba(255,69,69,.1);border-bottom:1px solid rgba(255,69,69,.3);padding:10px 24px;align-items:center;gap:12px;font-size:12.5px;color:#FF8888">
+  <span>⚠️</span>
+  <span id="apiErrorMsg">API connection failed</span>
+  <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="init()">↺ Retry</button>
+</div>
+
+<script>
+// ============================================================
+// API CONFIG & AUTH
+// ============================================================
+const API_BASE = 'https://vigil-production-17ca.up.railway.app';
+const LOGIN_EMAIL = 'j.marchetti@northernexpress.ca';
+const LOGIN_PASS  = 'Test1234!';
+
+let authToken = null;
+
+async function apiLogin() {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: LOGIN_EMAIL, password: LOGIN_PASS }),
+  });
+  if (!res.ok) throw new Error(`Login failed (${res.status})`);
+  const data = await res.json();
+  authToken = data.token;
+}
+
+async function apiFetch(path, opts = {}, _retry = true) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+      ...(opts.headers || {}),
+    },
+  });
+  if (res.status === 401 && _retry) {
+    await apiLogin();
+    return apiFetch(path, opts, false);
+  }
+  if (!res.ok) throw new Error(`API ${res.status} — ${path}`);
+  return res.json();
+}
+
+// ============================================================
+// DATA MAPPING
+// ============================================================
+function mapRole(jobTitle) {
+  const t = (jobTitle || '').toLowerCase();
+  if (t.includes('hse') || t === 'safety representative' || t.includes('environmental tech')) return 'HSE Coordinator';
+  if (t.includes('safety supervisor')) return 'HSE Coordinator';
+  if (t.includes('mechanic')) return 'Mechanic';
+  if (t.includes('supervisor') || t.includes('manager') || t.includes(' lead') || t.includes('inspector')) return 'Supervisor';
+  if (t.includes('dispatcher') || t.includes('administrator') || t.includes('hr ') || t.includes('office coord') || t.includes('logistics')) return 'Dispatcher';
+  // Drivers, operators, laborers, helpers all map to Driver
+  return 'Driver';
+}
+
+function mapCredentialType(credType) {
+  const t = (credType || '').toLowerCase();
+  if (t === 'class 1 driver licence' || t === 'class 3 driver licence' || t === "class 1 driver's licence" || t === "class 1 driver's license") return 'license';
+  if (t.match(/class\s*[1-5]\s*(driver)?\s*(licen[sc]e|licence)/i) || t.includes("driver's licen")) return 'license';
+  if (t.includes('class 1') || t.includes('class 3') || t.includes('class 5')) return 'license';
+  if (t === 'h2s alive' || t.includes('h2s') || t.includes('hydrogen sulphide') || t.includes('hydrogen sulfide')) return 'h2s';
+  if (t === 'fall protection' || t.includes('fall protection') || t.includes('working at heights')) return 'fallprotection';
+  if (t === 'transportation of dangerous goods' || t.includes('tdg') || t.includes('dangerous goods')) return 'tdg';
+  if (t === 'whmis 2015' || t.includes('whmis') || t.includes('hazcom') || t.includes('ghs')) return 'whmis';
+  if (t.includes('abstract')) return 'abstract';
+  if (t.includes('medical cert') || t.includes('dot physical') || t.includes('tc medical')) return 'medical';
+  if (t.includes('drug') && t.includes('alcohol')) return 'da';
+  if (t.includes('first aid') || t.includes('cpr')) return 'firstaid';
+  if (t.includes('defensive driving')) return 'defensive';
+  return null;
+}
+
+function mapWorker(worker, credentials) {
+  const role = mapRole(worker.job_title);
+  const creds = {};
+  let licenseClass = role === 'Driver' ? 'Class 5' : 'N/A';
+
+  (credentials || []).forEach(cred => {
+    if (!cred.expiry_date) return;
+    const key = mapCredentialType(cred.credential_type);
+    if (!key) return;
+    // Keep the one with the latest expiry if duplicates
+    if (!creds[key] || cred.expiry_date > creds[key].expiry) {
+      creds[key] = {
+        expiry: cred.expiry_date.slice(0, 10),
+        issuer: cred.issuing_body || '',
+      };
+    }
+    if (key === 'license') {
+      const m = (cred.credential_type || '').match(/Class\s*(\d)/i);
+      if (m) licenseClass = `Class ${m[1]}`;
+    }
+  });
+
+  return {
+    id:         worker.employee_number || worker.id,
+    _uuid:      worker.id,
+    name:       `${worker.first_name} ${worker.last_name}`,
+    role,
+    licenseClass,
+    site:       worker.site       || '—',
+    department: worker.department || '—',
+    phone:      worker.phone      || '—',
+    email:      worker.email      || '—',
+    startDate:  worker.hire_date  ? worker.hire_date.slice(0, 10) : '—',
+    status:     worker.status     || 'active',
+    creds,
+  };
+}
+
+// ============================================================
+// DATA LOAD
+// ============================================================
+async function loadData() {
+  setLoadingMsg('Fetching workers…');
+  const { workers } = await apiFetch('/api/workers');
+
+  setLoadingMsg(`Loading credentials for ${workers.length} workers…`);
+  const credResults = await Promise.all(
+    workers.map(w =>
+      apiFetch(`/api/workers/${w.id}/credentials`)
+        .then(d => d.credentials || [])
+        .catch(() => [])
+    )
+  );
+
+  employees = workers.map((w, i) => mapWorker(w, credResults[i]));
+}
+
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loadingMsg');
+  if (el) el.textContent = msg;
+}
+
+function showLoading(on) {
+  document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
+}
+
+function showApiError(msg) {
+  const banner = document.getElementById('apiErrorBanner');
+  document.getElementById('apiErrorMsg').textContent = msg;
+  banner.style.display = 'flex';
+}
+
+function hideApiError() {
+  document.getElementById('apiErrorBanner').style.display = 'none';
+}
+
+async function init() {
+  showLoading(true);
+  hideApiError();
+  try {
+    setLoadingMsg('Authenticating…');
+    await apiLogin();
+    await loadData();
+    showLoading(false);
+    renderAll();
+  } catch (err) {
+    showLoading(false);
+    showApiError(err.message + ' — is the Vigil API running at ' + API_BASE + '?');
+  }
+}
+
+// ============================================================
+// DATA STORE
+// ============================================================
+const CRED_TYPES = [
+  {key:'license',       label:"Driver's License",    icon:'🪪', required:['Driver']},
+  {key:'whmis',         label:'WHMIS 2015',           icon:'☢️', required:['Driver','Mechanic','Dispatcher','Supervisor','HSE Coordinator']},
+  {key:'tdg',           label:'TDG (Dangerous Goods)',icon:'⚠️', required:['Driver']},
+  {key:'h2s',           label:'H2S Alive',            icon:'⚗️', required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
+  {key:'fallprotection',label:'Fall Protection',      icon:'🪢', required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
+  {key:'abstract',      label:'Driver Abstract',      icon:'📄', required:[]},
+  {key:'medical',       label:'Medical Certificate',  icon:'🏥', required:[]},
+  {key:'da',            label:'Drug & Alcohol Test',  icon:'🧪', required:[]},
+  {key:'firstaid',      label:'First Aid / CPR',      icon:'🩺', required:[]},
+  {key:'defensive',     label:'Defensive Driving',    icon:'🚗', required:[]},
+];
+
+let employees = [];
+let currentFilter = 'all';
+let currentRoleFilter = '';
+let selectedEmpId = null;
+
+// ============================================================
+// CREDENTIAL UTILITIES
+// ============================================================
+function daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function credStatus(expiry) {
+  const days = daysUntil(expiry);
+  if (days < 0) return 'expired';
+  if (days <= 30) return 'critical';
+  if (days <= 60) return 'expiring';
+  return 'valid';
+}
+
+function credChip(expiry, credKey, role) {
+  const credType = CRED_TYPES.find(c => c.key === credKey);
+  if (credType && !credType.required.includes(role)) {
+    return '<span class="chip gray">N/A</span>';
+  }
+  if (!expiry) return '<span class="chip gray">Not on file</span>';
+  const days = daysUntil(expiry);
+  const status = credStatus(expiry);
+  if (status === 'expired') return `<span class="chip red"><span class="chip-dot"></span>Expired ${Math.abs(days)}d ago</span>`;
+  if (status === 'critical') return `<span class="chip warn"><span class="chip-dot"></span>${days}d left</span>`;
+  if (status === 'expiring') return `<span class="chip blue"><span class="chip-dot"></span>${days}d left</span>`;
+  return `<span class="chip green"><span class="chip-dot"></span>Valid</span>`;
+}
+
+function overallCompliance(emp) {
+  let expired = 0, critical = 0, expiring = 0;
+  CRED_TYPES.forEach(ct => {
+    if (!ct.required.includes(emp.role)) return;
+    const cred = emp.creds[ct.key];
+    if (!cred) { expired++; return; }
+    const s = credStatus(cred.expiry);
+    if (s === 'expired') expired++;
+    else if (s === 'critical') critical++;
+    else if (s === 'expiring') expiring++;
+  });
+  if (expired > 0) return {status:'non-compliant', label:`Non-Compliant (${expired} expired)`, chip:'<span class="chip red">Non-Compliant</span>'};
+  if (critical > 0) return {status:'critical', label:`Action Required (${critical} critical)`, chip:'<span class="chip warn">Action Required</span>'};
+  if (expiring > 0) return {status:'expiring', label:'Monitor', chip:'<span class="chip blue">Monitor</span>'};
+  return {status:'compliant', label:'Fully Compliant', chip:'<span class="chip green">Compliant</span>'};
+}
+
+// ============================================================
+// RENDER ROSTER
+// ============================================================
+function getFilteredEmployees() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  return employees.filter(e => {
+    const comp = overallCompliance(e);
+    const matchSearch = !search || e.name.toLowerCase().includes(search) || e.id.toLowerCase().includes(search) || e.role.toLowerCase().includes(search) || e.site.toLowerCase().includes(search);
+    const matchRole = !currentRoleFilter || e.role === currentRoleFilter;
+    let matchFilter = true;
+    if (currentFilter === 'expired') matchFilter = comp.status === 'non-compliant';
+    if (currentFilter === 'expiring') {
+      let has = false;
+      CRED_TYPES.forEach(ct => {
+        if (!ct.required.includes(e.role)) return;
+        const s = credStatus(e.creds[ct.key]?.expiry || '2000-01-01');
+        if (s === 'critical' || s === 'expiring') has = true;
+      });
+      matchFilter = has;
+    }
+    if (currentFilter === 'compliant') matchFilter = comp.status === 'compliant';
+    if (currentFilter === 'noncompliant') matchFilter = comp.status === 'non-compliant' || comp.status === 'critical';
+    return matchSearch && matchRole && matchFilter;
+  });
+}
+
+function renderRoster() {
+  const filtered = getFilteredEmployees();
+  const body = document.getElementById('rosterBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('rosterCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = filtered.map(emp => {
+    const comp = overallCompliance(emp);
+    return `<tr onclick="openEmployeeDetail('${emp.id}')" ${selectedEmpId === emp.id ? 'class="selected"' : ''}>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0">${emp.name.charAt(0)}</div>
+          <div>
+            <div style="font-weight:600;font-size:12.5px">${emp.name}</div>
+            <div style="font-size:10px;color:var(--muted)">${emp.id} · ${emp.site}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="chip gray">${emp.role}</span></td>
+      <td>${emp.licenseClass}</td>
+      <td>${credChip(emp.creds.license?.expiry, 'license', emp.role)}</td>
+      <td>${credChip(emp.creds.whmis?.expiry, 'whmis', emp.role)}</td>
+      <td>${credChip(emp.creds.tdg?.expiry, 'tdg', emp.role)}</td>
+      <td>${credChip(emp.creds.h2s?.expiry, 'h2s', emp.role)}</td>
+      <td>${credChip(emp.creds.fallprotection?.expiry, 'fallprotection', emp.role)}</td>
+      <td>${comp.chip}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openEmployeeDetail('${emp.id}')">View</button>
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openDrawer('edit','${emp.id}')">Edit</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function roleColor(role) {
+  const colors = {Driver:'#00C2FF,#0080AA',Supervisor:'#9B6DFF,#6040AA',Mechanic:'#FF6B35,#AA4020',Dispatcher:'#00E5A0,#00A070','HSE Coordinator':'#FFB800,#AA8000'};
+  return colors[role] || '#4A6880,#2A4860';
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function renderStats() {
+  const total = employees.length;
+  let expired = 0, expiring = 0, compliant = 0, noncompliant = 0;
+  employees.forEach(e => {
+    const comp = overallCompliance(e);
+    if (comp.status === 'compliant') compliant++;
+    else if (comp.status === 'non-compliant') { noncompliant++; expired++; }
+    else if (comp.status === 'critical') { noncompliant++; expiring++; }
+    else if (comp.status === 'expiring') expiring++;
+  });
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat blue"><div class="stat-label">Total Workers</div><div class="stat-val">${total}</div><div class="stat-note">Active employees</div></div>
+    <div class="stat green"><div class="stat-label">Fully Compliant</div><div class="stat-val">${compliant}</div><div class="stat-note up">↑ ${total ? Math.round(compliant/total*100) : 0}% of workforce</div></div>
+    <div class="stat danger"><div class="stat-label">Non-Compliant</div><div class="stat-val">${noncompliant}</div><div class="stat-note dn">${noncompliant > 0 ? 'Immediate action required' : 'All clear'}</div></div>
+    <div class="stat warn"><div class="stat-label">Expiring (30 days)</div><div class="stat-val">${expiring}</div><div class="stat-note">Proactive action needed</div></div>
+    <div class="stat purple"><div class="stat-label">Compliance Rate</div><div class="stat-val">${total ? Math.round(compliant/total*100) : 0}%</div><div class="stat-note">Target: 100%</div></div>
+  `;
+
+  let expiredCreds = 0;
+  employees.forEach(e => {
+    CRED_TYPES.forEach(ct => {
+      if (!ct.required.includes(e.role)) return;
+      if (credStatus(e.creds[ct.key]?.expiry || '2000-01-01') === 'expired') expiredCreds++;
+    });
+  });
+  let expiringCreds = 0;
+  employees.forEach(e => {
+    CRED_TYPES.forEach(ct => {
+      if (!ct.required.includes(e.role)) return;
+      const s = credStatus(e.creds[ct.key]?.expiry || '2000-01-01');
+      if (s === 'critical' || s === 'expiring') expiringCreds++;
+    });
+  });
+  document.getElementById('expiredCount').textContent = expiredCreds;
+  document.getElementById('expiringCount').textContent = expiringCreds;
+  document.getElementById('noncompliantCount').textContent = noncompliant;
+  document.getElementById('navTotal').textContent = total;
+  document.getElementById('navAlerts').textContent = noncompliant;
+  document.getElementById('navExpiring').textContent = expiring;
+  document.getElementById('navDrivers').textContent = employees.filter(e => e.role === 'Driver').length;
+}
+
+// ============================================================
+// FILTER & SEARCH
+// ============================================================
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  const el = document.getElementById('filter-' + f);
+  if (el) el.classList.add('active');
+  renderRoster();
+}
+
+function filterRoster() { renderRoster(); }
+
+function filterByRole(role) {
+  currentRoleFilter = role;
+  currentFilter = 'all';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  showPanel('roster');
+  renderRoster();
+}
+
+function filterByRoleSelect(role) {
+  currentRoleFilter = role;
+  renderRoster();
+}
+
+// ============================================================
+// EMPLOYEE DETAIL DRAWER
+// ============================================================
+function openEmployeeDetail(empId) {
+  selectedEmpId = empId;
+  const emp = employees.find(e => e.id === empId);
+  if (!emp) return;
+  renderRoster();
+
+  const comp = overallCompliance(emp);
+  document.getElementById('drawerTitle').textContent = emp.name;
+
+  let credRows = CRED_TYPES.map(ct => {
+    const cred = emp.creds[ct.key];
+    const required = ct.required.includes(emp.role);
+    if (!required) return '';
+    const expiry = cred?.expiry || null;
+    const days = expiry ? daysUntil(expiry) : -999;
+    const status = expiry ? credStatus(expiry) : 'expired';
+    const bgColor = status === 'expired' ? 'rgba(255,69,69,.08)' : status === 'critical' ? 'rgba(255,184,0,.06)' : 'rgba(0,229,160,.05)';
+    const borderColor = status === 'expired' ? 'rgba(255,69,69,.2)' : status === 'critical' ? 'rgba(255,184,0,.2)' : 'var(--border)';
+    const pct = expiry ? Math.min(100, Math.max(0, (days / 365) * 100)) : 0;
+    const barColor = status === 'expired' ? 'var(--danger)' : status === 'critical' ? 'var(--warn)' : 'var(--a3)';
+    const chipHtml = expiry ? credChip(expiry, ct.key, emp.role) : '<span class="chip red">Not on file</span>';
+    const expiryText = expiry ? `${new Date(expiry).toLocaleDateString('en-CA')} (${days < 0 ? Math.abs(days) + 'd overdue' : days + 'd remaining'})` : 'Not recorded';
+    return `
+      <div class="cred-card" style="background:${bgColor};border-color:${borderColor}">
+        <div class="cred-icon" style="background:${bgColor}">${ct.icon}</div>
+        <div class="cred-body">
+          <div class="cred-name">${ct.label}</div>
+          <div class="cred-detail">${expiryText}${cred?.issuer ? ' · ' + cred.issuer : ''}</div>
+          <div class="expiry-bar"><div class="expiry-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        </div>
+        <div class="cred-status">${chipHtml}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">${emp.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${emp.id} · ${emp.role} · ${emp.site}</div>
+        <div style="margin-top:4px">${comp.chip}</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchDetailTab(this,'dt-creds')">Credentials</div>
+      <div class="tab" onclick="switchDetailTab(this,'dt-info')">Personal Info</div>
+      <div class="tab" onclick="switchDetailTab(this,'dt-history')">History</div>
+    </div>
+
+    <div id="dt-creds">${credRows}</div>
+
+    <div id="dt-info" style="display:none">
+      <div class="section-label">Employment Details</div>
+      <div class="detail-row"><span class="detail-label">Employee ID</span><span class="detail-val">${emp.id}</span></div>
+      <div class="detail-row"><span class="detail-label">Full Name</span><span class="detail-val">${emp.name}</span></div>
+      <div class="detail-row"><span class="detail-label">Role</span><span class="detail-val">${emp.role}</span></div>
+      <div class="detail-row"><span class="detail-label">Job Title</span><span class="detail-val">${emp.jobTitle || emp.role}</span></div>
+      <div class="detail-row"><span class="detail-label">License Class</span><span class="detail-val">${emp.licenseClass}</span></div>
+      <div class="detail-row"><span class="detail-label">Site / Hub</span><span class="detail-val">${emp.site}</span></div>
+      <div class="detail-row"><span class="detail-label">Department</span><span class="detail-val">${emp.department}</span></div>
+      <div class="detail-row"><span class="detail-label">Start Date</span><span class="detail-val">${emp.startDate}</span></div>
+      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-val">${emp.status}</span></div>
+      <div style="margin-top:14px" class="section-label">Contact</div>
+      <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">${emp.phone}</span></div>
+      <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">${emp.email}</span></div>
+    </div>
+
+    <div id="dt-history" style="display:none">
+      <div class="section-label">Activity Log</div>
+      <div style="font-size:12px;color:var(--muted);line-height:2">
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--a3)">✓</span> Employee record created — ${emp.startDate}</div>
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--accent)">📧</span> Last compliance notification sent — <em>Auto-generated</em></div>
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--warn)">⚠️</span> Compliance flag raised — credential expiry detected</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('drawerFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="openDrawer('edit','${emp.id}')">✏️ Edit Record</button>
+    <button class="btn btn-warn" onclick="sendNotification('${emp.id}')">📧 Send Notification</button>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="deleteEmployee('${emp.id}')">🗑 Remove</button>
+  `;
+
+  openDrawerEl();
+}
+
+function switchDetailTab(el, tabId) {
+  el.closest('.drawer-body').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['dt-creds','dt-info','dt-history'].forEach(id => {
+    const el2 = document.getElementById(id);
+    if (el2) el2.style.display = id === tabId ? 'block' : 'none';
+  });
+}
+
+// ============================================================
+// ADD / EDIT DRAWER
+// ============================================================
+function openDrawer(mode, empId) {
+  const emp = empId ? employees.find(e => e.id === empId) : null;
+  document.getElementById('drawerTitle').textContent = emp ? 'Edit Employee — ' + emp.name : 'Add New Employee';
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="section-label">Employee Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-label">Full Name <span class="required">*</span></div>
+        <input class="form-input" id="f-name" placeholder="First Last" value="${emp?.name || ''}">
+        <div class="form-error" id="e-name">Name is required</div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Employee ID</div>
+        <input class="form-input" id="f-id" placeholder="Auto-generated" value="${emp?.id || ''}" ${emp ? 'readonly style="opacity:.5"' : ''}>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-label">Role <span class="required">*</span></div>
+        <select class="form-input form-select" id="f-role" onchange="updateCredFields()">
+          <option value="">Select role...</option>
+          ${['Driver','Dispatcher','Mechanic','Supervisor','HSE Coordinator'].map(r => `<option ${emp?.role===r?'selected':''}>${r}</option>`).join('')}
+        </select>
+        <div class="form-error" id="e-role">Role is required</div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">License Class</div>
+        <select class="form-input form-select" id="f-licClass">
+          ${['N/A','Class 1','Class 2','Class 3','Class 4','Class 5'].map(c => `<option ${emp?.licenseClass===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-label">Site / Hub</div>
+        <select class="form-input form-select" id="f-site">
+          ${['Calgary Hub HQ','Edmonton Hub','Site B Pipeline','Red Deer Terminal'].map(s => `<option ${emp?.site===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Start Date</div>
+        <input class="form-input" id="f-start" type="date" value="${emp?.startDate || new Date().toISOString().split('T')[0]}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-label">Phone</div>
+        <input class="form-input" id="f-phone" placeholder="403-555-0000" value="${emp?.phone || ''}">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Email</div>
+        <input class="form-input" id="f-email" type="email" placeholder="worker@company.ca" value="${emp?.email || ''}">
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:6px">Credential Expiry Dates</div>
+    <div class="alert blue" style="margin-bottom:12px">📋 Enter expiry dates for credentials this worker currently holds. Leave blank if not yet obtained — the system will flag as "Not on file."</div>
+    <div id="credFields">
+      ${CRED_TYPES.map(ct => `
+        <div class="form-grid" style="margin-bottom:8px">
+          <div class="form-group">
+            <div class="form-label">${ct.icon} ${ct.label}</div>
+            <input class="form-input" id="f-cred-${ct.key}" type="date" value="${emp?.creds[ct.key]?.expiry || ''}">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Issuing Body</div>
+            <input class="form-input" id="f-issuer-${ct.key}" placeholder="e.g. Alberta Registry" value="${emp?.creds[ct.key]?.issuer || ''}">
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('drawerFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveEmployee('${emp?.id || ''}')">${emp ? '💾 Save Changes' : '✅ Add Employee'}</button>
+    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+  `;
+
+  openDrawerEl();
+}
+
+function openDrawerEl() {
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+function saveEmployee(existingId) {
+  const name = document.getElementById('f-name').value.trim();
+  const role = document.getElementById('f-role').value;
+  let valid = true;
+
+  if (!name) { document.getElementById('e-name').classList.add('show'); document.getElementById('f-name').classList.add('error'); valid = false; }
+  else { document.getElementById('e-name').classList.remove('show'); document.getElementById('f-name').classList.remove('error'); }
+
+  if (!role) { document.getElementById('e-role').classList.add('show'); document.getElementById('f-role').classList.add('error'); valid = false; }
+  else { document.getElementById('e-role').classList.remove('show'); document.getElementById('f-role').classList.remove('error'); }
+
+  if (!valid) return;
+
+  const creds = {};
+  CRED_TYPES.forEach(ct => {
+    const expiry = document.getElementById('f-cred-' + ct.key)?.value;
+    const issuer = document.getElementById('f-issuer-' + ct.key)?.value;
+    if (expiry) creds[ct.key] = {expiry, issuer: issuer || ''};
+    else {
+      const existing = existingId ? employees.find(e => e.id === existingId) : null;
+      if (existing?.creds[ct.key]) creds[ct.key] = existing.creds[ct.key];
+    }
+  });
+
+  if (existingId) {
+    const idx = employees.findIndex(e => e.id === existingId);
+    employees[idx] = {
+      ...employees[idx],
+      name,
+      role,
+      licenseClass: document.getElementById('f-licClass').value,
+      site: document.getElementById('f-site').value,
+      startDate: document.getElementById('f-start').value,
+      phone: document.getElementById('f-phone').value,
+      email: document.getElementById('f-email').value,
+      creds,
+    };
+    showToast('success', '✅ ' + name + "'s record updated successfully");
+  } else {
+    const newId = 'EMP-' + String(employees.length + 1).padStart(3, '0');
+    employees.push({
+      id: newId,
+      name, role,
+      licenseClass: document.getElementById('f-licClass').value,
+      site: document.getElementById('f-site').value,
+      startDate: document.getElementById('f-start').value,
+      phone: document.getElementById('f-phone').value,
+      email: document.getElementById('f-email').value,
+      status: 'active',
+      creds,
+    });
+    showToast('success', '✅ ' + name + ' added to registry');
+  }
+
+  closeDrawer();
+  renderAll();
+}
+
+function deleteEmployee(empId) {
+  const emp = employees.find(e => e.id === empId);
+  showModal(
+    'Remove Employee',
+    `Are you sure you want to remove <strong>${emp.name}</strong> from the registry? This action cannot be undone.`,
+    [
+      {label:'Cancel', cls:'btn-ghost', action:'closeModal()'},
+      {label:'Remove Employee', cls:'btn-danger', action:`confirmDelete('${empId}')`}
+    ]
+  );
+}
+
+function confirmDelete(empId) {
+  const emp = employees.find(e => e.id === empId);
+  employees = employees.filter(e => e.id !== empId);
+  closeDrawer();
+  closeModal();
+  renderAll();
+  showToast('success', '🗑 ' + emp.name + ' removed from registry');
+}
+
+// ============================================================
+// ALERTS PANEL
+// ============================================================
+function renderAlertsPanel() {
+  const nonCompliant = employees.filter(e => {
+    const c = overallCompliance(e);
+    return c.status === 'non-compliant';
+  });
+
+  if (nonCompliant.length === 0) {
+    document.getElementById('alertsList').innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">No compliance alerts</div><div class="empty-sub">All credentials are current</div></div>`;
+    return;
+  }
+
+  document.getElementById('alertsList').innerHTML = nonCompliant.map(emp => {
+    const expiredCreds = CRED_TYPES.filter(ct => {
+      if (!ct.required.includes(emp.role)) return false;
+      return credStatus(emp.creds[ct.key]?.expiry || '2000-01-01') === 'expired';
+    });
+    return `
+      <div class="card" style="border-color:rgba(255,69,69,.25);margin-bottom:12px">
+        <div class="card-hdr" style="background:rgba(255,69,69,.05)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600">${emp.name}</div>
+              <div style="font-size:11px;color:var(--muted)">${emp.id} · ${emp.role} · ${emp.site}</div>
+            </div>
+            <span class="chip red" style="margin-left:8px">Non-Compliant</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-warn btn-sm" onclick="sendNotification('${emp.id}')">📧 Notify</button>
+            <button class="btn btn-ghost btn-sm" onclick="openEmployeeDetail('${emp.id}');showPanel('roster')">View Record</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:12px">
+          ${expiredCreds.map(ct => {
+            const cred = emp.creds[ct.key];
+            const days = cred ? Math.abs(daysUntil(cred.expiry)) : 0;
+            return `<div class="alert red" style="margin-bottom:6px">🔴 <strong>${ct.label}</strong> — Expired ${days} day${days !== 1 ? 's' : ''} ago${cred?.issuer ? ' · Issued by: ' + cred.issuer : ''}</div>`;
+          }).join('')}
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn btn-primary btn-sm" onclick="openDrawer('edit','${emp.id}')">✏️ Update Credentials</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// EXPIRING PANEL
+// ============================================================
+function renderExpiringPanel() {
+  const rows = [];
+  employees.forEach(emp => {
+    CRED_TYPES.forEach(ct => {
+      if (!ct.required.includes(emp.role)) return;
+      const cred = emp.creds[ct.key];
+      if (!cred) return;
+      const s = credStatus(cred.expiry);
+      if (s === 'critical' || s === 'expiring') {
+        rows.push({emp, ct, cred, days: daysUntil(cred.expiry), status: s});
+      }
+    });
+  });
+
+  rows.sort((a,b) => a.days - b.days);
+
+  if (rows.length === 0) {
+    document.getElementById('expiringList').innerHTML = `<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-title">No upcoming expiries</div><div class="empty-sub">All credentials are valid for more than 30 days</div></div>`;
+    return;
+  }
+
+  document.getElementById('expiringList').innerHTML = `
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">${rows.length} credentials expiring within 60 days</div></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Employee</th><th>Role</th><th>Credential</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td><strong>${r.emp.name}</strong><br><span style="font-size:10px;color:var(--muted)">${r.emp.id} · ${r.emp.site}</span></td>
+                <td><span class="chip gray">${r.emp.role}</span></td>
+                <td>${r.ct.icon} ${r.ct.label}</td>
+                <td>${new Date(r.cred.expiry).toLocaleDateString('en-CA')}</td>
+                <td>${r.status === 'critical' ? `<span class="chip warn">${r.days}d left</span>` : `<span class="chip blue">${r.days}d left</span>`}</td>
+                <td><div style="display:flex;gap:5px">
+                  <button class="btn btn-warn btn-xs" onclick="sendNotification('${r.emp.id}')">📧 Notify</button>
+                  <button class="btn btn-ghost btn-xs" onclick="openDrawer('edit','${r.emp.id}');showPanel('roster')">Update</button>
+                </div></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// DASHBOARD PANEL
+// ============================================================
+function renderDashboard() {
+  const total = employees.length;
+  const byRole = {};
+  employees.forEach(e => { byRole[e.role] = (byRole[e.role] || 0) + 1; });
+
+  const credHealth = CRED_TYPES.map(ct => {
+    let valid = 0, expired = 0, expiring = 0, na = 0;
+    employees.forEach(e => {
+      if (!ct.required.includes(e.role)) { na++; return; }
+      const s = credStatus(e.creds[ct.key]?.expiry || '2000-01-01');
+      if (s === 'valid') valid++;
+      else if (s === 'expired') expired++;
+      else expiring++;
+    });
+    const applicable = total - na;
+    const pct = applicable > 0 ? Math.round(valid / applicable * 100) : 100;
+    return {ct, valid, expired, expiring, applicable, pct};
+  });
+
+  document.getElementById('dashboardContent').innerHTML = `
+    <div class="stats">
+      <div class="stat blue"><div class="stat-label">Total Workforce</div><div class="stat-val">${total}</div></div>
+      <div class="stat green"><div class="stat-label">Fully Compliant</div><div class="stat-val">${employees.filter(e => overallCompliance(e).status === 'compliant').length}</div></div>
+      <div class="stat danger"><div class="stat-label">Non-Compliant</div><div class="stat-val">${employees.filter(e => overallCompliance(e).status !== 'compliant').length}</div></div>
+      <div class="stat warn"><div class="stat-label">Expiring 30d</div><div class="stat-val">${employees.filter(e => overallCompliance(e).status === 'expiring' || overallCompliance(e).status === 'critical').length}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Credential Health by Type</div></div>
+      <div class="card-body">
+        ${credHealth.map(ch => `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <div style="font-size:12px;font-weight:600">${ch.ct.icon} ${ch.ct.label}</div>
+              <div style="display:flex;gap:6px;align-items:center">
+                ${ch.expired > 0 ? `<span class="chip red">${ch.expired} expired</span>` : ''}
+                ${ch.expiring > 0 ? `<span class="chip warn">${ch.expiring} expiring</span>` : ''}
+                <span style="font-size:11px;color:${ch.pct >= 90 ? 'var(--a3)' : ch.pct >= 70 ? 'var(--warn)' : 'var(--danger)'};font-weight:600">${ch.pct}%</span>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-fill" style="width:${ch.pct}%;background:${ch.pct >= 90 ? 'var(--a3)' : ch.pct >= 70 ? 'var(--warn)' : 'var(--danger)'}"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Workforce by Role</div></div>
+      <div class="card-body">
+        ${Object.entries(byRole).map(([role, count]) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:12.5px">${role}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${count/total*100}%;background:var(--accent);border-radius:2px"></div>
+              </div>
+              <span style="font-size:12px;font-weight:600;color:var(--accent)">${count}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if ((n.getAttribute('onclick') || '').includes("'" + id + "'")) n.classList.add('active');
+  });
+  if (id === 'alerts') renderAlertsPanel();
+  if (id === 'expiring') renderExpiringPanel();
+  if (id === 'dashboard') renderDashboard();
+}
+
+function sendNotification(empId) {
+  const emp = employees.find(e => e.id === empId);
+  showToast('success', '📧 Notification sent to ' + emp.name + ' and their supervisor');
+}
+
+function notifyAll() {
+  const count = employees.filter(e => overallCompliance(e).status !== 'compliant').length;
+  showToast('success', `📧 Notifications sent to ${count} non-compliant workers and supervisors`);
+}
+
+function exportReport() {
+  showToast('success', '⬇ Compliance report exported — check your downloads');
+}
+
+function saveSettings() {
+  showToast('success', '✅ Notification settings saved');
+}
+
+function showToast(type, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.className = 'toast show ' + type;
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function showModal(title, body, actions) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalActions').innerHTML = actions.map(a => `<button class="btn ${a.cls}" onclick="${a.action}">${a.label}</button>`).join('');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ============================================================
+// RENDER ALL
+// ============================================================
+function renderAll() {
+  renderStats();
+  renderRoster();
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+init();
+</script>
+
+<script>
+// ── JURISDICTION AWARENESS ───────────────────────────────────
+let VIGIL_JUR = 'ca';
+
+const EMP_TERMS = {
+  ca: {
+    whmis: 'WHMIS 2015', licence: 'Class 1 / Class 3 Licence',
+    licenceShort: 'Class 1', medCert: 'TC Medical Certificate',
+    workerComp: 'WCB', hazcom: 'WHMIS',
+    credTypes: ['H2S Alive', 'WHMIS 2015', 'First Aid CPR-C', 'Class 1 Licence', 'TC Medical Certificate', 'Confined Space Entry', 'Fall Protection', 'TDG', 'JHSC Part 1'],
+    osha: 'OHS Act', regulator: 'Alberta OHS',
+    flag: '🍁',
+  },
+  us: {
+    whmis: 'HazCom / GHS', licence: 'CDL Class A / Class B',
+    licenceShort: 'CDL-A', medCert: 'DOT Physical (MCSA-5875)',
+    workerComp: "Workers' Compensation", hazcom: 'HazCom 2012',
+    credTypes: ['OSHA 10', 'OSHA 30', 'HazCom / GHS', 'CDL Class A', 'DOT Physical', 'Confined Space (OSHA 1910.146)', 'Fall Protection (OSHA 1926.502)', 'HazMat', 'Safety Committee Member'],
+    osha: 'OSHA', regulator: 'Federal OSHA / State OSHA',
+    flag: '🇺🇸',
+  }
+};
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'VIGIL_JUR') {
+    VIGIL_JUR = e.data.jur;
+    updateEmpJurBanner();
+    if (typeof renderAll === 'function') renderAll();
+  }
+});
+
+function getEmpTerms() {
+  return EMP_TERMS[VIGIL_JUR] || EMP_TERMS.ca;
+}
+
+function updateEmpJurBanner() {
+  const t = getEmpTerms();
+  let banner = document.getElementById('emp-jur-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'emp-jur-banner';
+    banner.style.cssText = 'margin:0 0 12px;padding:8px 14px;border-radius:7px;font-size:12px;display:flex;align-items:center;gap:8px;';
+    const main = document.querySelector('.content') || document.querySelector('main') || document.body;
+    const firstChild = main.firstElementChild;
+    if (firstChild) main.insertBefore(banner, firstChild);
+    else main.prepend(banner);
+  }
+  const isUS = VIGIL_JUR === 'us';
+  banner.style.background = isUS ? 'rgba(0,194,255,.07)' : 'rgba(255,107,53,.07)';
+  banner.style.border = isUS ? '1px solid rgba(0,194,255,.2)' : '1px solid rgba(255,107,53,.2)';
+  banner.style.color = isUS ? '#00C2FF' : '#FF8C52';
+  banner.innerHTML = t.flag + ' <strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Licence: ' + t.licence + ' · Hazard Comm: ' + t.whmis + ' · Medical: ' + t.medCert + ' · Compensation: ' + t.workerComp + ' · Regulator: ' + t.regulator;
+}
+</script>
+</body>
+</html>

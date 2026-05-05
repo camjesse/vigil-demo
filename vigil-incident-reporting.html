@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Incident Reporting & CAPA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;--border:#1E2D40;--b2:#263648;--accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;--purple:#8B5CF6;--cyan:#06B6D4;--orange:#F97316;--text:#C8DCF0;--text2:#8AAAC4;--muted:#4A6880}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOP BAR */
+.topbar{background:linear-gradient(90deg,#060A14,#091220);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:9.5px;color:var(--muted);letter-spacing:.5px}
+.topbar-center{flex:1;display:flex;align-items:center;gap:8px;padding:0 16px}
+.breadcrumb{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.breadcrumb b{color:var(--text2)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.co-tag{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:10px;color:var(--text2)}
+.lpill{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--ok)}
+.pd{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
+.btn-primary{background:var(--danger);color:#fff}
+.btn-primary:hover{background:#DC2626}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(59,130,246,.3)}
+.btn-ghost:hover{background:rgba(59,130,246,.08)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#059669}
+.btn-sm{padding:3px 9px;font-size:10.5px}
+
+/* MAIN AREA */
+.main{flex:1;overflow:hidden;position:relative}
+
+/* PANELS */
+.panel{position:absolute;inset:0;overflow-y:auto;transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .22s}
+.panel.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.panel-pad{padding:18px}
+
+/* ALERT STRIP */
+.astrip{background:linear-gradient(90deg,rgba(239,68,68,.06),transparent);border-bottom:1px solid rgba(239,68,68,.1);padding:5px 18px;display:flex;align-items:center;gap:8px;font-size:10.5px;flex-shrink:0}
+.al{color:var(--danger);font-weight:700;font-size:10px}
+.ai-item{display:flex;align-items:center;gap:4px;cursor:pointer}
+.ai-item:hover{text-decoration:underline}
+.adot{width:5px;height:5px;border-radius:50%}
+.asep{color:var(--b2);margin:0 2px}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-card.bl::before{background:linear-gradient(90deg,var(--accent),transparent)}
+.kpi-card.ok::before{background:linear-gradient(90deg,var(--ok),transparent)}
+.kpi-card.warn::before{background:linear-gradient(90deg,var(--warn),transparent)}
+.kpi-card.danger::before{background:linear-gradient(90deg,var(--danger),transparent)}
+.kpi-card.pu::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.kpi-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1}
+.kpi-card.bl .kpi-val{color:var(--accent)}
+.kpi-card.ok .kpi-val{color:var(--ok)}
+.kpi-card.warn .kpi-val{color:var(--warn)}
+.kpi-card.danger .kpi-val{color:var(--danger)}
+.kpi-card.pu .kpi-val{color:var(--purple)}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.kpi-sub.up{color:var(--ok)}.kpi-sub.dn{color:var(--danger)}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border)}
+.card-title{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.card-action{font-size:10.5px;color:var(--accent);cursor:pointer}
+.card-body{padding:14px}
+.card-body-flush{padding:0}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+.tbl td{padding:8px 12px;font-size:11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.clickable:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+
+/* CHIPS/BADGES */
+.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.chip.danger{background:rgba(239,68,68,.15);color:var(--danger)}
+.chip.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.chip.ok{background:rgba(16,185,129,.15);color:var(--ok)}
+.chip.accent{background:rgba(59,130,246,.15);color:var(--accent)}
+.chip.purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.chip.cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
+.chip.muted{background:rgba(74,104,128,.15);color:var(--text2)}
+.chip.orange{background:rgba(249,115,22,.15);color:var(--orange)}
+
+/* GRID */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* OVERDUE */
+.overdue-days{color:var(--danger);font-weight:600;font-size:10.5px}
+
+/* FORM PANEL */
+.form-wrap{max-width:680px;margin:0 auto;padding:24px 18px}
+.form-header{margin-bottom:24px}
+.form-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
+.form-sub{font-size:12px;color:var(--muted)}
+.step-bar{display:flex;gap:0;margin-bottom:28px;position:relative}
+.step-bar::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:1px;background:var(--border)}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;z-index:1}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--s3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--muted);transition:all .2s}
+.step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.step-lbl{font-size:9px;color:var(--muted);text-align:center;line-height:1.3;max-width:60px}
+.step-lbl.active{color:var(--accent)}
+.step-lbl.done{color:var(--ok)}
+.form-section{display:none}
+.form-section.active{display:block}
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.type-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .14s}
+.type-card:hover{border-color:var(--b2);background:var(--s3)}
+.type-card.selected{border-color:var(--accent);background:rgba(59,130,246,.08)}
+.type-icon{font-size:22px;margin-bottom:6px}
+.type-label{font-size:10.5px;font-weight:600;color:var(--text2)}
+.type-card.selected .type-label{color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-label{font-size:10.5px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px}
+.form-label .req{color:var(--danger)}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .14s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent)}
+.form-select option{background:var(--s3)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-hint{font-size:10px;color:var(--muted)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:10px}
+.toggle-label{font-size:12px;color:var(--text)}
+.toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--b2);border-radius:20px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--ok)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);background:#fff}
+.upload-zone{border:1.5px dashed var(--border);border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:all .14s;margin-bottom:14px}
+.upload-zone:hover{border-color:var(--accent);background:rgba(59,130,246,.03)}
+.upload-icon{font-size:28px;margin-bottom:8px;opacity:.5}
+.upload-text{font-size:11.5px;color:var(--muted);line-height:1.6}
+.upload-text b{color:var(--accent)}
+.form-nav{display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid var(--border);margin-top:18px}
+.review-section{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:10px}
+.review-title{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600;margin-bottom:8px}
+.review-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.review-row:last-child{border-bottom:none}
+.review-row .rv{color:var(--text2)}
+.review-row .rk{color:var(--muted)}
+.success-card{background:linear-gradient(135deg,rgba(16,185,129,.06),rgba(59,130,246,.04));border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:24px;text-align:center}
+.success-icon{font-size:40px;margin-bottom:10px}
+.success-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ok);margin-bottom:6px}
+.success-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+
+/* BODY MAP */
+.body-map-wrap{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
+.body-map-col{flex:1;text-align:center}
+.body-map-lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.body-map-col svg .region{fill:rgba(59,130,246,.06);stroke:var(--border);stroke-width:1;cursor:pointer;transition:all .14s}
+.body-map-col svg .region:hover{fill:rgba(59,130,246,.2)}
+.body-map-col svg .region.selected{fill:rgba(239,68,68,.3);stroke:var(--danger)}
+.body-selected-list{flex-shrink:0;width:160px}
+.body-selected-lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.body-tag{display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:4px;padding:3px 7px;font-size:10px;color:var(--danger);margin-bottom:4px}
+.body-none{font-size:10.5px;color:var(--muted);font-style:italic}
+
+/* DETAIL PANEL */
+.detail-wrap{max-width:760px;margin:0 auto;padding:24px 18px}
+.detail-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px}
+.detail-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.detail-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.detail-badges{display:flex;flex-wrap:wrap;gap:5px}
+.timeline{display:flex;align-items:center;gap:0;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.tl-node{width:28px;height:28px;border-radius:50%;background:var(--s3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.tl-node.done{background:var(--ok);border-color:var(--ok)}
+.tl-node.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.tl-lbl{font-size:8.5px;color:var(--muted);margin-top:4px;text-align:center;max-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-lbl.done{color:var(--ok)}.tl-lbl.active{color:var(--accent)}
+.tl-line{flex:1;height:1.5px;background:var(--border);min-width:20px;max-width:60px;margin-bottom:18px}
+.tl-line.done{background:var(--ok)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.detail-fact{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.detail-fact-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.detail-fact-val{font-size:12px;color:var(--text);font-weight:500}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:9px;margin-top:18px}
+.desc-box{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+.capa-item{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
+.capa-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.capa-info{flex:1}
+.capa-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.capa-meta{font-size:10.5px;color:var(--muted)}
+.capa-status{flex-shrink:0}
+.add-capa-form{background:var(--s2);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:14px;margin-top:10px;display:none}
+.add-capa-form.open{display:block}
+.empty-state{text-align:center;padding:28px;color:var(--muted);font-size:11.5px}
+.empty-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+
+/* CHART */
+.chart-container{position:relative;height:100px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chart-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.chart-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* AUTOCOMPLETE */
+.ac-wrap{position:relative}
+.ac-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--s3);border:1px solid var(--border);border-radius:6px;max-height:160px;overflow-y:auto;z-index:200;display:none}
+.ac-item{padding:7px 11px;font-size:11.5px;cursor:pointer;border-bottom:1px solid var(--border)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:var(--s4)}
+.ac-item .ac-name{font-weight:500}
+.ac-item .ac-sub{font-size:10px;color:var(--muted)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* LOADING */
+.spinner{width:32px;height:32px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px}
+.loading-wrap span{font-size:12px;color:var(--muted)}
+
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:12px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s;min-width:220px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+
+@media(max-width:768px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .type-grid{grid-template-columns:repeat(4,1fr)}
+  .detail-grid{grid-template-columns:1fr 1fr}
+  .topbar-center{display:none}
+}
+@media(max-width:480px){
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-strip{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">🛡️</div>
+    <div>
+      <div class="logo-title">Incident Reporting & CAPA</div>
+      <div class="logo-sub">Vigil HSE Platform</div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="breadcrumb">
+      <span>Northern Express Transport</span>
+      <span style="color:var(--border)">›</span>
+      <b>Incidents</b>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lpill"><div class="pd"></div><span id="worker-pill">— Workers</span></div>
+    <div class="co-tag">🚛 Northern Express Transport</div>
+    <button class="btn btn-primary" onclick="showPanel('form')">🚨 Report Incident</button>
+  </div>
+</header>
+
+<!-- ALERT STRIP -->
+<div class="astrip" id="astrip" style="display:none">
+  <span class="al">⚠️ Alerts:</span>
+  <span id="astrip-content"></span>
+  <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="document.getElementById('astrip').style.display='none'">✕</button>
+</div>
+
+<!-- MAIN PANELS -->
+<div class="main">
+
+  <!-- PANEL 1: DASHBOARD -->
+  <div class="panel" id="panel-dash">
+    <div class="panel-pad">
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-card danger">
+          <div class="kpi-label">Total Incidents YTD</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub" id="kpi-total-sub">Loading…</div>
+        </div>
+        <div class="kpi-card warn">
+          <div class="kpi-label">Open Investigations</div>
+          <div class="kpi-val" id="kpi-open">—</div>
+          <div class="kpi-sub" id="kpi-open-sub">Active cases</div>
+        </div>
+        <div class="kpi-card ok">
+          <div class="kpi-label">CAPA Closure Rate</div>
+          <div class="kpi-val" id="kpi-capa-rate">—</div>
+          <div class="kpi-sub" id="kpi-capa-sub">Loading…</div>
+        </div>
+        <div class="kpi-card bl">
+          <div class="kpi-label">Days Since Last LTI</div>
+          <div class="kpi-val" id="kpi-days-lti">—</div>
+          <div class="kpi-sub" id="kpi-days-lti-sub">Lost time injury</div>
+        </div>
+      </div>
+
+      <!-- CHART + CAPA TRACKER -->
+      <div class="row2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📊 Incident Trend — Last 12 Months</div>
+            <div id="chart-total-badge" style="font-size:10.5px;color:var(--muted)"></div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <svg id="trend-chart" width="100%" height="100" viewBox="0 0 600 100" preserveAspectRatio="none"></svg>
+            </div>
+            <div class="chart-legend" id="chart-legend"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">⚡ CAPA Tracker</div>
+            <span class="chip warn" id="capa-overdue-badge" style="display:none"></span>
+          </div>
+          <div class="card-body-flush">
+            <div id="capa-list">
+              <div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INCIDENTS TABLE -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">🚨 Active Incidents
+            <span class="chip danger" id="active-count-badge" style="display:none"></span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="form-select" id="filter-status" style="width:auto;padding:3px 8px;font-size:10.5px" onchange="filterIncidents()">
+              <option value="">All Status</option>
+              <option value="reported">Reported</option>
+              <option value="under_investigation">Under Investigation</option>
+              <option value="capa_open">CAPA Open</option>
+              <option value="capa_complete">CAPA Complete</option>
+              <option value="approved">Approved</option>
+              <option value="closed">Closed</option>
+            </select>
+            <select class="form-select" id="filter-type" style="width:auto;padding:3px 8px;font-size:10.5px" onchange="filterIncidents()">
+              <option value="">All Types</option>
+              <option value="injury">Injury</option>
+              <option value="near_miss">Near Miss</option>
+              <option value="vehicle">Vehicle</option>
+              <option value="environmental">Environmental</option>
+              <option value="property_damage">Property Damage</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body-flush">
+          <div id="incidents-table">
+            <div class="loading-wrap"><div class="spinner"></div><span>Loading incidents…</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 2: REPORT INCIDENT FORM -->
+  <div class="panel hidden" id="panel-form">
+    <div class="form-wrap">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <div style="flex:1;display:flex;align-items:center;gap:10px">
+          <div>
+            <div class="form-title">Report an Incident</div>
+            <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="flex-shrink:0;color:var(--muted)">✕ Cancel</button>
+      </div>
+
+      <!-- STEP INDICATOR -->
+      <div class="step-bar" id="step-bar">
+        <div class="step-item">
+          <div class="step-dot active" id="sdot-1">1</div>
+          <div class="step-lbl active" id="slbl-1">What<br>Happened</div>
+        </div>
+        <div class="tl-line"></div>
+        <div class="step-item">
+          <div class="step-dot" id="sdot-2">2</div>
+          <div class="step-lbl" id="slbl-2">Who Was<br>Involved</div>
+        </div>
+        <div class="tl-line"></div>
+        <div class="step-item">
+          <div class="step-dot" id="sdot-3">3</div>
+          <div class="step-lbl" id="slbl-3">Injury<br>Details</div>
+        </div>
+        <div class="tl-line"></div>
+        <div class="step-item">
+          <div class="step-dot" id="sdot-4">4</div>
+          <div class="step-lbl" id="slbl-4">Description<br>& Actions</div>
+        </div>
+        <div class="tl-line"></div>
+        <div class="step-item">
+          <div class="step-dot" id="sdot-5">5</div>
+          <div class="step-lbl" id="slbl-5">Review<br>& Submit</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: WHAT HAPPENED -->
+      <div class="form-section active" id="step-1">
+        <div class="form-label" style="margin-bottom:12px;font-size:13px;color:var(--text)">Select Incident Type <span class="req">*</span></div>
+        <div class="type-grid" id="type-grid">
+          <div class="type-card" data-type="injury" onclick="selectType(this,'injury')"><div class="type-icon">🤕</div><div class="type-label">Injury</div></div>
+          <div class="type-card" data-type="near_miss" onclick="selectType(this,'near_miss')"><div class="type-icon">⚠️</div><div class="type-label">Near Miss</div></div>
+          <div class="type-card" data-type="vehicle" onclick="selectType(this,'vehicle')"><div class="type-icon">🚛</div><div class="type-label">Vehicle</div></div>
+          <div class="type-card" data-type="property_damage" onclick="selectType(this,'property_damage')"><div class="type-icon">🏗️</div><div class="type-label">Property</div></div>
+          <div class="type-card" data-type="environmental" onclick="selectType(this,'environmental')"><div class="type-icon">🌿</div><div class="type-label">Environmental</div></div>
+          <div class="type-card" data-type="fire" onclick="selectType(this,'fire')"><div class="type-icon">🔥</div><div class="type-label">Fire</div></div>
+          <div class="type-card" data-type="spill" onclick="selectType(this,'spill')"><div class="type-icon">🛢️</div><div class="type-label">Spill</div></div>
+          <div class="type-card" data-type="security" onclick="selectType(this,'security')"><div class="type-icon">🔒</div><div class="type-label">Security</div></div>
+        </div>
+
+        <div id="severity-suggestion" style="display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--warn);margin-bottom:14px">
+          💡 <span id="severity-hint"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Incident Date <span class="req">*</span></label>
+            <input type="date" class="form-input" id="f-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Incident Time</label>
+            <input type="time" class="form-input" id="f-time">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Site <span class="req">*</span></label>
+            <select class="form-select" id="f-site">
+              <option value="">— Select site —</option>
+              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
+              <option value="Edmonton Hub">Edmonton Hub</option>
+              <option value="Site B Pipeline">Site B Pipeline</option>
+              <option value="Red Deer Terminal">Red Deer Terminal</option>
+              <option value="Highway / En Route">Highway / En Route</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location Detail</label>
+            <input type="text" class="form-input" id="f-location" placeholder="e.g. Loading dock B, Bay 3…">
+          </div>
+        </div>
+        <div class="form-nav">
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-primary" onclick="goStep(2)">Next: Who Was Involved →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: WHO WAS INVOLVED -->
+      <div class="form-section" id="step-2">
+        <div class="form-group">
+          <label class="form-label">Worker Involved</label>
+          <div class="ac-wrap">
+            <input type="text" class="form-input" id="f-worker-search" placeholder="Search worker name…" autocomplete="off" oninput="workerSearch(this.value)">
+            <div class="ac-dropdown" id="worker-ac"></div>
+          </div>
+          <input type="hidden" id="f-worker-id">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Reported By</label>
+            <input type="text" class="form-input" id="f-reported-by" readonly style="opacity:.7">
+            <input type="hidden" id="f-reported-by-id">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" class="form-input" id="f-department" placeholder="e.g. Operations, Field Services…">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Job Title at Time of Incident</label>
+          <input type="text" class="form-input" id="f-job-title" placeholder="Auto-filled when worker selected">
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(3)">Next: Injury Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: INJURY DETAILS (injury type only) -->
+      <div class="form-section" id="step-3">
+        <div id="step3-injury-fields">
+          <div class="section-title" style="margin-top:0">Body Map — Select Injury Location(s)</div>
+          <div class="body-map-wrap">
+            <div class="body-map-col">
+              <div class="body-map-lbl">Front View</div>
+              <svg viewBox="0 0 100 220" width="110" height="220">
+                <!-- Head -->
+                <ellipse class="region" data-region="Head" cx="50" cy="18" rx="16" ry="16" onclick="toggleBodyRegion(this)"/>
+                <!-- Neck -->
+                <rect class="region" data-region="Neck" x="42" y="33" width="16" height="10" rx="3" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Shoulder -->
+                <ellipse class="region" data-region="Left Shoulder" cx="24" cy="50" rx="12" ry="10" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Shoulder -->
+                <ellipse class="region" data-region="Right Shoulder" cx="76" cy="50" rx="12" ry="10" onclick="toggleBodyRegion(this)"/>
+                <!-- Chest/Torso -->
+                <rect class="region" data-region="Chest" x="33" y="44" width="34" height="30" rx="4" onclick="toggleBodyRegion(this)"/>
+                <!-- Abdomen -->
+                <rect class="region" data-region="Abdomen" x="33" y="75" width="34" height="22" rx="4" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Upper Arm -->
+                <rect class="region" data-region="Left Upper Arm" x="13" y="60" width="12" height="28" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Upper Arm -->
+                <rect class="region" data-region="Right Upper Arm" x="75" y="60" width="12" height="28" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Lower Arm -->
+                <rect class="region" data-region="Left Forearm" x="10" y="90" width="11" height="26" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Lower Arm -->
+                <rect class="region" data-region="Right Forearm" x="79" y="90" width="11" height="26" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Hand -->
+                <ellipse class="region" data-region="Left Hand" cx="15" cy="125" rx="9" ry="7" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Hand -->
+                <ellipse class="region" data-region="Right Hand" cx="85" cy="125" rx="9" ry="7" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Upper Leg -->
+                <rect class="region" data-region="Left Upper Leg" x="30" y="100" width="17" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Upper Leg -->
+                <rect class="region" data-region="Right Upper Leg" x="53" y="100" width="17" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Lower Leg -->
+                <rect class="region" data-region="Left Lower Leg" x="31" y="140" width="14" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Lower Leg -->
+                <rect class="region" data-region="Right Lower Leg" x="55" y="140" width="14" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <!-- Left Foot -->
+                <ellipse class="region" data-region="Left Foot" cx="37" cy="184" rx="11" ry="7" onclick="toggleBodyRegion(this)"/>
+                <!-- Right Foot -->
+                <ellipse class="region" data-region="Right Foot" cx="63" cy="184" rx="11" ry="7" onclick="toggleBodyRegion(this)"/>
+              </svg>
+            </div>
+            <div class="body-map-col">
+              <div class="body-map-lbl">Back View</div>
+              <svg viewBox="0 0 100 220" width="110" height="220">
+                <ellipse class="region" data-region="Back of Head" cx="50" cy="18" rx="16" ry="16" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Upper Back" x="33" y="44" width="34" height="28" rx="4" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Lower Back" x="33" y="73" width="34" height="24" rx="4" onclick="toggleBodyRegion(this)"/>
+                <ellipse class="region" data-region="Left Shoulder (Back)" cx="24" cy="50" rx="12" ry="10" onclick="toggleBodyRegion(this)"/>
+                <ellipse class="region" data-region="Right Shoulder (Back)" cx="76" cy="50" rx="12" ry="10" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Left Upper Arm (Back)" x="13" y="60" width="12" height="28" rx="5" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Right Upper Arm (Back)" x="75" y="60" width="12" height="28" rx="5" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Left Hamstring" x="30" y="100" width="17" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Right Hamstring" x="53" y="100" width="17" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Left Calf" x="31" y="140" width="14" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+                <rect class="region" data-region="Right Calf" x="55" y="140" width="14" height="38" rx="5" onclick="toggleBodyRegion(this)"/>
+              </svg>
+            </div>
+            <div class="body-selected-list">
+              <div class="body-selected-lbl">Selected Areas</div>
+              <div id="body-selected">
+                <div class="body-none">Click a region on the diagram</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Injury Type</label>
+              <select class="form-select" id="f-injury-type">
+                <option value="">— Select —</option>
+                <option value="strain_sprain">Strain / Sprain</option>
+                <option value="laceration">Laceration / Cut</option>
+                <option value="fracture">Fracture</option>
+                <option value="contusion">Contusion / Bruising</option>
+                <option value="burn">Burn</option>
+                <option value="chemical_exposure">Chemical Exposure</option>
+                <option value="eye_injury">Eye Injury</option>
+                <option value="hearing_loss">Hearing Loss</option>
+                <option value="repetitive_strain">Repetitive Strain</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Treatment Type <span class="req">*</span></label>
+              <select class="form-select" id="f-treatment" onchange="treatmentChanged()">
+                <option value="">— Select —</option>
+                <option value="first_aid">First Aid (on-site)</option>
+                <option value="medical_aid">Medical Aid (clinic/doctor)</option>
+                <option value="hospitalization">Hospitalization</option>
+                <option value="fatality">Fatality</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">Was this a Lost Time Injury (LTI)?</span>
+            <label class="toggle"><input type="checkbox" id="f-lost-time" onchange="lostTimeChanged()"><span class="toggle-slider"></span></label>
+          </div>
+          <div id="lost-time-days-wrap" style="display:none;margin-bottom:10px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Lost Time Days</label>
+              <input type="number" class="form-input" id="f-lost-days" min="1" placeholder="Number of days away">
+            </div>
+          </div>
+        </div>
+        <div id="step3-noinjury" style="display:none;padding:24px 0;text-align:center">
+          <div style="font-size:32px;margin-bottom:8px;opacity:.4">✓</div>
+          <div style="font-size:13px;color:var(--muted)">No injury details required for this incident type</div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(4)">Next: Description →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: DESCRIPTION & ACTIONS -->
+      <div class="form-section" id="step-4">
+        <div class="form-group">
+          <label class="form-label">Incident Description <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-description" rows="4" placeholder="Describe what happened — what was the sequence of events leading to the incident?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Immediate Actions Taken</label>
+          <textarea class="form-textarea" id="f-immediate-actions" rows="3" placeholder="What was done immediately after the incident? (first aid, area secured, notified supervisor…)"></textarea>
+        </div>
+
+        <div class="upload-zone" onclick="toast('📎 File upload available in full release')">
+          <div class="upload-icon">📸</div>
+          <div class="upload-text"><b>Drop photos here</b> or click to upload<br>JPG, PNG, PDF — max 10MB each</div>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Is this incident OSHA/WCB recordable?</span>
+          <label class="toggle"><input type="checkbox" id="f-recordable"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row" style="margin-bottom:14px">
+          <span class="toggle-label">Is regulatory reporting required?</span>
+          <label class="toggle"><input type="checkbox" id="f-regulatory" onchange="regulatoryChanged()"><span class="toggle-slider"></span></label>
+        </div>
+        <div id="regulatory-body-wrap" style="display:none;margin-bottom:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Regulatory Body</label>
+            <select class="form-select" id="f-reg-body">
+              <option value="WorkSafe Alberta">WorkSafe Alberta (OHS)</option>
+              <option value="TC">Transport Canada (TC)</option>
+              <option value="AEP">Alberta Environment and Parks (AEP)</option>
+              <option value="OSHA">OSHA</option>
+              <option value="EPA">EPA</option>
+              <option value="TSB">TSB — Transportation Safety Board</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(5)">Review & Submit →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: REVIEW & SUBMIT -->
+      <div class="form-section" id="step-5">
+        <div id="review-content"></div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+          </div>
+          <button class="btn btn-ok" id="submit-btn" onclick="submitIncident()">✓ Submit Incident Report</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS STATE (shown after submit) -->
+      <div id="form-success" style="display:none">
+        <div class="success-card">
+          <div class="success-icon">✅</div>
+          <div class="success-num" id="success-num">INC-2026-0002</div>
+          <div class="success-sub">Incident reported successfully. The investigation team has been notified.</div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="showPanel('dash')">← Back to Dashboard</button>
+            <button class="btn btn-primary" id="add-capa-after-btn" onclick="addCapaAfterSubmit()">+ Add Corrective Action</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 3: INCIDENT DETAIL -->
+  <div class="panel hidden" id="panel-detail">
+    <div class="detail-wrap">
+      <div style="margin-bottom:16px">
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('dash')">← Back to Incidents</button>
+      </div>
+      <div id="detail-content">
+        <div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const API = 'https://vigil-production-17ca.up.railway.app';
+const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+const LOGGED_IN = {id:'1a549387-4fcd-40f5-838f-9dee721701d2', name:'James Marchetti'};
+
+// ── STATE ─────────────────────────────────────────────────────
+let token = null;
+let incidents = [];
+let capas = [];
+let workers = [];
+let stats = null;
+let currentPanel = 'dash';
+let newIncidentId = null;
+let bodySelected = new Set();
+let formStep = 1;
+let formData = {};
+
+// ── HELPERS ───────────────────────────────────────────────────
+async function apiGet(path) {
+  const r = await fetch(API + path, {headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}});
+  if (!r.ok) return null;
+  return r.json().catch(() => null);
+}
+async function apiPost(path, body) {
+  const r = await fetch(API + path, {method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return {ok: r.ok, status: r.status, data: await r.json().catch(() => null)};
+}
+function fmt(str) {
+  if (!str) return '—';
+  return str.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtShortDate(s) {
+  if (!s) return '—';
+  const d = new Date(s);
+  return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+}
+function daysSince(s) {
+  if (!s) return null;
+  return Math.floor((Date.now() - new Date(s).getTime()) / 86400000);
+}
+function daysUntil(s) {
+  if (!s) return null;
+  return Math.ceil((new Date(s).getTime() - Date.now()) / 86400000);
+}
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'ok' ? 'rgba(16,185,129,.15)' : type === 'danger' ? 'rgba(239,68,68,.15)' : 'var(--s3)';
+  t.style.borderColor = type === 'ok' ? 'rgba(16,185,129,.3)' : type === 'danger' ? 'rgba(239,68,68,.3)' : 'var(--border)';
+  t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+  setTimeout(() => { t.style.transform = 'translateY(60px)'; t.style.opacity = '0'; }, 3000);
+}
+
+// ── SEVERITY / TYPE CHIP HELPERS ──────────────────────────────
+function sevChip(s) {
+  const map = {
+    near_miss:  ['muted','Near Miss'],
+    first_aid:  ['accent','First Aid'],
+    minor:      ['warn','Minor'],
+    serious:    ['orange','Serious'],
+    critical:   ['danger','Critical'],
+    fatality:   ['danger','Fatality'],
+  };
+  const [cls, lbl] = map[s] || ['muted', fmt(s)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function typeChip(t) {
+  const map = {
+    injury:          ['danger','🤕 Injury'],
+    near_miss:       ['ok','⚠️ Near Miss'],
+    vehicle:         ['warn','🚛 Vehicle'],
+    environmental:   ['cyan','🌿 Environmental'],
+    property_damage: ['accent','🏗️ Property'],
+    fire:            ['orange','🔥 Fire'],
+    spill:           ['orange','🛢️ Spill'],
+    security:        ['muted','🔒 Security'],
+  };
+  const [cls, lbl] = map[t] || ['muted', fmt(t)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function statusChip(s) {
+  const map = {
+    reported:           ['accent','Reported'],
+    under_investigation:['warn','Investigating'],
+    capa_open:          ['orange','CAPA Open'],
+    capa_complete:      ['ok','CAPA Done'],
+    approved:           ['ok','Approved'],
+    closed:             ['muted','Closed'],
+  };
+  const [cls, lbl] = map[s] || ['muted', fmt(s)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function priorityChip(p) {
+  const map = {critical:['danger','Critical'],high:['orange','High'],medium:['warn','Medium'],low:['accent','Low']};
+  const [cls, lbl] = map[p] || ['muted', fmt(p)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  const ar = await fetch(API + '/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(AUTH)});
+  if (!ar.ok) { toast('⚠️ Could not connect to Vigil API', 'danger'); return; }
+  const ab = await ar.json();
+  token = ab.token || ab.access_token || (ab.data && ab.data.token);
+  if (!token) return;
+
+  const [incData, capaData, statsData, workerData] = await Promise.all([
+    apiGet('/api/incidents?limit=100'),
+    apiGet('/api/corrective-actions?limit=100'),
+    apiGet('/api/incidents/stats?hours_worked=94000'),
+    apiGet('/api/workers?limit=100'),
+  ]);
+
+  incidents = (incData && incData.incidents) || [];
+  capas     = (capaData && capaData.corrective_actions) || [];
+  stats     = statsData || {};
+  workers   = (workerData && workerData.workers) || [];
+
+  // Worker count pill
+  const wc = document.getElementById('worker-pill');
+  if (wc) wc.textContent = `${workers.length} Workers`;
+
+  // Form auto-fill
+  const rfb = document.getElementById('f-reported-by');
+  if (rfb) rfb.value = LOGGED_IN.name;
+  document.getElementById('f-reported-by-id').value = LOGGED_IN.id;
+  // Default date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('f-date').value = today;
+
+  renderKPIs();
+  renderChart();
+  renderIncidentsTable();
+  renderCapaList();
+  buildAlertStrip();
+}
+
+// ── KPIs ──────────────────────────────────────────────────────
+function renderKPIs() {
+  const s = stats.summary || {};
+  const rates = stats.rates || {};
+
+  // Total YTD
+  document.getElementById('kpi-total').textContent = s.total_incidents || 0;
+  const byType = stats.by_type || [];
+  const typeSummary = byType.map(t => `${t.count} ${fmt(t.incident_type)}`).join(' · ');
+  document.getElementById('kpi-total-sub').textContent = typeSummary || 'YTD';
+
+  // Open investigations
+  const openInc = incidents.filter(i => !['closed','approved','capa_complete'].includes(i.workflow_status));
+  document.getElementById('kpi-open').textContent = openInc.length;
+  const openBySev = openInc.filter(i => i.severity === 'serious').length;
+  document.getElementById('kpi-open-sub').textContent = openBySev > 0 ? `${openBySev} serious` : 'Active cases';
+  document.getElementById('kpi-open-sub').className = 'kpi-sub' + (openBySev > 0 ? ' dn' : '');
+
+  // CAPA closure rate
+  const capaTotal = capas.length;
+  const capaCompleted = capas.filter(c => c.status === 'completed').length;
+  const capaPct = capaTotal > 0 ? Math.round((capaCompleted / capaTotal) * 100) : 0;
+  const capaOverdue = capas.filter(c => c.is_overdue).length;
+  document.getElementById('kpi-capa-rate').textContent = `${capaPct}%`;
+  document.getElementById('kpi-capa-sub').textContent = capaOverdue > 0 ? `${capaOverdue} overdue` : `${capaCompleted}/${capaTotal} closed`;
+  document.getElementById('kpi-capa-sub').className = 'kpi-sub' + (capaOverdue > 0 ? ' dn' : ' up');
+
+  // Days since last LTI
+  const ltiIncidents = incidents.filter(i => i.was_lost_time);
+  if (ltiIncidents.length > 0) {
+    const lastLTI = ltiIncidents.reduce((a, b) => new Date(a.incident_date) > new Date(b.incident_date) ? a : b);
+    const days = daysSince(lastLTI.incident_date);
+    document.getElementById('kpi-days-lti').textContent = days;
+    document.getElementById('kpi-days-lti-sub').textContent = `Last: ${fmtShortDate(lastLTI.incident_date)}`;
+  } else {
+    document.getElementById('kpi-days-lti').textContent = '—';
+    document.getElementById('kpi-days-lti-sub').textContent = 'No LTI on record';
+  }
+}
+
+// ── TREND CHART ───────────────────────────────────────────────
+function renderChart() {
+  const byMonth = stats.by_month || [];
+  if (!byMonth.length) return;
+
+  const sorted = [...byMonth].sort((a, b) => new Date(a.month) - new Date(b.month));
+  const maxCount = Math.max(...sorted.map(m => m.count), 1);
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const W = 600, H = 100;
+  const barW = Math.floor(W / sorted.length) - 4;
+  const gap = (W - barW * sorted.length) / (sorted.length + 1);
+
+  let bars = '';
+  let labels = '';
+  sorted.forEach((m, i) => {
+    const d = new Date(m.month);
+    const lbl = `${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+    const barH = m.count > 0 ? Math.max(Math.round((m.count / maxCount) * 75), 6) : 0;
+    const x = gap + i * (barW + gap);
+    const y = H - barH - 18;
+    const color = m.lost_time_count > 0 ? '#EF4444' : '#3B82F6';
+    if (barH > 0) {
+      bars += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2" fill="${color}" opacity=".8">
+        <title>${lbl}: ${m.count} incident${m.count !== 1 ? 's' : ''}${m.lost_time_count ? ` (${m.lost_time_count} LTI)` : ''}</title>
+      </rect>`;
+      if (m.count > 0) bars += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" fill="#8AAAC4" font-size="9" font-family="DM Sans">${m.count}</text>`;
+    }
+    labels += `<text x="${x + barW/2}" y="${H - 2}" text-anchor="middle" fill="#4A6880" font-size="9" font-family="DM Sans">${lbl}</text>`;
+  });
+
+  document.getElementById('trend-chart').innerHTML = bars + labels;
+
+  // Legend
+  const byType = stats.by_type || [];
+  const typeColors = {injury:'#EF4444',near_miss:'#10B981',vehicle:'#F59E0B',environmental:'#06B6D4',property_damage:'#3B82F6'};
+  const legendHtml = byType.map(t => `
+    <div class="chart-leg-item">
+      <div class="chart-leg-dot" style="background:${typeColors[t.incident_type] || '#4A6880'}"></div>
+      ${fmt(t.incident_type)}: <b style="color:var(--text)">${t.count}</b>
+    </div>
+  `).join('');
+  document.getElementById('chart-legend').innerHTML = legendHtml;
+  document.getElementById('chart-total-badge').textContent = `${byMonth.reduce((s,m) => s+m.count, 0)} total`;
+}
+
+// ── INCIDENTS TABLE ───────────────────────────────────────────
+function renderIncidentsTable(filtered) {
+  const list = filtered || incidents;
+  const el = document.getElementById('incidents-table');
+
+  const active = incidents.filter(i => !['closed'].includes(i.workflow_status));
+  const badge = document.getElementById('active-count-badge');
+  badge.textContent = `${active.length} active`;
+  badge.style.display = '';
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>No incidents found</div>`;
+    return;
+  }
+  el.innerHTML = `<table class="tbl">
+    <thead>
+      <tr>
+        <th>Incident #</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Severity</th>
+        <th>Site</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${list.map(i => `
+        <tr class="clickable" onclick="showDetail('${i.id}')">
+          <td><b style="color:var(--accent);font-family:'Syne',sans-serif;font-size:11px">${i.incident_number}</b></td>
+          <td style="max-width:220px">
+            <div style="font-weight:500;line-height:1.35">${i.title}</div>
+            <div style="font-size:9.5px;color:var(--muted)">${i.worker_involved_first_name ? i.worker_involved_first_name + ' ' + i.worker_involved_last_name : ''}</div>
+          </td>
+          <td>${typeChip(i.incident_type)}</td>
+          <td>${sevChip(i.severity)}</td>
+          <td style="font-size:10.5px;color:var(--text2)">${i.site || '—'}</td>
+          <td style="font-size:10.5px;color:var(--text2)">${fmtShortDate(i.incident_date)}</td>
+          <td>${statusChip(i.workflow_status)}</td>
+          <td onclick="event.stopPropagation()">
+            <button class="btn btn-ghost btn-sm" onclick="showDetail('${i.id}')">View →</button>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+}
+
+function filterIncidents() {
+  const status = document.getElementById('filter-status').value;
+  const type   = document.getElementById('filter-type').value;
+  const filtered = incidents.filter(i =>
+    (!status || i.workflow_status === status) &&
+    (!type   || i.incident_type === type)
+  );
+  renderIncidentsTable(filtered);
+}
+
+// ── CAPA LIST ─────────────────────────────────────────────────
+function renderCapaList() {
+  const el = document.getElementById('capa-list');
+  const openCapas = capas.filter(c => c.status !== 'completed');
+  const overdue = capas.filter(c => c.is_overdue);
+  const badge = document.getElementById('capa-overdue-badge');
+  if (overdue.length > 0) {
+    badge.textContent = `${overdue.length} overdue`;
+    badge.style.display = '';
+  }
+
+  if (!openCapas.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div>No open CAPAs</div>`;
+    return;
+  }
+  el.innerHTML = openCapas.map(c => {
+    const due = daysUntil(c.due_date);
+    const dueStr = c.is_overdue
+      ? `<span class="overdue-days">⚠️ ${c.days_overdue}d overdue</span>`
+      : due != null ? `<span style="font-size:10px;color:var(--muted)">Due ${fmtShortDate(c.due_date)}</span>` : '';
+    const assignee = c.assignee_first_name ? `${c.assignee_first_name} ${c.assignee_last_name}` : '—';
+    return `<div style="display:flex;align-items:flex-start;gap:9px;padding:10px 14px;border-bottom:1px solid var(--border)">
+      <div style="width:7px;height:7px;border-radius:50%;background:${c.is_overdue ? 'var(--danger)' : c.priority === 'high' || c.priority === 'critical' ? 'var(--warn)' : 'var(--accent)'};margin-top:4px;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11.5px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${priorityChip(c.priority)}
+          <span style="font-size:9.5px;color:var(--muted)">${c.incident_number || ''}</span>
+          <span style="font-size:9.5px;color:var(--muted)">→ ${assignee}</span>
+          ${dueStr}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ALERT STRIP ───────────────────────────────────────────────
+function buildAlertStrip() {
+  const openInc = incidents.filter(i => !['closed','approved'].includes(i.workflow_status)).length;
+  const overdueCapas = capas.filter(c => c.is_overdue).length;
+  const seriousInc = incidents.filter(i => i.severity === 'serious' && i.workflow_status !== 'closed').length;
+  if (!openInc && !overdueCapas && !seriousInc) return;
+  const strip = document.getElementById('astrip');
+  const parts = [];
+  if (seriousInc > 0) parts.push(`<div class="ai-item" style="color:var(--danger)"><div class="adot" style="background:var(--danger)"></div>${seriousInc} serious incident${seriousInc>1?'s':''} open</div>`);
+  if (openInc > 0) parts.push(`<div class="ai-item" style="color:var(--warn)"><div class="adot" style="background:var(--warn)"></div>${openInc} open investigation${openInc>1?'s':''}</div>`);
+  if (overdueCapas > 0) parts.push(`<div class="ai-item" style="color:var(--orange)"><div class="adot" style="background:var(--orange)"></div>${overdueCapas} CAPA overdue</div>`);
+  document.getElementById('astrip-content').innerHTML = parts.join('<span class="asep">·</span>');
+  strip.style.display = 'flex';
+}
+
+// ── PANEL NAVIGATION ──────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+  const el = document.getElementById('panel-' + id);
+  if (el) el.classList.remove('hidden');
+  currentPanel = id;
+  if (id === 'form') resetForm();
+}
+function cancelForm() {
+  resetForm();
+  showPanel('dash');
+}
+
+// ── INCIDENT DETAIL ───────────────────────────────────────────
+function showDetail(id) {
+  const inc = incidents.find(i => i.id === id);
+  if (!inc) return;
+  showPanel('detail');
+  renderDetail(inc);
+}
+
+function renderDetail(inc) {
+  const incCapas = capas.filter(c => c.incident_id === inc.id);
+  const WORKFLOW = [
+    {key:'reported',         label:'Reported'},
+    {key:'under_investigation',label:'Investigation'},
+    {key:'capa_open',        label:'CAPA Open'},
+    {key:'capa_complete',    label:'CAPA Done'},
+    {key:'approved',         label:'Approved'},
+    {key:'closed',           label:'Closed'},
+  ];
+  const curIdx = WORKFLOW.findIndex(w => w.key === inc.workflow_status);
+
+  const timelineHtml = WORKFLOW.map((w, i) => {
+    const isDone   = i < curIdx;
+    const isActive = i === curIdx;
+    const dotCls   = isDone ? 'done' : isActive ? 'active' : '';
+    const lblCls   = isDone ? 'done' : isActive ? 'active' : '';
+    const lineCls  = i < WORKFLOW.length - 1 ? (isDone ? 'tl-line done' : 'tl-line') : '';
+    const icon     = isDone ? '✓' : isActive ? '●' : String(i + 1);
+    return `<div class="tl-step"><div class="tl-node ${dotCls}">${icon}</div><div class="tl-lbl ${lblCls}">${w.label}</div></div>${i < WORKFLOW.length - 1 ? `<div class="${lineCls}"></div>` : ''}`;
+  }).join('');
+
+  const worker = inc.worker_involved_first_name ? `${inc.worker_involved_first_name} ${inc.worker_involved_last_name}` : '—';
+  const reporter = inc.reported_by_first_name ? `${inc.reported_by_first_name} ${inc.reported_by_last_name}` : '—';
+  const investigator = inc.investigator_first_name ? `${inc.investigator_first_name} ${inc.investigator_last_name}` : '—';
+
+  const factsHtml = [
+    ['Incident Date', fmtDate(inc.incident_date)],
+    ['Reported Date', fmtDate(inc.reported_date)],
+    ['Site', inc.site || '—'],
+    ['Location Detail', inc.location_detail || '—'],
+    ['Department', inc.department || '—'],
+    ['Worker Involved', worker],
+    ['Reported By', reporter],
+    ['Assigned Investigator', investigator],
+    ['Treatment', fmt(inc.treatment_type)],
+    ['Lost Time', inc.was_lost_time ? `Yes — ${inc.lost_time_days || 0}d` : 'No'],
+    ['Recordable', inc.was_recordable ? 'Yes' : 'No'],
+    ['Regulatory Reportable', inc.is_regulatory_reportable ? 'Yes' : 'No'],
+  ].map(([k, v]) => `<div class="detail-fact"><div class="detail-fact-lbl">${k}</div><div class="detail-fact-val">${v}</div></div>`).join('');
+
+  const capasHtml = incCapas.length === 0
+    ? `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">📋</div>No CAPAs linked yet</div>`
+    : incCapas.map(c => {
+        const dot = c.status === 'completed' ? 'var(--ok)' : c.is_overdue ? 'var(--danger)' : 'var(--warn)';
+        const assignee = c.assignee_first_name ? `${c.assignee_first_name} ${c.assignee_last_name}` : '—';
+        const dueLabel = c.is_overdue ? `<span class="overdue-days">${c.days_overdue}d overdue</span>` : `Due ${fmtShortDate(c.due_date)}`;
+        return `<div class="capa-item">
+          <div class="capa-dot" style="background:${dot}"></div>
+          <div class="capa-info">
+            <div class="capa-title">${c.title}</div>
+            <div class="capa-meta">${priorityChip(c.priority)} &nbsp;→ ${assignee} &nbsp;${dueLabel}</div>
+            ${c.description ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px;line-height:1.5">${c.description}</div>` : ''}
+          </div>
+          <div class="capa-status">${c.status === 'completed' ? `<span class="chip ok">Closed</span>` : c.is_overdue ? `<span class="chip danger">Overdue</span>` : `<span class="chip warn">Open</span>`}</div>
+        </div>`;
+      }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-hdr">
+      <div>
+        <div class="detail-num">${inc.incident_number}</div>
+        <div class="detail-title">${inc.title}</div>
+        <div class="detail-badges">
+          ${typeChip(inc.incident_type)}
+          ${sevChip(inc.severity)}
+          ${statusChip(inc.workflow_status)}
+          ${inc.was_lost_time ? '<span class="chip danger">LTI</span>' : ''}
+          ${inc.was_recordable ? '<span class="chip orange">Recordable</span>' : ''}
+        </div>
+      </div>
+      <div style="flex-shrink:0;text-align:right">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:4px">Reported</div>
+        <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--text)">${fmtShortDate(inc.incident_date)}</div>
+        <div style="font-size:10px;color:var(--muted)">${daysSince(inc.incident_date)} days ago</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:0">Investigation Workflow</div>
+    <div class="timeline">${timelineHtml}</div>
+
+    <div class="section-title">Key Facts</div>
+    <div class="detail-grid">${factsHtml}</div>
+
+    ${inc.description ? `<div class="section-title">Description</div><div class="desc-box">${inc.description}</div>` : ''}
+    ${inc.immediate_actions ? `<div class="section-title">Immediate Actions</div><div class="desc-box">${inc.immediate_actions}</div>` : ''}
+    ${inc.root_cause_summary ? `<div class="section-title">Root Cause Summary</div><div class="desc-box">${inc.root_cause_summary}</div>` : ''}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px">
+      <div class="section-title" style="margin:0">Corrective Actions (${incCapas.length})</div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleAddCapaForm('${inc.id}')">+ Add CAPA</button>
+    </div>
+    ${capasHtml}
+
+    <div class="add-capa-form" id="add-capa-form">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">New Corrective Action</div>
+      <div class="form-group">
+        <label class="form-label">Title <span class="req">*</span></label>
+        <input type="text" class="form-input" id="capa-title" placeholder="e.g. Update SOP for confined space entry">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="capa-desc" rows="2" placeholder="Detail the corrective action required…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Assigned To</label>
+          <div class="ac-wrap">
+            <input type="text" class="form-input" id="capa-assignee-search" placeholder="Search worker…" autocomplete="off" oninput="capaWorkerSearch(this.value)">
+            <div class="ac-dropdown" id="capa-worker-ac"></div>
+          </div>
+          <input type="hidden" id="capa-assignee-id">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input type="date" class="form-input" id="capa-due">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="capa-priority">
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Action Type</label>
+          <select class="form-select" id="capa-action-type">
+            <option value="corrective">Corrective</option>
+            <option value="preventive">Preventive</option>
+            <option value="improvement">Improvement</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleAddCapaForm()">Cancel</button>
+        <button class="btn btn-ok btn-sm" onclick="submitCapa('${inc.id}')">+ Submit CAPA</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAddCapaForm(incId) {
+  const f = document.getElementById('add-capa-form');
+  if (f) f.classList.toggle('open');
+}
+
+async function submitCapa(incId) {
+  const title  = document.getElementById('capa-title').value.trim();
+  const desc   = document.getElementById('capa-desc').value.trim();
+  const assign = document.getElementById('capa-assignee-id').value;
+  const due    = document.getElementById('capa-due').value;
+  const prio   = document.getElementById('capa-priority').value;
+  const atype  = document.getElementById('capa-action-type').value;
+  if (!title) { toast('Title is required', 'danger'); return; }
+
+  const body = {title, description:desc, incident_id:incId, assigned_to:assign||LOGGED_IN.id, due_date:due||null, priority:prio, action_type:atype, assigned_by:LOGGED_IN.id};
+  const res = await apiPost('/api/corrective-actions', body);
+  if (res.ok) {
+    toast('✅ CAPA added', 'ok');
+    // Reload capas and re-render
+    const fresh = await apiGet('/api/corrective-actions?limit=100');
+    capas = (fresh && fresh.corrective_actions) || capas;
+    const inc = incidents.find(i => i.id === incId);
+    if (inc) renderDetail(inc);
+  } else {
+    toast('⚠️ Could not save — check API', 'danger');
+  }
+}
+
+// ── FORM ──────────────────────────────────────────────────────
+function resetForm() {
+  formStep = 1;
+  formData = {};
+  bodySelected.clear();
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('form-success').style.display = 'none';
+  document.getElementById('step-bar').style.display = 'flex';
+  document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+  document.querySelector('.form-nav') && null;
+  // Reset all inputs
+  ['f-date','f-time','f-location','f-department','f-job-title','f-description','f-immediate-actions','f-worker-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'f-date' ? new Date().toISOString().split('T')[0] : '';
+  });
+  ['f-site','f-injury-type','f-treatment'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['f-lost-time','f-recordable','f-regulatory'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+  document.getElementById('f-worker-id').value = '';
+  document.getElementById('regulatory-body-wrap').style.display = 'none';
+  document.getElementById('lost-time-days-wrap').style.display = 'none';
+  document.getElementById('severity-suggestion').style.display = 'none';
+  updateBodySelected();
+  goStep(1, true);
+}
+
+function goStep(n, silent) {
+  if (!silent) collectFormData();
+
+  // Validation on advance
+  if (!silent && n > formStep) {
+    if (formStep === 1) {
+      if (!formData.incident_type) { toast('Please select an incident type', 'danger'); return; }
+      if (!formData.incident_date) { toast('Please enter an incident date', 'danger'); return; }
+      if (!formData.site)          { toast('Please select a site', 'danger'); return; }
+    }
+    if (formStep === 4) {
+      if (!formData.description)   { toast('Description is required', 'danger'); return; }
+    }
+  }
+
+  formStep = n;
+  document.querySelectorAll('.form-section').forEach((s, i) => {
+    s.style.display = i + 1 === n ? 'block' : 'none';
+  });
+
+  // Step 3 — show/hide injury fields
+  if (n === 3) {
+    const isInjury = formData.incident_type === 'injury';
+    document.getElementById('step3-injury-fields').style.display = isInjury ? 'block' : 'none';
+    document.getElementById('step3-noinjury').style.display = isInjury ? 'none' : 'block';
+  }
+
+  // Step 5 — render review
+  if (n === 5) renderReview();
+
+  // Update step indicator
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.getElementById(`sdot-${i}`);
+    const lbl = document.getElementById(`slbl-${i}`);
+    if (!dot || !lbl) continue;
+    dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+    dot.textContent = i < n ? '✓' : String(i);
+    lbl.className = 'step-lbl' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+
+function collectFormData() {
+  const get = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+  const chk = id => { const e = document.getElementById(id); return e ? e.checked : false; };
+  Object.assign(formData, {
+    incident_type:   formData.incident_type || '',
+    incident_date:   get('f-date'),
+    incident_time:   get('f-time'),
+    site:            get('f-site'),
+    location_detail: get('f-location'),
+    worker_involved: get('f-worker-id'),
+    worker_name:     get('f-worker-search'),
+    department:      get('f-department'),
+    job_title:       get('f-job-title'),
+    injury_type:     get('f-injury-type'),
+    treatment_type:  get('f-treatment'),
+    was_lost_time:   chk('f-lost-time'),
+    lost_time_days:  get('f-lost-days') ? parseInt(get('f-lost-days')) : null,
+    description:     get('f-description'),
+    immediate_actions: get('f-immediate-actions'),
+    was_recordable:  chk('f-recordable'),
+    is_regulatory_reportable: chk('f-regulatory'),
+    body_regions:    [...bodySelected],
+    reported_by:     LOGGED_IN.id,
+  });
+}
+
+function selectType(el, type) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.incident_type = type;
+  // Severity suggestion
+  const hints = {
+    injury: 'Severity will be determined based on treatment type and lost time status.',
+    near_miss: 'Near miss incidents should be recorded even if no injury occurred — they are leading indicators.',
+    vehicle: 'Vehicle incidents may require DOT/TC regulatory reporting if involving commercial vehicles.',
+    environmental: 'Environmental incidents may trigger AEP or EPA reporting requirements.',
+    fire: 'Fire incidents should be reported to the fire authority and may require regulatory notification.',
+    spill: 'Spills may require immediate regulatory notification depending on volume and substance.',
+  };
+  const hint = hints[type];
+  if (hint) {
+    document.getElementById('severity-hint').textContent = hint;
+    document.getElementById('severity-suggestion').style.display = 'block';
+  } else {
+    document.getElementById('severity-suggestion').style.display = 'none';
+  }
+}
+
+function workerSearch(val) {
+  const ac = document.getElementById('worker-ac');
+  if (!val || val.length < 2) { ac.style.display = 'none'; return; }
+  const q = val.toLowerCase();
+  const matches = workers.filter(w => `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { ac.style.display = 'none'; return; }
+  ac.innerHTML = matches.map(w => `
+    <div class="ac-item" onclick="selectWorker('${w.id}','${w.first_name} ${w.last_name}','${w.job_title || ''}','${w.department || ''}')">
+      <div class="ac-name">${w.first_name} ${w.last_name}</div>
+      <div class="ac-sub">${w.job_title || ''} · ${w.site || ''}</div>
+    </div>
+  `).join('');
+  ac.style.display = 'block';
+}
+
+function selectWorker(id, name, jobTitle, dept) {
+  document.getElementById('f-worker-search').value = name;
+  document.getElementById('f-worker-id').value = id;
+  document.getElementById('f-job-title').value = jobTitle;
+  if (dept) document.getElementById('f-department').value = dept;
+  document.getElementById('worker-ac').style.display = 'none';
+  formData.worker_involved = id;
+  formData.worker_name = name;
+}
+
+function capaWorkerSearch(val) {
+  const ac = document.getElementById('capa-worker-ac');
+  if (!val || val.length < 2) { ac.style.display = 'none'; return; }
+  const q = val.toLowerCase();
+  const matches = workers.filter(w => `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)).slice(0, 6);
+  if (!matches.length) { ac.style.display = 'none'; return; }
+  ac.innerHTML = matches.map(w => `
+    <div class="ac-item" onclick="selectCapaWorker('${w.id}','${w.first_name} ${w.last_name}')">
+      <div class="ac-name">${w.first_name} ${w.last_name}</div>
+      <div class="ac-sub">${w.job_title || ''} · ${w.site || ''}</div>
+    </div>
+  `).join('');
+  ac.style.display = 'block';
+}
+
+function selectCapaWorker(id, name) {
+  document.getElementById('capa-assignee-search').value = name;
+  document.getElementById('capa-assignee-id').value = id;
+  document.getElementById('capa-worker-ac').style.display = 'none';
+}
+
+function treatmentChanged() {
+  const v = document.getElementById('f-treatment').value;
+  if (v === 'medical_aid' || v === 'hospitalization') {
+    document.getElementById('f-recordable').checked = true;
+  }
+  if (v === 'fatality') {
+    document.getElementById('f-recordable').checked = true;
+    document.getElementById('f-regulatory').checked = true;
+    regulatoryChanged();
+  }
+}
+
+function lostTimeChanged() {
+  const checked = document.getElementById('f-lost-time').checked;
+  document.getElementById('lost-time-days-wrap').style.display = checked ? 'block' : 'none';
+  if (checked) document.getElementById('f-recordable').checked = true;
+}
+
+function regulatoryChanged() {
+  const checked = document.getElementById('f-regulatory').checked;
+  document.getElementById('regulatory-body-wrap').style.display = checked ? 'block' : 'none';
+}
+
+// Body map
+function toggleBodyRegion(el) {
+  const region = el.dataset.region;
+  if (bodySelected.has(region)) {
+    bodySelected.delete(region);
+    el.classList.remove('selected');
+  } else {
+    bodySelected.add(region);
+    el.classList.add('selected');
+  }
+  updateBodySelected();
+}
+
+function updateBodySelected() {
+  const el = document.getElementById('body-selected');
+  if (!el) return;
+  if (bodySelected.size === 0) {
+    el.innerHTML = '<div class="body-none">Click a region on the diagram</div>';
+  } else {
+    el.innerHTML = [...bodySelected].map(r =>
+      `<div class="body-tag">${r} <span onclick="removeBodyRegion('${r}')" style="cursor:pointer;margin-left:4px;opacity:.7">×</span></div>`
+    ).join('');
+  }
+}
+
+function removeBodyRegion(r) {
+  bodySelected.delete(r);
+  document.querySelectorAll(`.region[data-region="${r}"]`).forEach(el => el.classList.remove('selected'));
+  updateBodySelected();
+}
+
+function renderReview() {
+  collectFormData();
+  const workerName = formData.worker_name || (formData.worker_involved ? '(ID: ' + formData.worker_involved + ')' : 'Not specified');
+  const sections = [
+    {title:'Incident', rows:[
+      ['Type', fmt(formData.incident_type)],
+      ['Date & Time', `${formData.incident_date || '—'} ${formData.incident_time || ''}`],
+      ['Site', formData.site || '—'],
+      ['Location', formData.location_detail || '—'],
+    ]},
+    {title:'People Involved', rows:[
+      ['Worker', workerName],
+      ['Reported By', LOGGED_IN.name],
+      ['Department', formData.department || '—'],
+      ['Job Title', formData.job_title || '—'],
+    ]},
+    ...(formData.incident_type === 'injury' ? [{title:'Injury Details', rows:[
+      ['Injury Type', fmt(formData.injury_type)],
+      ['Treatment', fmt(formData.treatment_type)],
+      ['Lost Time', formData.was_lost_time ? `Yes — ${formData.lost_time_days || 0} days` : 'No'],
+      ['Body Regions', formData.body_regions?.length > 0 ? formData.body_regions.join(', ') : '—'],
+    ]}] : []),
+    {title:'Details & Compliance', rows:[
+      ['Description', formData.description ? formData.description.slice(0, 80) + (formData.description.length > 80 ? '…' : '') : '—'],
+      ['Immediate Actions', formData.immediate_actions ? formData.immediate_actions.slice(0, 60) + '…' : '—'],
+      ['Recordable', formData.was_recordable ? '✓ Yes' : 'No'],
+      ['Regulatory', formData.is_regulatory_reportable ? '✓ Yes (report required)' : 'No'],
+    ]},
+  ];
+  document.getElementById('review-content').innerHTML = sections.map(sec => `
+    <div class="review-section">
+      <div class="review-title">${sec.title}</div>
+      ${sec.rows.map(([k, v]) => `<div class="review-row"><span class="rk">${k}</span><span class="rv">${v}</span></div>`).join('')}
+    </div>
+  `).join('');
+}
+
+async function submitIncident() {
+  collectFormData();
+  if (!formData.incident_type) { toast('Incident type is required', 'danger'); return; }
+  if (!formData.incident_date) { toast('Incident date is required', 'danger'); return; }
+  if (!formData.site)          { toast('Site is required', 'danger'); return; }
+  if (!formData.description)   { toast('Description is required', 'danger'); return; }
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.textContent = '⏳ Submitting…';
+  submitBtn.disabled = true;
+
+  // Auto-suggest severity
+  let severity = 'minor';
+  if (formData.incident_type === 'near_miss') severity = 'near_miss';
+  else if (formData.treatment_type === 'first_aid') severity = 'first_aid';
+  else if (formData.treatment_type === 'medical_aid') severity = 'minor';
+  else if (formData.treatment_type === 'hospitalization' || formData.was_lost_time) severity = 'serious';
+  else if (formData.treatment_type === 'fatality') severity = 'critical';
+
+  const timeStr = formData.incident_time || '00:00';
+  const incidentDateISO = formData.incident_date
+    ? `${formData.incident_date}T${timeStr}:00.000Z`
+    : null;
+  const titleStr = (formData.description || '').trim().split(/\s+/).slice(0, 8).join(' ') || fmt(formData.incident_type) + ' incident';
+
+  const payload = {
+    title: titleStr,
+    description: formData.description,
+    incident_type: formData.incident_type,
+    severity,
+    incident_date: incidentDateISO,
+    site: formData.site,
+    location_detail: formData.location_detail || null,
+    department: formData.department || null,
+    job_title_at_time: formData.job_title || null,
+    worker_involved: formData.worker_involved || null,
+    reported_by: LOGGED_IN.id,
+    immediate_actions: formData.immediate_actions || null,
+    treatment_type: formData.treatment_type || null,
+    was_lost_time: formData.was_lost_time || false,
+    lost_time_days: formData.lost_time_days || null,
+    was_recordable: formData.was_recordable || false,
+    is_regulatory_reportable: formData.is_regulatory_reportable || false,
+    body_map: formData.body_regions?.length > 0 ? formData.body_regions : null,
+  };
+
+  const res = await apiPost('/api/incidents', payload);
+
+  submitBtn.textContent = '✓ Submit Incident Report';
+  submitBtn.disabled = false;
+
+  if (res.ok && res.data && res.data.incident) {
+    const created = res.data.incident;
+    newIncidentId = created.id;
+    incidents.unshift(created);
+
+    // Hide form, show success
+    document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+    document.getElementById('step-bar').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    document.getElementById('success-num').textContent = created.incident_number;
+    document.getElementById('add-capa-after-btn').setAttribute('data-inc-id', created.id);
+
+    renderIncidentsTable();
+    renderKPIs();
+    toast(`✅ Incident ${created.incident_number} submitted`, 'ok');
+  } else {
+    const errDetail = res.data?.message || res.data?.error || res.data?.errors?.join(', ') || `HTTP ${res.status}`;
+    toast(`⚠️ Submission failed: ${errDetail}`, 'danger');
+    console.error('[Vigil] submit error — status:', res.status, '| body:', res.data);
+    console.error('[Vigil] payload sent:', payload);
+  }
+}
+
+function addCapaAfterSubmit() {
+  const incId = document.getElementById('add-capa-after-btn').getAttribute('data-inc-id');
+  showPanel('dash');
+  // Give DOM time to render, then scroll
+  setTimeout(() => {
+    const inc = incidents.find(i => i.id === incId);
+    if (inc) showDetail(incId);
+  }, 100);
+}
+
+// Close autocomplete on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ac-wrap')) {
+    document.querySelectorAll('.ac-dropdown').forEach(d => d.style.display = 'none');
+  }
+});
+
+// ── START ─────────────────────────────────────────────────────
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

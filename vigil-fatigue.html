@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Hours & Fatigue Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;
+  --border:#1E2D40;--b2:#263648;
+  --accent:#00C2FF;--a2:#FF6B35;--a3:#00E5A0;--purple:#9B6DFF;
+  --text:#C8DCF0;--text2:#8AAAC4;--muted:#4A6880;
+  --danger:#FF4545;--warn:#FFB800;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+
+.topbar{background:linear-gradient(90deg,#090E18,#0C1520);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-shield{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00C2FF,#00E5A0);display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-mod{font-size:11px;color:var(--muted);margin-left:4px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.co-badge{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2)}
+.user-dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+
+.alert-banner{border-bottom:1px solid rgba(255,69,69,.15);padding:6px 24px;display:flex;align-items:center;gap:12px;font-size:11.5px;flex-shrink:0;background:linear-gradient(90deg,rgba(255,69,69,.08),transparent)}
+.ab-item{display:flex;align-items:center;gap:5px;cursor:pointer}.ab-item:hover{text-decoration:underline}
+.ab-dot{width:5px;height:5px;border-radius:50%}.ab-sep{color:var(--b2)}
+
+.main-area{display:flex;flex:1;overflow:hidden}
+
+.sidenav{width:210px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);padding:14px 0;overflow-y:auto}
+.nav-sec{padding:0 10px;margin-bottom:6px}
+.nav-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:6px 8px 4px;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;font-size:12.5px;color:var(--muted);margin-bottom:1px}
+.ni:hover{background:var(--s2);color:var(--text)}
+.ni.active{background:rgba(0,194,255,.1);color:var(--accent);font-weight:500}
+.nicon{font-size:13px;width:16px;text-align:center}
+.nbadge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 5px;border-radius:5px}
+.nb-rd{background:rgba(255,69,69,.2);color:var(--danger)}.nb-yw{background:rgba(255,184,0,.2);color:var(--warn)}.nb-bl{background:rgba(0,194,255,.2);color:var(--accent)}.nb-gr{background:rgba(0,229,160,.2);color:var(--a3)}
+
+.content{flex:1;overflow-y:auto;padding:22px}
+.panel{display:none}.panel.active{display:block}
+
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
+.page-sub{font-size:12px;color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:18px}
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.bl::after{background:var(--accent)}.sc.gr::after{background:var(--a3)}.sc.rd::after{background:var(--danger)}.sc.yw::after{background:var(--warn)}.sc.pu::after{background:var(--purple)}.sc.or::after{background:var(--a2)}
+.sl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.sv{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.sv.bl{color:var(--accent)}.sv.gr{color:var(--a3)}.sv.rd{color:var(--danger)}.sv.yw{color:var(--warn)}.sv.pu{color:var(--purple)}.sv.or{color:var(--a2)}
+.sn{font-size:10px;color:var(--muted);margin-top:3px}.sn.up{color:var(--a3)}.sn.dn{color:var(--danger)}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:13px;font-weight:600}.ca{font-size:11px;color:var(--accent);cursor:pointer}
+.cb{padding:14px}
+
+/* DRIVER HOS CARD — hero element */
+.driver-hos{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:15px;margin-bottom:10px;position:relative;overflow:hidden;transition:all .15s;cursor:pointer}
+.driver-hos:hover{border-color:var(--b2)}
+.driver-hos.critical{border-color:rgba(255,69,69,.4);background:rgba(255,69,69,.03)}
+.driver-hos.warning{border-color:rgba(255,184,0,.3);background:rgba(255,184,0,.02)}
+.driver-hos.ok{border-color:rgba(0,229,160,.2)}
+.dh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.dh-left{display:flex;align-items:center;gap:11px}
+.dh-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.dh-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
+.dh-role{font-size:11px;color:var(--muted)}
+.dh-right{text-align:right}
+
+/* FATIGUE GAUGE */
+.fatigue-gauge{display:flex;flex-direction:column;align-items:flex-end}
+.fg-score{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.fg-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-top:2px}
+
+/* HOS BAR CHART */
+.hos-bar-wrap{margin-bottom:10px}
+.hos-rule{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.hos-rule-label{font-size:10.5px;color:var(--muted);width:140px;flex-shrink:0}
+.hos-bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:visible;position:relative}
+.hos-bar-fill{height:100%;border-radius:5px;transition:width .4s ease;position:relative}
+.hos-bar-limit{position:absolute;top:-3px;bottom:-3px;width:2px;background:rgba(255,255,255,.3);border-radius:1px}
+.hos-bar-val{font-size:11px;font-weight:600;width:70px;text-align:right;flex-shrink:0}
+.hos-limit-label{font-size:9px;color:var(--muted);width:50px;text-align:right;flex-shrink:0}
+
+/* ELD TIMELINE */
+.eld-timeline{display:flex;height:28px;border-radius:4px;overflow:hidden;margin-bottom:4px}
+.eld-seg{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:rgba(255,255,255,.8);transition:all .15s;cursor:pointer;min-width:2px;position:relative}
+.eld-seg:hover{filter:brightness(1.2)}
+.eld-off{background:rgba(90,110,130,.35)}
+.eld-sb{background:rgba(155,109,255,.5)}
+.eld-on{background:rgba(255,184,0,.65)}
+.eld-drive{background:rgba(0,194,255,.75)}
+.eld-hours{display:flex;margin-bottom:2px}
+.eld-hour-mark{flex:1;text-align:center;font-size:8px;color:var(--muted);border-left:1px solid var(--border);padding-top:2px}
+
+/* DISPATCH GATE */
+.dispatch-gate{background:linear-gradient(135deg,#0F0508,#0C1020);border:2px solid rgba(255,69,69,.4);border-radius:10px;padding:18px;margin-bottom:14px}
+.dg-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dg-icon{font-size:28px}
+.dg-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--danger)}
+.dg-sub{font-size:12px;color:var(--muted)}
+.dg-reasons{margin-bottom:12px}
+.dg-reason{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:rgba(255,69,69,.07);border:1px solid rgba(255,69,69,.15);border-radius:6px;margin-bottom:6px;font-size:12px;color:#FF8888}
+.dg-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0;margin-top:5px}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.chip.gr{background:rgba(0,229,160,.15);color:var(--a3)}.chip.rd{background:rgba(255,69,69,.15);color:var(--danger)}.chip.yw{background:rgba(255,184,0,.15);color:var(--warn)}.chip.bl{background:rgba(0,194,255,.15);color:var(--accent)}.chip.pu{background:rgba(155,109,255,.15);color:var(--purple)}.chip.gy{background:rgba(90,110,130,.2);color:var(--muted)}.chip.or{background:rgba(255,107,53,.15);color:var(--a2)}
+
+.alert{padding:10px 14px;border-radius:7px;font-size:12px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert.rd{background:rgba(255,69,69,.08);border:1px solid rgba(255,69,69,.2);color:#FF8888}
+.alert.yw{background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.2);color:var(--warn)}
+.alert.gr{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);color:var(--a3)}
+.alert.bl{background:rgba(0,194,255,.08);border:1px solid rgba(0,194,255,.2);color:var(--accent)}
+.alert.pu{background:rgba(155,109,255,.09);border:1px solid rgba(155,109,255,.3);color:#C4A3FF}
+
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.fl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fi{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12.5px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .15s;width:100%}
+.fi:focus{outline:none;border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+.fi-ta{resize:vertical;min-height:60px}
+.fi-sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234A6880'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+.btn{padding:8px 16px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--accent);color:#000}.btn-p:hover{background:#00AADD}
+.btn-rd{background:var(--danger);color:#fff}
+.btn-g{background:transparent;color:var(--accent);border:1px solid rgba(0,194,255,.35)}.btn-g:hover{background:rgba(0,194,255,.08)}
+.btn-yw{background:rgba(255,184,0,.12);color:var(--warn);border:1px solid rgba(255,184,0,.3)}
+.btn-pu{background:linear-gradient(135deg,#9B6DFF,#7040D0);color:#fff}
+.btn-gr{background:var(--a3);color:#000}
+.btn-sm{padding:5px 11px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px}
+
+.pw{background:var(--border);border-radius:3px;height:5px;overflow:hidden}
+.pf{height:100%;border-radius:3px}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;backdrop-filter:blur(2px)}
+.overlay.open{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:660px;background:var(--s1);border-left:1px solid var(--border);z-index:101;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;overflow:hidden}
+.drawer.open{transform:translateX(0)}
+.dh2{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dt{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.dc{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted)}
+.db{flex:1;overflow-y:auto;padding:18px}
+.df{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:150;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-ov.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:500px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.6);max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12.5px;z-index:200;transform:translateY(80px);opacity:0;transition:all .25s ease;display:flex;align-items:center;gap:10px;min-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(0,229,160,.3)}.toast.error{border-color:rgba(255,69,69,.3)}.toast.warn{border-color:rgba(255,184,0,.3)}
+
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600}
+.tbl td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
+
+.sec-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:8px 16px;font-size:12.5px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .12s;font-weight:500}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* GPS AUDIT */
+.gps-row{display:flex;gap:10px;padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:12px;align-items:flex-start}
+.gps-row.mismatch{border-color:rgba(255,69,69,.3);background:rgba(255,69,69,.04)}
+.gps-row.ok{border-color:rgba(0,229,160,.15)}
+.gps-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:80px;flex-shrink:0;padding-top:1px}
+.gps-content{flex:1}
+.gps-title{font-weight:600;margin-bottom:2px}
+.gps-detail{font-size:11px;color:var(--muted)}
+
+/* REGULATION CARD */
+.reg-card{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px;margin-bottom:8px}
+.reg-title{font-size:12.5px;font-weight:600;margin-bottom:3px}
+.reg-detail{font-size:11.5px;color:var(--muted);line-height:1.6}
+.reg-limit{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)}
+
+/* DISPATCH SIMULATOR */
+.dispatch-sim{background:linear-gradient(135deg,var(--s1),#0C0818);border:1px solid rgba(155,109,255,.2);border-radius:10px;padding:18px;margin-bottom:14px}
+.ds-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;color:var(--purple)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-shield">🛡️</div>
+    <div><span class="logo-name">VIGIL</span><span class="logo-mod">/ Hours & Fatigue Management</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="co-badge">🚛 Northern Express Transport Ltd.</div>
+    <div class="user-dot">C</div>
+  </div>
+</div>
+
+<div class="alert-banner">
+  <span style="color:var(--danger);font-weight:700;font-size:11px">⚠️ HOS Alerts:</span>
+  <div class="ab-item" style="color:var(--danger)" onclick="showPanel('dashboard')"><div class="ab-dot" style="background:var(--danger)"></div>P. Whitehorse — at weekly limit (70h). Dispatch blocked.</div>
+  <span class="ab-sep">·</span>
+  <div class="ab-item" style="color:var(--danger)" onclick="showPanel('dashboard')"><div class="ab-dot" style="background:var(--danger)"></div>A. Reyes — 7 consecutive days. Mandatory day off required.</div>
+  <span class="ab-sep">·</span>
+  <div class="ab-item" style="color:var(--warn)" onclick="showPanel('audit')"><div class="ab-dot" style="background:var(--warn)"></div>2 ELD discrepancies flagged for review</div>
+  <div style="margin-left:auto">
+    <button class="btn btn-p btn-sm" onclick="openDispatchCheck()">⚡ Check Driver Hours</button>
+  </div>
+</div>
+
+<div class="main-area">
+<div class="sidenav">
+  <div class="nav-sec">
+    <div class="nav-lbl">Overview</div>
+    <div class="ni active" onclick="showPanel('dashboard')"><span class="nicon">📊</span>HOS Dashboard<span class="nbadge nb-rd" id="nav-alert">0</span></div>
+    <div class="ni" onclick="showPanel('dispatch')"><span class="nicon">⚡</span>Dispatch Gate</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Driver Hours</div>
+    <div class="ni" onclick="showPanel('drivers')"><span class="nicon">👷</span>All Drivers</div>
+    <div class="ni" onclick="showPanel('eld')"><span class="nicon">📡</span>ELD Integration</div>
+    <div class="ni" onclick="showPanel('logs')"><span class="nicon">📋</span>Duty Status Logs</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Compliance</div>
+    <div class="ni" onclick="showPanel('audit')"><span class="nicon">🔍</span>GPS Audit Trail<span class="nbadge nb-yw">2</span></div>
+    <div class="ni" onclick="showPanel('violations')"><span class="nicon">⛔</span>Violations<span class="nbadge nb-rd" id="nav-viol">0</span></div>
+    <div class="ni" onclick="showPanel('regulations')"><span class="nicon">📖</span>HOS Regulations</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Reporting</div>
+    <div class="ni" onclick="showPanel('fatigue-report')"><span class="nicon">🧠</span>Fatigue Analysis</div>
+    <div class="ni" onclick="showPanel('overrides')"><span class="nicon">🔓</span>Override Log<span class="nbadge nb-yw" id="nav-ov">0</span></div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div class="panel active" id="panel-dashboard">
+  <div class="page-hdr">
+    <div><div class="page-title">Hours & Fatigue Management</div><div class="page-sub">HOS compliance · ELD integration · Fatigue index · Dispatch gating · GPS audit</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-yw btn-sm" onclick="showPanel('audit')">🔍 GPS Audit</button>
+      <button class="btn btn-p btn-sm" onclick="openDispatchCheck()">⚡ Check Driver</button>
+    </div>
+  </div>
+
+  <div class="stats" id="dashStats"></div>
+
+  <div class="alert rd" id="criticalAlert"></div>
+
+  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px">
+    <div>
+      <div class="card">
+        <div class="ch">
+          <div class="ct">Driver HOS Status — Current Week</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:6px;font-size:10px">
+              <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:rgba(0,194,255,.75);border-radius:2px;display:inline-block"></span>Drive</span>
+              <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:rgba(255,184,0,.65);border-radius:2px;display:inline-block"></span>On Duty</span>
+              <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:rgba(155,109,255,.5);border-radius:2px;display:inline-block"></span>Sleeper</span>
+              <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:rgba(90,110,130,.35);border-radius:2px;display:inline-block"></span>Off Duty</span>
+            </div>
+          </div>
+        </div>
+        <div class="cb" id="hosCards" style="padding:10px"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="border-color:rgba(155,109,255,.2);background:linear-gradient(160deg,var(--s1),#0C0814)">
+        <div class="ch" style="border-color:rgba(155,109,255,.15)"><div class="ct" style="color:var(--purple)">🧠 Fatigue Index Summary</div><div class="ca" style="color:var(--purple)" onclick="showPanel('fatigue-report')">Details →</div></div>
+        <div class="cb" id="fatigueIndex" style="padding:10px"></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><div class="ct">⚡ Dispatch Availability</div><div class="ca" onclick="showPanel('dispatch')">Full Gate →</div></div>
+        <div class="cb" id="dispatchSummary" style="padding:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DISPATCH GATE ===== -->
+<div class="panel" id="panel-dispatch">
+  <div class="page-hdr">
+    <div><div class="page-title">Dispatch Gate</div><div class="page-sub">Driver availability · HOS compliance check · Fatigue gate · Override workflow</div></div>
+    <button class="btn btn-p btn-sm" onclick="openDispatchCheck()">⚡ Check Driver Hours</button>
+  </div>
+
+  <div class="alert bl">⚡ <strong>Dispatch Gate Policy:</strong> The system automatically blocks dispatch for any driver who has exceeded HOS limits or whose fatigue index is Critical. Supervisors cannot override Critical blocks — only HSE Manager authorization with documented justification. All overrides are permanently logged.</div>
+
+  <div id="dispatchGatePanel"></div>
+</div>
+
+<!-- ===== DRIVERS ===== -->
+<div class="panel" id="panel-drivers">
+  <div class="page-hdr">
+    <div><div class="page-title">All Drivers — HOS Detail</div><div class="page-sub">Full hours breakdown · Consecutive days · Rest periods · Compliance status</div></div>
+  </div>
+  <div id="driversPanel"></div>
+</div>
+
+<!-- ===== ELD ===== -->
+<div class="panel" id="panel-eld">
+  <div class="page-hdr">
+    <div><div class="page-title">ELD Integration</div><div class="page-sub">Electronic Logging Device data feed · Automatic HOS calculation · Live sync status</div></div>
+    <button class="btn btn-gr btn-sm" onclick="showToast('success','🔄 ELD sync triggered — data updated')">🔄 Sync Now</button>
+  </div>
+  <div id="eldPanel"></div>
+</div>
+
+<!-- ===== LOGS ===== -->
+<div class="panel" id="panel-logs">
+  <div class="page-hdr">
+    <div><div class="page-title">Duty Status Logs</div><div class="page-sub">Complete duty status history · Searchable · Export for DOT/NSC audit</div></div>
+    <button class="btn btn-g btn-sm" onclick="showToast('success','📄 Duty logs exported — 30 day period')">⬇ Export Logs</button>
+  </div>
+  <div id="logsPanel"></div>
+</div>
+
+<!-- ===== GPS AUDIT ===== -->
+<div class="panel" id="panel-audit">
+  <div class="page-hdr">
+    <div><div class="page-title">GPS Audit Trail</div><div class="page-sub">ELD vs GPS cross-reference · Location verification · Discrepancy flagging</div></div>
+  </div>
+  <div id="auditPanel"></div>
+</div>
+
+<!-- ===== VIOLATIONS ===== -->
+<div class="panel" id="panel-violations">
+  <div class="page-hdr">
+    <div><div class="page-title">HOS Violations</div><div class="page-sub">Regulatory violations · Corrective actions · Carrier safety rating impact</div></div>
+  </div>
+  <div id="violationsPanel"></div>
+</div>
+
+<!-- ===== REGULATIONS ===== -->
+<div class="panel" id="panel-regulations">
+  <div class="page-hdr">
+    <div><div class="page-title">HOS Regulations</div><div class="page-sub">Federal/provincial Hours of Service rules — Canada Motor Vehicle Safety Act · NSC</div></div>
+  </div>
+  <div id="regulationsPanel"></div>
+</div>
+
+<!-- ===== FATIGUE REPORT ===== -->
+<div class="panel" id="panel-fatigue-report">
+  <div class="page-hdr">
+    <div><div class="page-title">Fatigue Analysis</div><div class="page-sub">Fatigue index trends · Contributing factors · AI correlation · Incident risk</div></div>
+    <button class="btn btn-g btn-sm" onclick="showToast('success','📄 Fatigue analysis report exported')">⬇ Export Report</button>
+  </div>
+  <div id="fatiguePanel"></div>
+</div>
+
+<!-- ===== OVERRIDES ===== -->
+<div class="panel" id="panel-overrides">
+  <div class="page-hdr">
+    <div><div class="page-title">Override Log</div><div class="page-sub">All HOS override authorizations — permanent audit record</div></div>
+  </div>
+  <div id="overridesPanel"></div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh2"><div class="dt" id="drawerTitle">Driver HOS</div><div class="dc" onclick="closeDrawer()">✕</div></div>
+  <div class="db" id="drawerBody"></div>
+  <div class="df" id="drawerFooter"></div>
+</div>
+
+<div class="modal-ov" id="modalOv">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────
+function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
+function fmtDate(dt){return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
+function fmtTime(dt){return new Date(dt).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}
+
+// HOS RULES (Canada — Federal)
+let HOS_RULES = {
+  maxDriveDaily: 13,      // max driving hours in a day
+  maxOnDutyDaily: 14,     // max on-duty in a day
+  mandatoryBreak: 0.5,    // break required after 8h drive
+  minOffBetweenShifts: 8, // min off-duty between shifts
+  maxWeekly: 70,          // 70h / 7-day cycle
+  maxConsecutiveDays: 14, // after which 24h off required
+  resetRequires: 36,      // hours off to reset 70h cycle
+};
+
+// DRIVER DATA — populated from API on init
+let drivers = [];
+let authToken = null;
+
+let overrides = [];
+
+// ─── API CONFIG ───────────────────────────────────────────────
+const API_BASE = 'https://vigil-production-17ca.up.railway.app';
+
+async function apiLogin() {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email:'j.marchetti@northernexpress.ca', password:'Test1234!'})
+  });
+  if (!res.ok) throw new Error(`Login failed: ${res.status}`);
+  const data = await res.json();
+  authToken = data.token || data.access_token || (data.data && data.data.token);
+  if (!authToken) throw new Error('No auth token in login response');
+}
+
+async function apiFetch(path) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: {'Authorization':`Bearer ${authToken}`,'Content-Type':'application/json'}
+  });
+  if (!res.ok) throw new Error(`${res.status} ${path}`);
+  const body = await res.json();
+  // Unwrap Vigil envelope shapes — each endpoint uses its own key
+  const unwrap = v => {
+    if (Array.isArray(v)) return v;
+    if (v && Array.isArray(v.shifts))      return v.shifts;
+    if (v && Array.isArray(v.assessments)) return v.assessments;
+    if (v && Array.isArray(v.workers))     return v.workers;
+    if (v && Array.isArray(v.results))     return v.results;
+    if (v && Array.isArray(v.items))       return v.items;
+    return v;
+  };
+  return body.data !== undefined ? unwrap(body.data) : unwrap(body);
+}
+
+// ─── LOADING STATE ────────────────────────────────────────────
+function showLoading(msg) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(7,9,15,.9);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div style="width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent">VIGIL</div>
+    <div style="font-size:12px;color:var(--text2)">${msg}</div>
+  `;
+}
+
+function hideLoading() {
+  const el = document.getElementById('loading-overlay');
+  if (el) el.remove();
+}
+
+// ─── DATA MAPPING ─────────────────────────────────────────────
+const DRIVER_COLORS = ['#9B6DFF','#FF6B35','#00C2FF','#00E5A0','#FFB800','#FF4545','#C4A3FF'];
+
+function normalizeFatigueLevel(raw, score) {
+  const u = (raw || '').toUpperCase().replace(/[_\s]/g,'-');
+  if (u === 'CRITICAL' || u === 'VERY-HIGH') return 'CRITICAL';
+  if (u === 'HIGH') return 'HIGH';
+  if (u === 'MEDIUM' || u === 'MODERATE') return 'MEDIUM';
+  if (u === 'LOW') return 'LOW';
+  if (score >= 80) return 'CRITICAL';
+  if (score >= 60) return 'HIGH';
+  if (score >= 40) return 'MEDIUM';
+  return 'LOW';
+}
+
+function buildELDFromShift(shift) {
+  const workHrs = +(shift.total_hours || 0);
+  if (!workHrs) return [{s:0,e:24,t:'off'}];
+  const start = 6;
+  const end = Math.min(start + Math.min(workHrs, 14), 24);
+  const drive = Math.min(shift.drive_hours || workHrs * 0.75, end - start - 0.5);
+  const segs = [];
+  if (start > 0) segs.push({s:0,e:start,t:'off'});
+  segs.push({s:start,e:start+0.5,t:'on'});
+  if (drive > 0) segs.push({s:start+0.5,e:Math.min(start+0.5+drive, end),t:'drive'});
+  if (end < 24) segs.push({s:end,e:24,t:'off'});
+  return segs.filter(s=>s.e>s.s);
+}
+
+function mapApiDataToDrivers(workers, shifts, fatigueData, highRisk, compliance, stats, rotations) {
+  const workerMap = {};
+  (Array.isArray(workers)?workers:[]).forEach(w=>{ workerMap[String(w.id)]=w; });
+
+  const shiftsByWorker = {};
+  (Array.isArray(shifts)?shifts:[]).forEach(s=>{
+    const wid = String(s.worker_id);
+    if (!shiftsByWorker[wid]) shiftsByWorker[wid]=[];
+    shiftsByWorker[wid].push(s);
+  });
+
+  const fatigueByWorker = {};
+  (Array.isArray(fatigueData)?fatigueData:[]).forEach(f=>{
+    const wid = String(f.worker_id);
+    if (!fatigueByWorker[wid]) fatigueByWorker[wid]=[];
+    fatigueByWorker[wid].push(f);
+  });
+
+  const statsMap = {};
+  (Array.isArray(stats)?stats:[]).forEach(s=>{ statsMap[String(s.worker_id)]=s; });
+
+  const rotationMap = {};
+  (Array.isArray(rotations)?rotations:[]).forEach(r=>{ rotationMap[String(r.worker_id)]=r; });
+
+  const complianceMap = {};
+  const compArr = Array.isArray(compliance)?compliance:(compliance&&compliance.workers?compliance.workers:[]);
+  compArr.forEach(c=>{ complianceMap[String(c.worker_id)]=c; });
+
+  const allIds = new Set([
+    ...Object.keys(workerMap),
+    ...Object.keys(shiftsByWorker),
+    ...Object.keys(fatigueByWorker),
+    ...Object.keys(statsMap),
+    ...Object.keys(rotationMap),
+    ...Object.keys(complianceMap),
+  ].filter(id => id && id !== 'undefined'));
+
+  let colorIdx = 0;
+  return Array.from(allIds).map(wid=>{
+    const worker = workerMap[wid] || {};
+    const workerShifts = (shiftsByWorker[wid]||[]).sort((a,b)=>
+      new Date(b.shift_date||0)-new Date(a.shift_date||0)
+    );
+    const latestShift = workerShifts[0] || {};
+    const workerFatigue = (fatigueByWorker[wid]||[]).sort((a,b)=>
+      new Date(b.assessment_date||b.created_at||0)-new Date(a.assessment_date||a.created_at||0)
+    );
+    const latestFatigue = workerFatigue[0] || {};
+    const workerStats  = statsMap[wid] || complianceMap[wid] || {};
+    const rotation     = rotationMap[wid] || {};
+
+    const name   = (worker.first_name && worker.last_name)
+      ? `${worker.first_name} ${worker.last_name}`
+      : (worker.first_name || worker.last_name || worker.name || worker.full_name || `Worker ${wid}`);
+    const avatar = name.trim().charAt(0).toUpperCase();
+    const color  = DRIVER_COLORS[colorIdx++ % DRIVER_COLORS.length];
+
+    // API returns fatigue_risk_score on a 1-10 scale; scale to 0-100 for display thresholds
+    const rawScore = +(latestShift.fatigue_risk_score ?? latestFatigue.risk_score ?? latestFatigue.fatigue_risk_score ?? 0);
+    const fatigueScore = rawScore <= 10 && rawScore > 0 ? Math.round(rawScore * 10) : rawScore;
+    const fatigueLevel = normalizeFatigueLevel(
+      latestFatigue.risk_level || latestFatigue.fatigue_level || latestShift.fatigue_risk_level || latestFatigue.risk_tier || '', fatigueScore
+    );
+
+    // Vigil clearance values: cleared/monitor/restricted/not_cleared (also accept generic fit/pass/blocked)
+    const clearance   = (latestShift.fatigue_clearance_status || latestFatigue.clearance_status || latestFatigue.fatigue_clearance_status || '').toLowerCase();
+    const cleared     = ['cleared','approved','fit','pass','monitor'].includes(clearance);
+    const blockedFlag = ['blocked','denied','fail','unfit','restricted','not_cleared'].includes(clearance);
+
+    // Sum shift hours for the past 7 days as a reliable fallback for weekly total
+    const weekAgo = Date.now() - 7 * 24 * 3600 * 1000;
+    const weeklyShiftHours = workerShifts
+      .filter(s => new Date(s.shift_date || s.start_time || s.created_at || 0) >= weekAgo)
+      .reduce((sum, s) => sum + +(s.total_hours || s.hours_worked || s.duration_hours || 0), 0);
+
+    const onDutyWeek     = +(workerStats.weekly_hours ?? workerStats.total_hours_week ?? workerStats.total_hours ?? (weeklyShiftHours || null) ?? latestShift.total_hours ?? 0);
+    const driveHoursWeek = +(workerStats.drive_hours_week ?? workerStats.driving_hours ?? workerStats.total_drive_hours ?? 0);
+    const driveHoursToday= +(workerStats.drive_hours_today ?? workerStats.hours_today ?? latestShift.driving_hours ?? 0);
+    const onDutyToday    = +(workerStats.on_duty_today ?? workerStats.duty_hours_today ?? latestShift.on_duty_hours ?? latestShift.total_hours ?? 0);
+    const consecutiveDays= +(latestShift.consecutive_days_worked ?? latestShift.consecutive_days ?? rotation.consecutive_days ?? rotation.days_worked ?? 0);
+    const lastOffDurationHrs = +(rotation.last_rest_hours ?? rotation.last_off_duration_hours ?? latestShift.rest_hours_before ?? 8);
+
+    const blockReasons = [];
+    if (onDutyWeek >= HOS_RULES.maxWeekly)
+      blockReasons.push(`${HOS_RULES.maxWeekly}-hour weekly cycle limit reached (${onDutyWeek}h / ${HOS_RULES.maxWeekly}h max)`);
+    if (consecutiveDays >= 7)
+      blockReasons.push(`${consecutiveDays} consecutive working days — mandatory day off required`);
+    if (fatigueScore >= 80)
+      blockReasons.push(`Fatigue index CRITICAL (${fatigueScore}/100) — dispatch prohibited`);
+    else if (fatigueScore >= 60)
+      blockReasons.push(`Fatigue index HIGH (${fatigueScore}/100) — advisory issued to supervisor`);
+    if (blockedFlag && !blockReasons.length)
+      blockReasons.push(`Fatigue clearance status: ${latestShift.fatigue_clearance_status}`);
+
+    const dispatchable = onDutyWeek < HOS_RULES.maxWeekly &&
+                         consecutiveDays < 7 &&
+                         (clearance ? cleared : fatigueScore < 60);
+
+    const recommendedAction = latestFatigue.recommended_action || '';
+    const restRequired = recommendedAction || (
+      dispatchable
+        ? `${(HOS_RULES.maxDriveDaily-driveHoursToday).toFixed(1)}h drive remaining today. Within all limits.`
+        : 'Mandatory rest required before return to service.'
+    );
+
+    const karScore = latestFatigue.karolinska_score;
+
+    return {
+      id: wid,
+      name,
+      role: worker.position || worker.job_title || worker.role || worker.department || 'Worker',
+      site: latestShift.site || latestShift.location || worker.site || worker.location || worker.department || '—',
+      avatar,
+      color,
+      driveHoursWeek,
+      onDutyWeek,
+      offDutyWeek: Math.max(0, 168 - onDutyWeek),
+      driveHoursToday,
+      onDutyToday,
+      consecutiveDays,
+      lastOffDuty: latestShift.shift_date || new Date().toISOString().split('T')[0],
+      lastOffDurationHrs,
+      status: dispatchable ? 'Available' : 'Off Duty',
+      currentDutyStatus: dispatchable ? 'Available' : 'Off Duty',
+      fatigueScore,
+      fatigueLevel,
+      karScore,
+      recommendedAction,
+      dispatchable,
+      dispatchBlockReasons: blockReasons,
+      restRequired,
+      eldSource: worker.eld_device || worker.eld_unit || 'ELD Device',
+      eldSynced: new Date(),
+      todayELD: buildELDFromShift(latestShift),
+      weekELD: [],
+      violations: [],
+      gpsDiscrepancies: [],
+    };
+  });
+}
+
+// ─── APP INIT ─────────────────────────────────────────────────
+async function initApp() {
+  showLoading('Authenticating with Vigil API…');
+  try {
+    await apiLogin();
+    showLoading('Loading hours & fatigue data…');
+
+    const [workers, shifts, fatigueData, highRisk, compliance, stats, rotations] = await Promise.all([
+      apiFetch('/api/workers').catch(e=>{ console.warn('/api/workers:', e.message); return []; }),
+      apiFetch('/api/hours/shifts').catch(e=>{ console.warn('/api/hours/shifts:', e.message); return []; }),
+      apiFetch('/api/hours/fatigue').catch(e=>{ console.warn('/api/hours/fatigue:', e.message); return []; }),
+      apiFetch('/api/hours/fatigue/high-risk').catch(e=>{ console.warn('/api/hours/fatigue/high-risk:', e.message); return []; }),
+      apiFetch('/api/hours/compliance').catch(e=>{ console.warn('/api/hours/compliance:', e.message); return []; }),
+      apiFetch('/api/hours/stats').catch(e=>{ console.warn('/api/hours/stats:', e.message); return []; }),
+      apiFetch('/api/hours/rotations').catch(e=>{ console.warn('/api/hours/rotations:', e.message); return []; }),
+    ]);
+
+    // Log counts + sample field keys so we can verify the actual API shape
+    const sampleKeys = arr => Array.isArray(arr) && arr[0] ? Object.keys(arr[0]) : [];
+    console.log('[Vigil] API response shapes:', {
+      workers:    `${(workers||[]).length} items — keys: ${sampleKeys(workers).join(', ')}`,
+      shifts:     `${(shifts||[]).length} items — keys: ${sampleKeys(shifts).join(', ')}`,
+      fatigueData:`${(fatigueData||[]).length} items — keys: ${sampleKeys(fatigueData).join(', ')}`,
+      stats:      `${(stats||[]).length} items — keys: ${sampleKeys(stats).join(', ')}`,
+      rotations:  `${(rotations||[]).length} items — keys: ${sampleKeys(rotations).join(', ')}`,
+    });
+    if (Array.isArray(workers)    && workers[0])    console.log('[Vigil] sample worker:',    workers[0]);
+    if (Array.isArray(shifts)     && shifts[0])     console.log('[Vigil] sample shift:',     shifts[0]);
+    if (Array.isArray(fatigueData)&& fatigueData[0])console.log('[Vigil] sample fatigue:',   fatigueData[0]);
+    if (Array.isArray(stats)      && stats[0])      console.log('[Vigil] sample stat:',      stats[0]);
+
+    drivers = mapApiDataToDrivers(workers, shifts, fatigueData, highRisk, compliance, stats, rotations);
+    console.log('[Vigil] Mapped drivers:', drivers.length, drivers.map(d=>({id:d.id,name:d.name,onDutyWeek:d.onDutyWeek,fatigueScore:d.fatigueScore,dispatchable:d.dispatchable})));
+
+    hideLoading();
+    renderAll();
+    if (drivers.length === 0) {
+      showToast('warn', '⚠️ No worker data returned from API');
+    }
+  } catch (err) {
+    hideLoading();
+    console.error('Vigil API init failed:', err);
+    const el = document.getElementById('dashStats');
+    if (el) el.innerHTML = `
+      <div style="grid-column:1/-1;padding:32px;text-align:center">
+        <div style="font-size:28px;margin-bottom:10px">⚠️</div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--danger)">Cannot Connect to Vigil API</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;margin-bottom:14px">${err.message}</div>
+        <button class="btn btn-g btn-sm" onclick="initApp()">↺ Retry Connection</button>
+      </div>`;
+    showToast('error', `⚠️ API connection failed: ${err.message}`);
+  }
+}
+
+// ─── FATIGUE SCORE ────────────────────────────────────────────
+function getFatigueColor(score){
+  if(score>=80) return 'var(--danger)';
+  if(score>=60) return 'var(--a2)';
+  if(score>=40) return 'var(--warn)';
+  return 'var(--a3)';
+}
+function getFatigueClass(level){
+  return{CRITICAL:'rd',HIGH:'or',MEDIUM:'yw',LOW:'gr'}[level]||'gy';
+}
+
+// ─── ELD TIMELINE ─────────────────────────────────────────────
+function buildELDTimeline(segments){
+  const total = 24;
+  return`
+    <div class="eld-hours">
+      ${Array.from({length:25},(_,i)=>i%4===0?`<div class="eld-hour-mark" style="flex:${i===24?0:1}">${i}:00</div>`:'').join('')}
+    </div>
+    <div class="eld-timeline">
+      ${segments.map(seg=>{
+        const w = ((seg.e - seg.s) / total * 100).toFixed(1);
+        const label = seg.e - seg.s >= 2 ? (seg.t==='drive'?'Drive':seg.t==='on'?'On Duty':seg.t==='sb'?'Sleeper':'Off') : '';
+        return `<div class="eld-seg eld-${seg.t}" style="width:${w}%" title="${seg.t} ${seg.s}:00–${seg.e}:00">${label}</div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ─── RENDER STATS ─────────────────────────────────────────────
+function renderStats(){
+  console.log('[Vigil] renderStats — drivers.length:', drivers.length);
+  const critical = drivers.filter(d=>d.fatigueLevel==='CRITICAL').length;
+  const blocked = drivers.filter(d=>!d.dispatchable).length;
+  const available = drivers.filter(d=>d.dispatchable).length;
+  const dispatched = drivers.filter(d=>d.status==='Dispatched').length;
+  const highFatigue = drivers.filter(d=>d.fatigueScore>=60).length;
+  console.log('[Vigil] renderStats counts:', {blocked, available, dispatched, highFatigue, critical});
+  const gpsFlags = drivers.reduce((a,d)=>a+d.gpsDiscrepancies.length,0);
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="sc rd"><div class="sl">Blocked from Dispatch</div><div class="sv rd">${blocked}</div><div class="sn dn">HOS limit reached</div></div>
+    <div class="sc gr"><div class="sl">Available for Dispatch</div><div class="sv gr">${available}</div><div class="sn up">All limits clear</div></div>
+    <div class="sc bl"><div class="sl">Currently Dispatched</div><div class="sv bl">${dispatched}</div><div class="sn">En route</div></div>
+    <div class="sc yw"><div class="sl">High / Critical Fatigue</div><div class="sv yw">${highFatigue}</div><div class="sn dn">Intervention needed</div></div>
+    <div class="sc yw"><div class="sl">GPS Discrepancies</div><div class="sv yw">${gpsFlags}</div><div class="sn">Pending review</div></div>
+    <div class="sc pu"><div class="sl">Avg Weekly Hours</div><div class="sv pu">${Math.round(drivers.reduce((a,d)=>a+d.onDutyWeek,0)/drivers.length)}h</div><div class="sn">All drivers</div></div>
+  `;
+
+  document.getElementById('nav-alert').textContent = blocked;
+  document.getElementById('nav-viol').textContent = drivers.reduce((a,d)=>a+d.violations.length,0);
+  document.getElementById('nav-ov').textContent = overrides.length;
+
+  const ca = document.getElementById('criticalAlert');
+  if(critical > 0){
+    ca.style.display = 'flex';
+    ca.innerHTML = `⛔ <strong>${critical} driver${critical>1?'s are':' is'} CRITICAL fatigue and blocked from dispatch:</strong> ${drivers.filter(d=>d.fatigueLevel==='CRITICAL').map(d=>d.name).join(', ')}. Mandatory rest required before return to service.`;
+  } else {
+    ca.style.display = 'none';
+  }
+}
+
+// ─── RENDER HOS CARDS ─────────────────────────────────────────
+function renderHOSCards(){
+  const el = document.getElementById('hosCards');
+  if(!el) return;
+  el.innerHTML = drivers.map(d=>{
+    const wPct = Math.min(100,(d.onDutyWeek/HOS_RULES.maxWeekly*100));
+    const dPct = Math.min(100,(d.driveHoursToday/HOS_RULES.maxDriveDaily*100));
+    const hosClass = d.fatigueLevel==='CRITICAL'?'critical':d.fatigueLevel==='HIGH'?'warning':'ok';
+    return`
+    <div class="driver-hos ${hosClass}" onclick="openDriverDetail('${d.id}')">
+      <div class="dh-top">
+        <div class="dh-left">
+          <div class="dh-avatar" style="background:${d.color}22;color:${d.color};border:2px solid ${d.color}44">${d.avatar}</div>
+          <div>
+            <div class="dh-name">${d.name}</div>
+            <div class="dh-role">${d.role} · ${d.site}</div>
+            <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap">
+              ${statusChip(d.currentDutyStatus)}
+              <span class="chip ${getFatigueClass(d.fatigueLevel)}">${d.fatigueLevel} FATIGUE</span>
+              ${!d.dispatchable?'<span class="chip rd">⛔ Dispatch Blocked</span>':'<span class="chip gr">✅ Available</span>'}
+            </div>
+          </div>
+        </div>
+        <div class="fatigue-gauge">
+          <div class="fg-score" style="color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore}</div>
+          <div class="fg-label">Fatigue Index</div>
+        </div>
+      </div>
+
+      <!-- HOS BARS -->
+      <div class="hos-bar-wrap">
+        <div class="hos-rule">
+          <div class="hos-rule-label">Weekly on-duty</div>
+          <div class="hos-bar-track">
+            <div class="hos-bar-fill" style="width:${wPct}%;background:${wPct>=100?'var(--danger)':wPct>=85?'var(--warn)':'var(--a3)'}">
+              <div class="hos-bar-limit" style="left:100%"></div>
+            </div>
+          </div>
+          <div class="hos-bar-val" style="color:${wPct>=100?'var(--danger)':wPct>=85?'var(--warn)':'var(--text)'}">${d.onDutyWeek}h</div>
+          <div class="hos-limit-label">/ 70h max</div>
+        </div>
+        <div class="hos-rule">
+          <div class="hos-rule-label">Drive today</div>
+          <div class="hos-bar-track">
+            <div class="hos-bar-fill" style="width:${dPct}%;background:${dPct>=100?'var(--danger)':dPct>=80?'var(--warn)':'var(--accent)'}"></div>
+          </div>
+          <div class="hos-bar-val" style="color:${dPct>=100?'var(--danger)':dPct>=80?'var(--warn)':'var(--text)'}">${d.driveHoursToday}h</div>
+          <div class="hos-limit-label">/ 13h max</div>
+        </div>
+        <div class="hos-rule">
+          <div class="hos-rule-label">Consecutive days</div>
+          <div class="hos-bar-track">
+            <div class="hos-bar-fill" style="width:${Math.min(100,d.consecutiveDays/7*100)}%;background:${d.consecutiveDays>=7?'var(--danger)':d.consecutiveDays>=5?'var(--warn)':'var(--a3)'}"></div>
+          </div>
+          <div class="hos-bar-val" style="color:${d.consecutiveDays>=7?'var(--danger)':d.consecutiveDays>=5?'var(--warn)':'var(--text)'}">${d.consecutiveDays} days</div>
+          <div class="hos-limit-label">/ 7 rec.</div>
+        </div>
+      </div>
+
+      <!-- ELD TIMELINE TODAY -->
+      <div style="font-size:9.5px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Today's Duty Status</div>
+      ${buildELDTimeline(d.todayELD)}
+    </div>
+    `;
+  }).join('');
+}
+
+// ─── FATIGUE INDEX PANEL ──────────────────────────────────────
+function renderFatigueIndex(){
+  const el = document.getElementById('fatigueIndex');
+  if(!el) return;
+  el.innerHTML = drivers.map(d=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div style="width:28px;height:28px;border-radius:50%;background:${d.color}22;color:${d.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${d.avatar}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">${d.name.split(' ')[0]}</div>
+        <div class="pw" style="margin-top:4px">
+          <div class="pf" style="width:${d.fatigueScore}%;background:${getFatigueColor(d.fatigueScore)}"></div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore}</div>
+        <span class="chip ${getFatigueClass(d.fatigueLevel)}" style="font-size:9px">${d.fatigueLevel}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── DISPATCH SUMMARY ─────────────────────────────────────────
+function renderDispatchSummary(){
+  const el = document.getElementById('dispatchSummary');
+  if(!el) return;
+  el.innerHTML = drivers.map(d=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openDriverDetail('${d.id}')">
+      <div style="width:24px;height:24px;border-radius:50%;background:${d.color}22;color:${d.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${d.avatar}</div>
+      <div style="flex:1;font-size:12px;font-weight:600">${d.name.split(' ')[0]} ${d.name.split(' ')[1]?.charAt(0)}.</div>
+      <div>${d.dispatchable
+        ? '<span class="chip gr" style="font-size:10px">✅ Available</span>'
+        : '<span class="chip rd" style="font-size:10px">⛔ Blocked</span>'
+      }</div>
+    </div>
+  `).join('');
+}
+
+// ─── DRIVER DETAIL DRAWER ─────────────────────────────────────
+function openDriverDetail(id){
+  const d = drivers.find(x=>x.id===id);
+  if(!d) return;
+
+  document.getElementById('drawerTitle').innerHTML = `<span style="color:var(--accent)">${d.name}</span> — HOS & Fatigue Detail`;
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
+      ${statusChip(d.currentDutyStatus)}
+      <span class="chip ${getFatigueClass(d.fatigueLevel)}">${d.fatigueLevel} FATIGUE (${d.fatigueScore}/100)</span>
+      ${!d.dispatchable?'<span class="chip rd">⛔ Dispatch Blocked</span>':'<span class="chip gr">✅ Dispatchable</span>'}
+    </div>
+
+    ${!d.dispatchable?`
+    <div class="dispatch-gate">
+      <div class="dg-header">
+        <div class="dg-icon">⛔</div>
+        <div><div class="dg-title">Dispatch Blocked — ${d.name}</div><div class="dg-sub">This driver cannot be dispatched until all blocks are resolved</div></div>
+      </div>
+      <div class="dg-reasons">
+        ${d.dispatchBlockReasons.map(r=>`<div class="dg-reason"><div class="dg-dot"></div>${r}</div>`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">📋 Required: ${d.restRequired}</div>
+      <button class="btn btn-yw btn-sm" onclick="openOverride('${d.id}')">🔓 Request Override (HSE Manager)</button>
+    </div>`:''}
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchDTab(this,'dt-hours')">Hours</div>
+      <div class="tab" onclick="switchDTab(this,'dt-week')">This Week</div>
+      <div class="tab" onclick="switchDTab(this,'dt-gps')">GPS Audit</div>
+      <div class="tab" onclick="switchDTab(this,'dt-fatigue')">Fatigue Factors</div>
+    </div>
+
+    <!-- HOURS TAB -->
+    <div id="dt-hours">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+        ${[
+          ['Weekly On-Duty',d.onDutyWeek+'h','/ '+HOS_RULES.maxWeekly+'h',d.onDutyWeek>=70?'var(--danger)':d.onDutyWeek>=60?'var(--warn)':'var(--a3)'],
+          ['Drive Today',d.driveHoursToday+'h','/ '+HOS_RULES.maxDriveDaily+'h',d.driveHoursToday>=13?'var(--danger)':d.driveHoursToday>=10?'var(--warn)':'var(--accent)'],
+          ['Consecutive Days',d.consecutiveDays+' days','/ 7 rec.',d.consecutiveDays>=7?'var(--danger)':d.consecutiveDays>=5?'var(--warn)':'var(--a3)'],
+          ['On-Duty Today',d.onDutyToday+'h','/ 14h max',d.onDutyToday>=14?'var(--danger)':d.onDutyToday>=12?'var(--warn)':'var(--text)'],
+          ['Last Rest Period',d.lastOffDurationHrs+'h','min 8h req.',d.lastOffDurationHrs>=8?'var(--a3)':'var(--danger)'],
+          ['Weekly Drive',d.driveHoursWeek+'h','of '+HOS_RULES.maxWeekly+'h',d.driveHoursWeek>=60?'var(--warn)':'var(--text)'],
+        ].map(([l,v,s,c])=>`
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center">
+            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:${c}">${v}</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px">${l}</div>
+            <div style="font-size:9px;color:var(--muted)">${s}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="sec-lbl">Today's ELD Timeline</div>
+      ${buildELDTimeline(d.todayELD)}
+      <div style="font-size:10.5px;color:var(--muted);margin-top:6px">Source: ${d.eldSource} · ${d.eldSynced?'Last sync: '+fmtTime(d.eldSynced):'Manual log'}</div>
+
+      <div class="sec-lbl">HOS Compliance</div>
+      ${[
+        ['13-hr daily drive limit',d.driveHoursToday<=13,`${d.driveHoursToday}h used of 13h`],
+        ['14-hr daily on-duty limit',d.onDutyToday<=14,`${d.onDutyToday}h used of 14h`],
+        ['70-hr weekly cycle',d.onDutyWeek<=70,`${d.onDutyWeek}h used of 70h`],
+        ['8-hr minimum rest between shifts',d.lastOffDurationHrs>=8,`${d.lastOffDurationHrs}h rest recorded`],
+        ['Consecutive days ≤ 7',d.consecutiveDays<=7,`${d.consecutiveDays} consecutive days`],
+      ].map(([rule,ok,detail])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
+          <span style="font-size:14px">${ok?'✅':'❌'}</span>
+          <div style="flex:1"><div style="font-weight:600">${rule}</div><div style="font-size:11px;color:var(--muted)">${detail}</div></div>
+          <span class="chip ${ok?'gr':'rd'}">${ok?'Compliant':'VIOLATION'}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- WEEK TAB -->
+    <div id="dt-week" style="display:none">
+      ${d.weekELD.length>0?`
+        <div class="card" style="margin-bottom:12px">
+          <div class="ch"><div class="ct">Daily Hours Breakdown — This Week</div></div>
+          <div style="overflow-x:auto"><table class="tbl">
+            <thead><tr><th>Day</th><th>Drive</th><th>On-Duty</th><th>Sleeper</th><th>Off-Duty</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>
+              ${d.weekELD.map((day,i)=>{
+                const total = day.drive+day.onDuty+day.sleeper+day.offDuty;
+                return`<tr>
+                  <td style="font-weight:600">${day.day}</td>
+                  <td style="color:${day.drive>13?'var(--danger)':day.drive>10?'var(--warn)':'var(--text)'}">${day.drive}h</td>
+                  <td style="color:${day.onDuty>14?'var(--danger)':day.onDuty>12?'var(--warn)':'var(--text)'}">${day.onDuty}h</td>
+                  <td>${day.sleeper}h</td>
+                  <td>${day.offDuty}h</td>
+                  <td>${total.toFixed(1)}h</td>
+                  <td>${day.drive>13||day.onDuty>14?'<span class="chip rd">Violation</span>':day.offDuty<8?'<span class="chip yw">Low Rest</span>':'<span class="chip gr">OK</span>'}</td>
+                </tr>`;
+              }).join('')}
+              <tr style="background:rgba(255,255,255,.02);font-weight:600">
+                <td>TOTAL</td>
+                <td>${d.weekELD.reduce((a,x)=>a+x.drive,0).toFixed(1)}h</td>
+                <td style="color:${d.onDutyWeek>=70?'var(--danger)':d.onDutyWeek>=60?'var(--warn)':'var(--text)'}">${d.onDutyWeek}h</td>
+                <td>${d.weekELD.reduce((a,x)=>a+x.sleeper,0).toFixed(1)}h</td>
+                <td>${d.weekELD.reduce((a,x)=>a+x.offDuty,0).toFixed(1)}h</td>
+                <td>168h</td>
+                <td>${statusChip(d.onDutyWeek>=70?'Blocked':d.onDutyWeek>=60?'Warning':'OK')}</td>
+              </tr>
+            </tbody>
+          </table></div>
+        </div>
+      `:'<div style="text-align:center;padding:24px;color:var(--muted)">No weekly data available for this driver</div>'}
+    </div>
+
+    <!-- GPS TAB -->
+    <div id="dt-gps" style="display:none">
+      ${d.gpsDiscrepancies.length>0?`
+        <div class="alert yw">⚠️ ${d.gpsDiscrepancies.length} GPS discrepanc${d.gpsDiscrepancies.length>1?'ies':'y'} detected — ELD log does not match GPS location data. Review and correct ELD entries.</div>
+        ${d.gpsDiscrepancies.map(g=>`
+          <div class="gps-row mismatch">
+            <div class="gps-time">${g.time}</div>
+            <div class="gps-content">
+              <div class="gps-title">⚠️ Discrepancy Detected</div>
+              <div class="gps-detail"><strong>ELD Status:</strong> ${g.eld}</div>
+              <div class="gps-detail"><strong>GPS Data:</strong> ${g.gps}</div>
+              <div class="gps-detail" style="color:var(--warn);margin-top:4px">${g.note}</div>
+            </div>
+            <button class="btn btn-yw btn-xs" onclick="acknowledgeDiscrepancy(this)">Acknowledge</button>
+          </div>
+        `).join('')}
+      `:`<div class="alert gr">✅ No GPS discrepancies detected. ELD data matches GPS location history for this driver.</div>`}
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">GPS audit automatically cross-references ELD duty status entries against vehicle GPS telemetry every 15 minutes. Discrepancies indicate possible ELD entry errors or falsification attempts and are flagged for carrier review.</div>
+    </div>
+
+    <!-- FATIGUE TAB -->
+    <div id="dt-fatigue" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore}</div>
+        <div style="font-size:11px;color:var(--muted)">Fatigue Index Score</div>
+        <span class="chip ${getFatigueClass(d.fatigueLevel)}" style="margin-top:6px">${d.fatigueLevel}</span>
+      </div>
+      <div class="sec-lbl">Contributing Factors</div>
+      ${[
+        ['Weekly Hours',Math.round(d.onDutyWeek/70*35),'/ 35 pts',d.onDutyWeek>=70?'var(--danger)':d.onDutyWeek>=55?'var(--warn)':'var(--a3)'],
+        ['Consecutive Days',Math.round(d.consecutiveDays/7*25),'/ 25 pts',d.consecutiveDays>=7?'var(--danger)':d.consecutiveDays>=5?'var(--warn)':'var(--a3)'],
+        ['Shift Timing (night)',d.currentDutyStatus.includes('Driving')&&new Date().getHours()<6?10:0,'/ 10 pts','var(--warn)'],
+        ['Last Rest Gap',Math.max(0,Math.round((8-d.lastOffDurationHrs)*3)),'/ 15 pts',d.lastOffDurationHrs<8?'var(--danger)':'var(--a3)'],
+        ['Drive Hours Today',Math.round(d.driveHoursToday/13*15),'/ 15 pts',d.driveHoursToday>=10?'var(--warn)':'var(--a3)'],
+      ].map(([factor,pts,max,color])=>`
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+            <span>${factor}</span><span style="color:${color};font-weight:600">${pts} ${max}</span>
+          </div>
+          <div class="pw"><div class="pf" style="width:${Math.min(100,pts/parseInt(max.slice(3))*100)}%;background:${color}"></div></div>
+        </div>
+      `).join('')}
+      <div class="alert pu" style="margin-top:8px">🧠 This score is fed directly into Vigil's AI Predictive Risk engine. Drivers with High or Critical fatigue scores elevate incident probability predictions for their active routes by up to 3.4×.</div>
+    </div>
+  `;
+
+  document.getElementById('drawerFooter').innerHTML = `
+    ${!d.dispatchable?`<button class="btn btn-yw btn-sm" onclick="openOverride('${d.id}')">🔓 Request Override</button>`:''}
+    <button class="btn btn-g btn-sm" onclick="showToast('success','📄 Driver HOS report exported')">📄 Export Report</button>
+    <button class="btn btn-g" style="margin-left:auto" onclick="closeDrawer()">Close</button>
+  `;
+
+  openDrawerEl();
+}
+
+function switchDTab(el, tabId){
+  el.closest('.db').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['dt-hours','dt-week','dt-gps','dt-fatigue'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.style.display=id===tabId?'block':'none';
+  });
+}
+
+function acknowledgeDiscrepancy(btn){
+  btn.textContent='✅ Acknowledged';
+  btn.className='btn btn-gr btn-xs';
+  btn.disabled=true;
+  showToast('success','GPS discrepancy acknowledged — logged for review');
+}
+
+// ─── DISPATCH GATE PANEL ──────────────────────────────────────
+function renderDispatchGatePanel(){
+  const el = document.getElementById('dispatchGatePanel');
+  if(!el) return;
+
+  const blocked = drivers.filter(d=>!d.dispatchable);
+  const available = drivers.filter(d=>d.dispatchable);
+
+  el.innerHTML = `
+    <div class="dispatch-sim">
+      <div class="ds-title">🔬 Live Dispatch Simulation</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Select a driver to simulate dispatch assignment. The system will check all HOS rules and fatigue scores in real time.</div>
+      <div class="fgrid">
+        <div class="fg">
+          <div class="fl">Select Driver</div>
+          <select class="fi fi-sel" id="sim-driver" onchange="runDispatchSim()">
+            <option value="">— Select driver —</option>
+            ${drivers.map(d=>`<option value="${d.id}">${d.name} — ${d.fatigueLevel} Fatigue</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg">
+          <div class="fl">Route / Destination</div>
+          <select class="fi fi-sel" id="sim-route">
+            <option>Calgary Hub → Fort McMurray (Hwy 63 N)</option>
+            <option>Calgary Hub → Red Deer (Hwy 2 N)</option>
+            <option>Edmonton Hub → Grande Prairie (Hwy 43)</option>
+            <option>Local run — Calgary Hub</option>
+          </select>
+        </div>
+      </div>
+      <div id="sim-result" style="margin-top:10px"></div>
+    </div>
+
+    ${blocked.length>0?`
+    <div class="card" style="border-color:rgba(255,69,69,.25)">
+      <div class="ch"><div class="ct" style="color:var(--danger)">⛔ Blocked Drivers — ${blocked.length}</div></div>
+      <div class="cb" style="padding:10px">
+        ${blocked.map(d=>`
+          <div style="background:rgba(255,69,69,.04);border:1px solid rgba(255,69,69,.2);border-radius:7px;padding:12px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:34px;height:34px;border-radius:50%;background:${d.color}22;color:${d.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">${d.avatar}</div>
+                <div><div style="font-size:13px;font-weight:600">${d.name}</div><div style="font-size:11px;color:var(--muted)">${d.role}</div></div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore}</div>
+                <span class="chip rd">${d.fatigueLevel}</span>
+              </div>
+            </div>
+            ${d.dispatchBlockReasons.map(r=>`<div class="dg-reason" style="margin-bottom:5px"><div class="dg-dot"></div>${r}</div>`).join('')}
+            <div style="font-size:11.5px;color:var(--muted);margin-top:6px">📋 ${d.restRequired}</div>
+            <div style="display:flex;gap:7px;margin-top:10px">
+              <button class="btn btn-g btn-sm" onclick="openDriverDetail('${d.id}')">View HOS Detail</button>
+              <button class="btn btn-yw btn-sm" onclick="openOverride('${d.id}')">🔓 Request Override</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`:''}
+
+    <div class="card" style="border-color:rgba(0,229,160,.2)">
+      <div class="ch"><div class="ct" style="color:var(--a3)">✅ Available for Dispatch — ${available.length}</div></div>
+      <div class="cb" style="padding:0">
+        <table class="tbl">
+          <thead><tr><th>Driver</th><th>Weekly Hours</th><th>Drive Today</th><th>Consec. Days</th><th>Fatigue</th><th>Hours Remaining</th><th>Status</th></tr></thead>
+          <tbody>
+            ${available.map(d=>`<tr onclick="openDriverDetail('${d.id}')">
+              <td><strong>${d.name}</strong><div style="font-size:10px;color:var(--muted)">${d.role}</div></td>
+              <td>${d.onDutyWeek}h / 70h</td>
+              <td>${d.driveHoursToday}h / 13h</td>
+              <td>${d.consecutiveDays} days</td>
+              <td><span class="chip ${getFatigueClass(d.fatigueLevel)}">${d.fatigueLevel}</span></td>
+              <td style="color:var(--a3);font-weight:600">${(HOS_RULES.maxDriveDaily - d.driveHoursToday).toFixed(1)}h drive today<br><span style="font-size:10px;color:var(--muted)">${(HOS_RULES.maxWeekly - d.onDutyWeek).toFixed(1)}h weekly remaining</span></td>
+              <td><span class="chip gr">✅ Dispatchable</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function runDispatchSim(){
+  const id = document.getElementById('sim-driver')?.value;
+  const route = document.getElementById('sim-route')?.value||'';
+  const el = document.getElementById('sim-result');
+  if(!el||!id) return;
+
+  const d = drivers.find(x=>x.id===id);
+  if(!d) return;
+
+  if(!d.dispatchable){
+    el.innerHTML = `
+      <div class="dispatch-gate" style="margin-bottom:0;animation:fadeUp .25s ease forwards">
+        <div class="dg-header">
+          <div class="dg-icon">⛔</div>
+          <div><div class="dg-title">DISPATCH BLOCKED — ${d.name}</div><div class="dg-sub">System has prevented assignment to route: ${route.split('→')[0].trim()} → ${route.split('→')[1]?.trim()||'destination'}</div></div>
+        </div>
+        <div class="dg-reasons">
+          ${d.dispatchBlockReasons.map(r=>`<div class="dg-reason"><div class="dg-dot"></div>${r}</div>`).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">📋 ${d.restRequired}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-yw btn-sm" onclick="openOverride('${id}')">🔓 Request HSE Manager Override</button>
+          <button class="btn btn-g btn-sm" onclick="document.getElementById('sim-result').innerHTML=''">Cancel</button>
+        </div>
+      </div>
+    `;
+  } else {
+    const hoursLeft = (HOS_RULES.maxDriveDaily - d.driveHoursToday).toFixed(1);
+    el.innerHTML = `
+      <div style="background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.25);border-radius:8px;padding:14px;animation:fadeUp .25s ease forwards">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--a3);margin-bottom:8px">✅ DISPATCH APPROVED — ${d.name}</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Route: ${route}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;margin-bottom:10px">
+          <div><span style="color:var(--muted)">Drive remaining:</span><div style="font-weight:600;color:var(--a3)">${hoursLeft}h today</div></div>
+          <div><span style="color:var(--muted)">Weekly remaining:</span><div style="font-weight:600">${(HOS_RULES.maxWeekly-d.onDutyWeek).toFixed(1)}h</div></div>
+          <div><span style="color:var(--muted)">Fatigue index:</span><div style="font-weight:600;color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore} — ${d.fatigueLevel}</div></div>
+        </div>
+        ${d.fatigueLevel==='MEDIUM'?`<div class="alert yw" style="margin-bottom:8px">⚠️ Fatigue index is MEDIUM. Recommend informing driver of elevated fatigue and issuing road conditions briefing.</div>`:''}
+        <button class="btn btn-gr btn-sm" onclick="confirmDispatch('${id}')">✅ Confirm Dispatch</button>
+      </div>
+    `;
+  }
+}
+
+function confirmDispatch(id){
+  closeDrawer();
+  showToast('success','✅ Dispatch confirmed — journey plan generated');
+}
+
+// ─── OVERRIDE WORKFLOW ────────────────────────────────────────
+function openOverride(driverId){
+  const d = drivers.find(x=>x.id===driverId);
+  showModal('HSE Manager Override — '+d?.name,`
+    <div class="alert rd">⚠️ Overriding a HOS block is a serious decision. This override is permanently logged and may be reviewed in a carrier safety audit. Only proceed if there is a legitimate operational necessity.</div>
+    <div class="fg"><div class="fl">Justification for Override <span style="color:var(--danger)">*</span></div><textarea class="fi fi-ta" id="ov-reason" placeholder="Provide specific justification. Generic reasons will not be accepted..."></textarea></div>
+    <div class="fg"><div class="fl">Additional Safety Measures</div><input class="fi" id="ov-measures" placeholder="What additional controls will be in place? e.g. 2-hour check-in requirement, shorter route assigned..."></div>
+    <div class="fg"><div class="fl">Override Duration</div><select class="fi fi-sel" id="ov-duration"><option>This dispatch only</option><option>Today only</option></select></div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:4px">By approving this override, you accept responsibility for this driver's dispatch in violation of standard HOS limits. This record is permanent.</div>
+  `,[
+    {label:'Approve Override',cls:'btn-yw',action:`doOverride('${driverId}')`},
+    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
+  ]);
+}
+
+function doOverride(id){
+  const reason = document.getElementById('ov-reason')?.value.trim();
+  const measures = document.getElementById('ov-measures')?.value.trim();
+  if(!reason){showToast('error','⚠️ Justification is required');return;}
+  const d = drivers.find(x=>x.id===id);
+  overrides.push({
+    id:'OV-'+String(overrides.length+1).padStart(3,'0'),
+    driver:d?.name||'Unknown',
+    date:new Date().toISOString().split('T')[0],
+    reason, measures,
+    approvedBy:'HSE Manager',
+    blockReasons:d?.dispatchBlockReasons||[],
+  });
+  closeModal();closeDrawer();
+  renderAll();
+  showToast('warn',`⚠️ Override approved and logged — ${d?.name} cleared for this dispatch only`);
+}
+
+// ─── GPS AUDIT PANEL ──────────────────────────────────────────
+function renderAuditPanel(){
+  const el = document.getElementById('auditPanel');
+  if(!el) return;
+  const allDiscrepancies = drivers.flatMap(d=>
+    d.gpsDiscrepancies.map(g=>({...g, driverName:d.name, driverId:d.id}))
+  );
+
+  el.innerHTML = `
+    <div class="alert bl">🔍 <strong>GPS Audit:</strong> Vigil automatically cross-references ELD duty status entries against GPS telemetry every 15 minutes. Discrepancies are flagged for carrier review. Patterns of discrepancies may indicate ELD manipulation, which is a federal offence under the Commercial Vehicle Drivers Hours of Service Regulations.</div>
+    <div class="card">
+      <div class="ch"><div class="ct">All GPS Discrepancies — This Week (${allDiscrepancies.length})</div></div>
+      <div class="cb">
+        ${allDiscrepancies.length===0
+          ? '<div style="text-align:center;padding:24px;color:var(--muted)">No discrepancies detected this week</div>'
+          : allDiscrepancies.map(g=>`
+            <div class="gps-row mismatch" style="margin-bottom:8px">
+              <div class="gps-time">${g.time}</div>
+              <div class="gps-content">
+                <div class="gps-title" style="color:var(--warn)">⚠️ ${g.driverName} — Discrepancy</div>
+                <div class="gps-detail"><strong>ELD recorded:</strong> ${g.eld}</div>
+                <div class="gps-detail"><strong>GPS actual:</strong> ${g.gps}</div>
+                <div class="gps-detail" style="color:var(--warn);margin-top:3px">${g.note}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <button class="btn btn-g btn-xs" onclick="openDriverDetail('${g.driverId}')">View Driver</button>
+                <button class="btn btn-yw btn-xs" onclick="this.textContent='✅ Flagged';this.disabled=true">Flag</button>
+              </div>
+            </div>
+          `).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">How GPS Audit Works</div></div>
+      <div class="cb">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          ${[
+            ['📡','ELD Data Feed','Duty status, location, odometer, and engine data are streamed continuously from ELD device to Vigil.'],
+            ['📍','GPS Telemetry','Vehicle GPS coordinates are polled every 5 minutes. Speed, heading, and location are recorded independently.'],
+            ['⚖️','Cross-Reference Engine','Every 15 minutes, Vigil compares ELD status against GPS movement. Driving status with no movement — or vice versa — triggers a flag.'],
+          ].map(([i,n,d])=>`
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px;text-align:center">
+              <div style="font-size:24px;margin-bottom:8px">${i}</div>
+              <div style="font-size:12.5px;font-weight:600;margin-bottom:5px">${n}</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.6">${d}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── VIOLATIONS PANEL ─────────────────────────────────────────
+function renderViolationsPanel(){
+  const el = document.getElementById('violationsPanel');
+  if(!el) return;
+  const allViolations = drivers.flatMap(d=>d.violations.map(v=>({...v, driverName:d.name})));
+
+  el.innerHTML = allViolations.length===0
+    ? '<div class="alert gr">✅ No HOS violations recorded this period. All drivers are in compliance with federal regulations.</div>'
+    : `
+    <div class="alert yw">⚠️ ${allViolations.length} violation${allViolations.length>1?'s':''} recorded this period. Violations affect carrier safety rating. Address immediately with driver training and scheduling review.</div>
+    <div class="card">
+      <div class="ch"><div class="ct">HOS Violations — Current Period</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>ID</th><th>Driver</th><th>Violation Type</th><th>Rule Violated</th><th>Actual</th><th>Date</th><th>Severity</th><th>Status</th></tr></thead>
+        <tbody>
+          ${allViolations.map(v=>`<tr>
+            <td style="color:var(--accent);font-weight:600">${v.id}</td>
+            <td style="font-weight:600">${v.driverName}</td>
+            <td>${v.type}</td>
+            <td style="font-size:11.5px">${v.rule}</td>
+            <td style="color:var(--danger);font-weight:600">${v.actual}</td>
+            <td style="font-size:11.5px">${fmtDate(v.date)}</td>
+            <td><span class="chip yw">${v.severity}</span></td>
+            <td><span class="chip ${v.status==='Acknowledged'?'gr':'yw'}">${v.status}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ─── REGULATIONS ──────────────────────────────────────────────
+function renderRegulationsPanel(){
+  const el = document.getElementById('regulationsPanel');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="alert bl">📖 These are the federal Hours of Service regulations under the <strong>Commercial Vehicle Drivers Hours of Service Regulations</strong> (Canada). All Vigil HOS checks are built to these standards.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[
+        ['🚗','Maximum Daily Driving','13 hours','A driver may not drive after 13 hours of driving in a day.','Hour 13 = dispatch blocked for remainder of shift'],
+        ['⏱️','Maximum Duty Period','14 hours','A driver may not drive after 14 consecutive hours on duty.','Hour 14 = all driving prohibited until 8h off'],
+        ['🛌','Minimum Daily Rest','8 hours','A driver must have at least 8 consecutive hours off duty.','8h must be consecutive, not split'],
+        ['📅','Maximum Cycle — 7 Day','70 hours','A driver may not drive after 70 hours on duty in any 7-day period.','Reset requires 36 consecutive hours off duty'],
+        ['☕','Mandatory Break','30 minutes','A driver must take a 30-minute break before driving after 8h on duty.','Must be logged as off-duty or sleeper berth'],
+        ['🔄','Cycle Reset','36 hours','A driver may restart their 70-hour cycle after 36 consecutive hours off duty.','All previous hours are cleared on reset'],
+        ['🌙','Sleeper Berth','8+2 hours','Drivers may split their required rest: minimum 8h in sleeper + 2h in cab or sleeper.','Both periods must be taken before driving resumes'],
+        ['⚖️','Adverse Conditions','+2 hours','Drivers may extend driving by 2h if adverse conditions prevent reaching a safe location.','Must be documented in log — not a routine exemption'],
+      ].map(([icon,title,limit,rule,note])=>`
+        <div class="reg-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:18px">${icon}</span>
+            <div>
+              <div class="reg-title">${title}</div>
+              <div class="reg-limit">${limit}</div>
+            </div>
+          </div>
+          <div class="reg-detail">${rule}</div>
+          <div style="font-size:10.5px;color:var(--accent);margin-top:4px">Vigil: ${note}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ─── FATIGUE REPORT ───────────────────────────────────────────
+function renderFatiguePanel(){
+  const el = document.getElementById('fatiguePanel');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="stats">
+      <div class="sc rd"><div class="sl">Critical Fatigue</div><div class="sv rd">${drivers.filter(d=>d.fatigueLevel==='CRITICAL').length}</div></div>
+      <div class="sc or"><div class="sl">High Fatigue</div><div class="sv or">${drivers.filter(d=>d.fatigueLevel==='HIGH').length}</div></div>
+      <div class="sc yw"><div class="sl">Medium Fatigue</div><div class="sv yw">${drivers.filter(d=>d.fatigueLevel==='MEDIUM').length}</div></div>
+      <div class="sc gr"><div class="sl">Low Fatigue</div><div class="sv gr">${drivers.filter(d=>d.fatigueLevel==='LOW').length}</div></div>
+      <div class="sc pu"><div class="sl">Avg Fatigue Index</div><div class="sv pu">${Math.round(drivers.reduce((a,d)=>a+d.fatigueScore,0)/drivers.length)}</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Driver Fatigue Index — Current Week</div></div>
+      <div class="cb">
+        ${drivers.map(d=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openDriverDetail('${d.id}')">
+            <div style="width:36px;height:36px;border-radius:50%;background:${d.color}22;color:${d.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">${d.avatar}</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;margin-bottom:2px">${d.name}</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)">
+                <span>${d.onDutyWeek}h this week</span>
+                <span>${d.consecutiveDays} consecutive days</span>
+                <span>Last rest: ${d.lastOffDurationHrs}h</span>
+              </div>
+              <div class="pw" style="margin-top:6px"><div class="pf" style="width:${d.fatigueScore}%;background:${getFatigueColor(d.fatigueScore)}"></div></div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${getFatigueColor(d.fatigueScore)}">${d.fatigueScore}</div>
+              <span class="chip ${getFatigueClass(d.fatigueLevel)}">${d.fatigueLevel}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="alert pu">🧠 <strong>AI Integration:</strong> Fatigue index scores are fed directly into Vigil's Predictive AI module every 6 hours. Drivers scoring above 60 trigger elevated risk predictions for their active and upcoming routes. Patrick Whitehorse's score of 94 is currently the primary contributor to the EXTREME risk prediction for Calgary Hub.</div>
+  `;
+}
+
+// ─── ELD PANEL ────────────────────────────────────────────────
+function renderELDPanel(){
+  const el = document.getElementById('eldPanel');
+  if(!el) return;
+  const connected = drivers.filter(d=>d.eldSynced);
+  el.innerHTML = `
+    <div class="stats">
+      <div class="sc gr"><div class="sl">ELD Devices Connected</div><div class="sv gr">${connected.length}</div></div>
+      <div class="sc bl"><div class="sl">Manual Logs</div><div class="sv bl">${drivers.length-connected.length}</div></div>
+      <div class="sc gr"><div class="sl">Last Sync</div><div class="sv gr" style="font-size:14px">${fmtTime(new Date())}</div></div>
+    </div>
+    <div class="alert gr">✅ ELD integration active. All connected devices are syncing every 15 minutes. Duty status changes are automatically applied to HOS calculations.</div>
+    <div class="card">
+      <div class="ch"><div class="ct">Connected ELD Devices</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>Driver</th><th>ELD Device</th><th>Vehicle</th><th>Last Sync</th><th>Data Quality</th><th>Status</th></tr></thead>
+        <tbody>
+          ${drivers.map(d=>`<tr>
+            <td style="font-weight:600">${d.name}</td>
+            <td style="font-size:11.5px">${d.eldSource.split(' — ')[0]}</td>
+            <td style="font-size:11.5px">${d.eldSource.split(' — ')[1]||'N/A'}</td>
+            <td style="font-size:11.5px">${d.eldSynced?fmtTime(d.eldSynced):'Manual'}</td>
+            <td>${d.gpsDiscrepancies.length>0?'<span class="chip yw">Review Needed</span>':'<span class="chip gr">Clean</span>'}</td>
+            <td>${d.eldSynced?'<span class="chip gr">Connected</span>':'<span class="chip gy">Manual Log</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Supported ELD Providers</div></div>
+      <div class="cb">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          ${['Samsara','Geotab','KeepTruckin (Motive)','PeopleNet','Rand McNally','BigRoad','Omnitracs'].map(p=>`
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:6px">
+              <span style="color:var(--a3)">✅</span> ${p}
+            </div>
+          `).join('')}
+          <div style="background:var(--s2);border:1px dashed var(--border);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer" onclick="showToast('success','📧 API integration request sent')">
+            + Request Integration
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── LOGS PANEL ───────────────────────────────────────────────
+function renderLogsPanel(){
+  const el = document.getElementById('logsPanel');
+  if(!el) return;
+  const logs = [
+    {driver:'Patrick Whitehorse',date:rd(-1),from:'05:30',to:'18:45',drive:11.5,onDuty:13.25,offDuty:10.75,status:'Normal'},
+    {driver:'Ana Reyes',date:rd(-1),from:'06:00',to:'19:30',drive:10.5,onDuty:13.5,offDuty:10.5,status:'Normal'},
+    {driver:'Diallo Mensah',date:rd(-2),from:'05:00',to:'17:30',drive:9.5,onDuty:12.5,offDuty:11.5,status:'Normal'},
+    {driver:'Marcus Osei',date:rd(-5),from:'04:45',to:'18:15',drive:13.4,onDuty:13.5,offDuty:10.5,status:'Violation'},
+    {driver:'Bernard Tremblay',date:rd(-3),from:'07:00',to:'16:30',drive:4.5,onDuty:9.5,offDuty:14.5,status:'Normal'},
+  ];
+  el.innerHTML = `
+    <div class="card">
+      <div class="ch"><div class="ct">Duty Status Logs — Last 14 Days</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>Driver</th><th>Date</th><th>Shift Start</th><th>Shift End</th><th>Drive Hours</th><th>On Duty</th><th>Off Duty</th><th>Compliance</th></tr></thead>
+        <tbody>
+          ${logs.map(l=>`<tr>
+            <td style="font-weight:600">${l.driver}</td>
+            <td>${fmtDate(l.date)}</td>
+            <td>${l.from}</td>
+            <td>${l.to}</td>
+            <td style="color:${l.drive>13?'var(--danger)':l.drive>11?'var(--warn)':'var(--text)'};font-weight:${l.drive>13?'700':'400'}">${l.drive}h</td>
+            <td>${l.onDuty}h</td>
+            <td>${l.offDuty}h</td>
+            <td>${l.status==='Violation'?'<span class="chip rd">Violation</span>':'<span class="chip gr">Compliant</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ─── OVERRIDES PANEL ──────────────────────────────────────────
+function renderOverridesPanel(){
+  const el = document.getElementById('overridesPanel');
+  if(!el) return;
+  el.innerHTML = overrides.length===0
+    ? `<div class="alert gr">✅ No override authorizations on record. All dispatches have been within standard HOS limits.</div>
+       <div style="font-size:12px;color:var(--muted);line-height:1.7">Override requests appear here when an HSE Manager authorizes dispatch for a driver who has exceeded HOS limits. Every override is permanently logged and included in carrier safety audit packages.</div>`
+    : `<div class="alert yw">⚠️ ${overrides.length} override${overrides.length>1?'s have':' has'} been issued. These are permanent records and may be reviewed during a carrier safety audit.</div>
+       <div class="card">
+         <div class="ch"><div class="ct">Override Authorization Log — Permanent Record</div></div>
+         <div style="overflow-x:auto"><table class="tbl">
+           <thead><tr><th>Override ID</th><th>Driver</th><th>Date</th><th>HOS Violations</th><th>Justification</th><th>Approved By</th></tr></thead>
+           <tbody>
+             ${overrides.map(ov=>`<tr>
+               <td style="color:var(--warn);font-weight:600">${ov.id}</td>
+               <td style="font-weight:600">${ov.driver}</td>
+               <td>${fmtDate(ov.date)}</td>
+               <td style="font-size:11px">${ov.blockReasons[0]||'HOS override'}</td>
+               <td style="font-size:11px;max-width:200px">${ov.reason}</td>
+               <td>${ov.approvedBy}</td>
+             </tr>`).join('')}
+           </tbody>
+         </table></div>
+       </div>`;
+}
+
+// ─── OPEN DISPATCH CHECK ──────────────────────────────────────
+function openDispatchCheck(){
+  showPanel('dispatch');
+  setTimeout(()=>{
+    const sel = document.getElementById('sim-driver');
+    if(sel && drivers[0]){sel.value=drivers[0].id;runDispatchSim();}
+  },100);
+}
+
+// ─── UTILITIES ────────────────────────────────────────────────
+function statusChip(s){
+  const m={Dispatched:'gr',Available:'bl','Off Duty':'gy','On Site':'bl',Driving:'gr','On Duty (Not Driving)':'yw',Blocked:'rd',OK:'gr',Warning:'yw'};
+  return`<span class="chip ${m[s]||'gy'}">${s}</span>`;
+}
+
+// ─── PANEL SYSTEM ─────────────────────────────────────────────
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('panel-'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>{if((n.getAttribute('onclick')||'').includes("'"+id+"'")) n.classList.add('active');});
+  if(id==='dispatch') renderDispatchGatePanel();
+  if(id==='drivers') renderDriversPanel();
+  if(id==='eld') renderELDPanel();
+  if(id==='logs') renderLogsPanel();
+  if(id==='audit') renderAuditPanel();
+  if(id==='violations') renderViolationsPanel();
+  if(id==='regulations') renderRegulationsPanel();
+  if(id==='fatigue-report') renderFatiguePanel();
+  if(id==='overrides') renderOverridesPanel();
+}
+
+function renderDriversPanel(){
+  const el=document.getElementById('driversPanel');
+  if(!el) return;
+  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Drivers — HOS Summary</div></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Driver</th><th>Role</th><th>Weekly Hours</th><th>Drive Today</th><th>Consec. Days</th><th>Fatigue Score</th><th>ELD</th><th>Dispatch</th></tr></thead><tbody>
+    ${drivers.map(d=>`<tr onclick="openDriverDetail('${d.id}')">
+      <td><strong>${d.name}</strong></td>
+      <td style="font-size:11.5px">${d.role}</td>
+      <td style="color:${d.onDutyWeek>=70?'var(--danger)':d.onDutyWeek>=60?'var(--warn)':'var(--text)'};font-weight:${d.onDutyWeek>=60?'700':'400'}">${d.onDutyWeek}h / 70h</td>
+      <td>${d.driveHoursToday}h / 13h</td>
+      <td style="color:${d.consecutiveDays>=7?'var(--danger)':d.consecutiveDays>=5?'var(--warn)':'var(--text)'}">${d.consecutiveDays} days</td>
+      <td><span style="font-family:'DM Mono',monospace;color:${getFatigueColor(d.fatigueScore)};font-weight:700">${d.fatigueScore}</span> <span class="chip ${getFatigueClass(d.fatigueLevel)}">${d.fatigueLevel}</span></td>
+      <td style="font-size:11px">${d.eldSynced?'<span class="chip gr">Connected</span>':'<span class="chip gy">Manual</span>'}</td>
+      <td>${d.dispatchable?'<span class="chip gr">✅ Available</span>':'<span class="chip rd">⛔ Blocked</span>'}</td>
+    </tr>`).join('')}
+  </tbody></table></div></div>`;
+}
+
+function openDrawerEl(){document.getElementById('overlay').classList.add('open');document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open')}
+function showModal(title,body,actions){
+  document.getElementById('modalTitle').innerHTML=title;
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalActions').innerHTML=actions.map(a=>`<button class="btn ${a.cls}" onclick="${a.action}">${a.label}</button>`).join('');
+  document.getElementById('modalOv').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOv').classList.remove('open')}
+function showToast(type,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show '+(['success','error','warn'].includes(type)?type:'success');
+  setTimeout(()=>t.classList.remove('show'),3400);
+}
+
+function renderAll(){
+  renderStats();
+  renderHOSCards();
+  renderFatigueIndex();
+  renderDispatchSummary();
+  const cur=document.querySelector('.panel.active')?.id.replace('panel-','');
+  if(cur==='dispatch') renderDispatchGatePanel();
+  if(cur==='drivers') renderDriversPanel();
+  if(cur==='eld') renderELDPanel();
+  if(cur==='logs') renderLogsPanel();
+  if(cur==='audit') renderAuditPanel();
+  if(cur==='violations') renderViolationsPanel();
+  if(cur==='regulations') renderRegulationsPanel();
+  if(cur==='fatigue-report') renderFatiguePanel();
+  if(cur==='overrides') renderOverridesPanel();
+}
+
+initApp();
+</script>
+
+<script>
+// ── JURISDICTION AWARENESS ───────────────────────────────────
+let VIGIL_JUR = 'ca';
+
+const HOS_RULES_CA = {
+  maxDriveDaily: 13, maxOnDutyDaily: 14, mandatoryBreak: 0.5,
+  minOffBetweenShifts: 8, maxWeekly: 70, maxConsecutiveDays: 14, resetRequires: 36,
+  label: 'Canada Federal HOS', regulator: 'TC / NSC Standard 9',
+  driveLabel: '13-hour daily drive', weeklyLabel: '70h / 7-day cycle',
+  resetLabel: '36h off-duty reset', whmis: 'WHMIS', workerComp: 'WCB',
+  licence: 'Class 1', medCert: 'TC Medical Certificate',
+};
+const HOS_RULES_US = {
+  maxDriveDaily: 11, maxOnDutyDaily: 14, mandatoryBreak: 0.5,
+  minOffBetweenShifts: 10, maxWeekly: 60, maxConsecutiveDays: 14, resetRequires: 34,
+  label: 'FMCSA HOS Regulations', regulator: 'FMCSA 49 CFR Parts 390-399',
+  driveLabel: '11-hour daily drive', weeklyLabel: '60h/7-day or 70h/8-day cycle',
+  resetLabel: '34-hour restart provision', whmis: 'HazCom / GHS', workerComp: "Workers' Comp",
+  licence: 'CDL Class A', medCert: 'DOT Physical (MCSA-5875)',
+};
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'VIGIL_JUR') {
+    VIGIL_JUR = e.data.jur;
+    Object.assign(HOS_RULES, VIGIL_JUR === 'us' ? HOS_RULES_US : HOS_RULES_CA);
+    updateJurBanner();
+    renderAll();
+  }
+});
+
+function updateJurBanner() {
+  const rules = VIGIL_JUR === 'us' ? HOS_RULES_US : HOS_RULES_CA;
+  let banner = document.getElementById('jur-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'jur-banner';
+    banner.style.cssText = 'margin:0 0 14px;padding:8px 14px;border-radius:7px;font-size:12px;display:flex;align-items:center;gap:10px;line-height:1.5;';
+    const content = document.querySelector('.content');
+    const firstPanel = document.getElementById('panel-dashboard');
+    if (firstPanel) firstPanel.insertBefore(banner, firstPanel.firstChild);
+  }
+  const isUS = VIGIL_JUR === 'us';
+  banner.style.background = isUS ? 'rgba(0,194,255,.07)' : 'rgba(255,107,53,.07)';
+  banner.style.border = isUS ? '1px solid rgba(0,194,255,.2)' : '1px solid rgba(255,107,53,.2)';
+  banner.style.color = isUS ? '#00C2FF' : '#FF8C52';
+  banner.innerHTML = (isUS ? '🇺🇸' : '🍁') + ' <strong>' + rules.label + '</strong> — Drive: ' + rules.driveLabel + ' · Weekly: ' + rules.weeklyLabel + ' · Reset: ' + rules.resetLabel + ' · Regulator: ' + rules.regulator;
+}
+</script>
+</body>
+</html>

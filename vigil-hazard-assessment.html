@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Hazard Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;--border:#1E2D40;--b2:#263648;--accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;--purple:#8B5CF6;--cyan:#06B6D4;--orange:#F97316;--text:#C8DCF0;--text2:#8AAAC4;--muted:#4A6880}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOP BAR */
+.topbar{background:linear-gradient(90deg,#060A14,#091220);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:9.5px;color:var(--muted);letter-spacing:.5px}
+.topbar-center{flex:1;display:flex;align-items:center;padding:0 16px}
+.breadcrumb{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.breadcrumb b{color:var(--text2)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.co-tag{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:10px;color:var(--text2)}
+.lpill{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--ok)}
+.pd{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
+.btn-primary{background:var(--warn);color:#000}
+.btn-primary:hover{background:#D97706}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(59,130,246,.3)}
+.btn-ghost:hover{background:rgba(59,130,246,.08)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#059669}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:3px 9px;font-size:10.5px}
+
+/* LAYOUT */
+.main{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .22s}
+.panel.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.panel-pad{padding:18px}
+
+/* ALERT STRIP */
+.astrip{background:linear-gradient(90deg,rgba(239,68,68,.06),transparent);border-bottom:1px solid rgba(239,68,68,.1);padding:5px 18px;display:flex;align-items:center;gap:8px;font-size:10.5px;flex-shrink:0}
+.al{color:var(--danger);font-weight:700;font-size:10px}
+.ai-item{display:flex;align-items:center;gap:4px}
+.adot{width:5px;height:5px;border-radius:50%}
+.asep{color:var(--b2);margin:0 2px}
+
+/* KPI */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-card.bl::before{background:linear-gradient(90deg,var(--accent),transparent)}
+.kpi-card.ok::before{background:linear-gradient(90deg,var(--ok),transparent)}
+.kpi-card.warn::before{background:linear-gradient(90deg,var(--warn),transparent)}
+.kpi-card.danger::before{background:linear-gradient(90deg,var(--danger),transparent)}
+.kpi-card.pu::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.kpi-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1}
+.kpi-card.bl .kpi-val{color:var(--accent)}
+.kpi-card.ok .kpi-val{color:var(--ok)}
+.kpi-card.warn .kpi-val{color:var(--warn)}
+.kpi-card.danger .kpi-val{color:var(--danger)}
+.kpi-card.pu .kpi-val{color:var(--purple)}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.kpi-sub.up{color:var(--ok)}.kpi-sub.dn{color:var(--danger)}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border)}
+.card-title{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.card-action{font-size:10.5px;color:var(--accent);cursor:pointer}
+.card-body{padding:14px}
+.card-body-flush{padding:0}
+
+/* GRID */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+.tbl td{padding:8px 12px;font-size:11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.clickable:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.chip.danger{background:rgba(239,68,68,.15);color:var(--danger)}
+.chip.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.chip.ok{background:rgba(16,185,129,.15);color:var(--ok)}
+.chip.accent{background:rgba(59,130,246,.15);color:var(--accent)}
+.chip.purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.chip.cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
+.chip.muted{background:rgba(74,104,128,.15);color:var(--text2)}
+.chip.orange{background:rgba(249,115,22,.15);color:var(--orange)}
+
+/* LIVE STATS */
+.live-row{display:flex;gap:0}
+.live-stat{flex:1;padding:12px 16px;border-right:1px solid var(--border);text-align:center}
+.live-stat:last-child{border-right:none}
+.live-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.live-lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* TEMPLATE GRID */
+.tmpl-grid-dash{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tmpl-item{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;cursor:pointer;transition:all .14s}
+.tmpl-item:hover{border-color:var(--b2);background:var(--s3)}
+.tmpl-item-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.tmpl-icon{font-size:18px;flex-shrink:0}
+.tmpl-name{font-size:11.5px;font-weight:600;line-height:1.3;flex:1;min-width:0}
+.tmpl-meta{font-size:9.5px;color:var(--muted)}
+
+/* FORM PANEL */
+.form-wrap{max-width:700px;margin:0 auto;padding:24px 18px}
+.form-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
+.form-sub{font-size:12px;color:var(--muted)}
+
+/* STEP BAR */
+.step-bar{display:flex;gap:0;margin-bottom:28px;position:relative}
+.step-bar::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:1px;background:var(--border)}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;z-index:1}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--s3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--muted);transition:all .2s}
+.step-dot.active{background:var(--warn);border-color:var(--warn);color:#000}
+.step-dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.step-lbl{font-size:9px;color:var(--muted);text-align:center;line-height:1.3;max-width:60px}
+.step-lbl.active{color:var(--warn)}.step-lbl.done{color:var(--ok)}
+.form-section{display:none}
+.form-section.active{display:block}
+.form-nav{display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid var(--border);margin-top:18px}
+
+/* FORM INPUTS */
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-label{font-size:10.5px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px}
+.form-label .req{color:var(--danger)}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .14s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--warn)}
+.form-select option{background:var(--s3)}
+.form-textarea{resize:vertical;min-height:70px;line-height:1.5}
+.form-hint{font-size:10px;color:var(--muted)}
+
+/* TEMPLATE SELECTOR IN FORM */
+
+/* HAZARD CARDS */
+.haz-card{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px}
+.haz-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.haz-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.haz-desc{font-size:12px;font-weight:500;line-height:1.4;flex:1}
+.haz-meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.haz-actions{display:flex;gap:6px;margin-bottom:8px}
+.haz-btn{padding:4px 10px;border-radius:4px;font-size:10.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s3);color:var(--muted);transition:all .14s;font-family:'DM Sans',sans-serif}
+.haz-btn:hover{border-color:var(--b2)}
+.haz-btn.sel-present{background:rgba(16,185,129,.15);border-color:var(--ok);color:var(--ok)}
+.haz-btn.sel-not_present{background:rgba(239,68,68,.15);border-color:var(--danger);color:var(--danger)}
+.haz-btn.sel-unsure{background:rgba(245,158,11,.15);border-color:var(--warn);color:var(--warn)}
+
+/* CONTROL ROWS */
+.ctrl-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;transition:border-color .14s}
+.ctrl-row.confirmed{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.03)}
+.ctrl-hier{display:inline-flex;padding:2px 6px;border-radius:3px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.ctrl-hier.elimination{background:rgba(16,185,129,.2);color:var(--ok)}
+.ctrl-hier.substitution{background:rgba(6,182,212,.2);color:var(--cyan)}
+.ctrl-hier.engineering{background:rgba(59,130,246,.2);color:var(--accent)}
+.ctrl-hier.administrative{background:rgba(245,158,11,.2);color:var(--warn)}
+.ctrl-hier.ppe{background:rgba(139,92,246,.2);color:var(--purple)}
+.ctrl-desc{flex:1;font-size:11.5px;color:var(--text)}
+.ctrl-req-badge{font-size:9px;color:var(--danger);font-weight:600;flex-shrink:0}
+
+/* SITE HAZARD ADDER */
+.site-haz-item{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px;margin-bottom:8px;position:relative}
+.site-haz-remove{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1}
+.site-haz-remove:hover{color:var(--danger)}
+
+/* TOGGLE */
+.toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--b2);border-radius:20px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--ok)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);background:#fff}
+
+/* QUALITY RING */
+.q-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.q-ring-val{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1}
+.q-ring-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* CREW */
+.crew-member{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s2);border:1px solid rgba(16,185,129,.2);border-radius:6px;margin-bottom:6px}
+.crew-avatar{width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0}
+.crew-name{flex:1;font-size:12px;font-weight:500}
+.crew-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px}
+.crew-remove:hover{color:var(--danger)}
+
+/* DETAIL PANEL */
+.detail-wrap{max-width:760px;margin:0 auto;padding:24px 18px}
+.detail-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.detail-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.detail-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.detail-fact{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.detail-fact-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.detail-fact-val{font-size:12px;color:var(--text);font-weight:500}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:9px;margin-top:18px}
+.desc-box{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+.flag-item{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--warn);margin-bottom:6px}
+
+/* SUCCESS */
+.success-card{background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(16,185,129,.04));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:28px;text-align:center}
+.success-icon{font-size:44px;margin-bottom:12px}
+.success-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--warn);margin-bottom:4px}
+.success-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
+.success-score{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;margin:12px 0}
+
+/* TIMELINE */
+.timeline{display:flex;align-items:center;gap:0;margin-bottom:18px;overflow-x:auto;padding-bottom:4px}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.tl-node{width:28px;height:28px;border-radius:50%;background:var(--s3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.tl-node.done{background:var(--ok);border-color:var(--ok)}
+.tl-node.active{background:var(--warn);border-color:var(--warn);color:#000;box-shadow:0 0 0 3px rgba(245,158,11,.2)}
+.tl-lbl{font-size:8.5px;color:var(--muted);margin-top:4px;text-align:center;max-width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-lbl.done{color:var(--ok)}.tl-lbl.active{color:var(--warn)}
+.tl-line{flex:1;height:1.5px;background:var(--border);min-width:20px;max-width:60px;margin-bottom:18px}
+.tl-line.done{background:var(--ok)}
+
+/* AUTOCOMPLETE */
+.ac-wrap{position:relative}
+.ac-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--s3);border:1px solid var(--border);border-radius:6px;max-height:160px;overflow-y:auto;z-index:200;display:none}
+.ac-item{padding:7px 11px;font-size:11.5px;cursor:pointer;border-bottom:1px solid var(--border)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:var(--s4)}
+.ac-item .ac-name{font-weight:500}
+.ac-item .ac-sub{font-size:10px;color:var(--muted)}
+
+/* LOADING / SPINNER */
+.spinner{width:32px;height:32px;border:2.5px solid var(--border);border-top-color:var(--warn);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;gap:12px}
+.loading-wrap span{font-size:12px;color:var(--muted)}
+.empty-state{text-align:center;padding:28px;color:var(--muted);font-size:11.5px}
+.empty-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+
+/* CHART */
+.chart-container{height:110px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:12px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s;min-width:220px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  .tmpl-grid-dash{grid-template-columns:1fr 1fr}
+  .topbar-center{display:none}
+  .detail-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">⚠️</div>
+    <div>
+      <div class="logo-title">Hazard Assessment</div>
+      <div class="logo-sub">Vigil HSE Platform</div>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="breadcrumb">
+      <span>Northern Express Transport</span>
+      <span style="color:var(--border)">›</span>
+      <b>Field Hazard Intelligence</b>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lpill"><div class="pd"></div><span id="worker-pill">— Workers</span></div>
+    <div class="co-tag">🚛 Northern Express Transport</div>
+    <button class="btn btn-primary" onclick="showPanel('form')">⚠️ Start FLHA</button>
+  </div>
+</header>
+
+<!-- ALERT STRIP -->
+<div class="astrip" id="astrip" style="display:none">
+  <span class="al">⚠️ Alerts:</span>
+  <span id="astrip-content"></span>
+  <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="document.getElementById('astrip').style.display='none'">✕</button>
+</div>
+
+<div class="main">
+
+  <!-- PANEL 1: DASHBOARD -->
+  <div class="panel" id="panel-dash">
+    <div class="panel-pad">
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip">
+        <div class="kpi-card warn">
+          <div class="kpi-label">FLHAs Today</div>
+          <div class="kpi-val" id="kpi-today">—</div>
+          <div class="kpi-sub" id="kpi-today-sub">Loading…</div>
+        </div>
+        <div class="kpi-card bl">
+          <div class="kpi-label">Avg Quality Score</div>
+          <div class="kpi-val" id="kpi-quality">—</div>
+          <div class="kpi-sub" id="kpi-quality-sub">All time</div>
+        </div>
+        <div class="kpi-card danger">
+          <div class="kpi-label">Flagged Today</div>
+          <div class="kpi-val" id="kpi-flagged">—</div>
+          <div class="kpi-sub" id="kpi-flagged-sub">Low quality score</div>
+        </div>
+        <div class="kpi-card pu">
+          <div class="kpi-label">Pending Review</div>
+          <div class="kpi-val" id="kpi-pending">—</div>
+          <div class="kpi-sub" id="kpi-pending-sub">Supervisor action needed</div>
+        </div>
+      </div>
+
+      <!-- LIVE TODAY + QUALITY CHART -->
+      <div class="row2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📡 Live Today</div>
+            <span class="chip warn" id="live-date" style="font-size:9.5px"></span>
+          </div>
+          <div class="live-row" id="live-stats-row">
+            <div class="live-stat">
+              <div class="live-val" id="live-high-risk" style="color:var(--danger)">—</div>
+              <div class="live-lbl">High Risk Active</div>
+            </div>
+            <div class="live-stat">
+              <div class="live-val" id="live-workers" style="color:var(--warn)">—</div>
+              <div class="live-lbl">In Field</div>
+            </div>
+            <div class="live-stat">
+              <div class="live-val" id="live-flagged-count" style="color:var(--orange)">—</div>
+              <div class="live-lbl">Flagged</div>
+            </div>
+          </div>
+          <div id="live-by-type" class="card-body" style="padding-top:10px;border-top:1px solid var(--border)"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📊 Quality Distribution</div>
+            <div id="chart-avg-badge" style="font-size:10.5px;color:var(--muted)"></div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <svg id="quality-chart" width="100%" height="110" viewBox="0 0 400 110" preserveAspectRatio="none"></svg>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:2px;background:var(--danger)"></div>Poor 0–50</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:2px;background:var(--warn)"></div>Fair 51–70</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:2px;background:var(--accent)"></div>Good 71–85</div>
+              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:2px;background:var(--ok)"></div>Excellent 86+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASSESSMENTS TABLE -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 Recent Assessments
+            <span class="chip danger" id="flagged-badge" style="display:none"></span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="form-select" id="filter-status" style="width:auto;padding:3px 8px;font-size:10.5px" onchange="filterAssessments()">
+              <option value="">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="submitted">Submitted</option>
+              <option value="flagged">Flagged</option>
+              <option value="supervisor_review">Pending Review</option>
+              <option value="returned">Returned</option>
+              <option value="approved">Approved</option>
+              <option value="closed">Closed</option>
+            </select>
+            <select class="form-select" id="filter-risk" style="width:auto;padding:3px 8px;font-size:10.5px" onchange="filterAssessments()">
+              <option value="">All Risk</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body-flush" id="assessments-table">
+          <div class="loading-wrap"><div class="spinner"></div><span>Loading assessments…</span></div>
+        </div>
+      </div>
+
+      <!-- TEMPLATE LIBRARY -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📚 Task Template Library</div>
+          <span class="card-action" onclick="showPanel('form')">+ Start FLHA from template</span>
+        </div>
+        <div class="card-body">
+          <div class="tmpl-grid-dash" id="tmpl-library">
+            <div class="loading-wrap" style="height:80px;grid-column:1/-1"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 2: START FLHA FORM -->
+  <div class="panel hidden" id="panel-form">
+    <div class="form-wrap">
+
+      <!-- HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div>
+          <div class="form-title">Start a Field Hazard Assessment</div>
+          <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+      </div>
+
+      <!-- STEP BAR -->
+      <div class="step-bar" id="step-bar">
+        <div class="step-item"><div class="step-dot active" id="sdot-1">1</div><div class="step-lbl active" id="slbl-1">Select<br>Task</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-2">2</div><div class="step-lbl" id="slbl-2">Known<br>Hazards</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-3">3</div><div class="step-lbl" id="slbl-3">Site<br>Hazards</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-4">4</div><div class="step-lbl" id="slbl-4">Confirm<br>Controls</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-5">5</div><div class="step-lbl" id="slbl-5">Crew &amp;<br>Submit</div></div>
+      </div>
+
+      <!-- STEP 1: SELECT TASK -->
+      <div class="form-section active" id="step-1">
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">Filter by Category</label>
+          <select class="form-select" id="tmpl-cat-filter" onchange="filterTemplateSelect()" style="width:100%;padding:10px 12px;background:#101520;color:#e2e8f0;border:1px solid #1A2232;border-radius:8px;font-size:13px;">
+            <option value="">All Categories</option>
+            <option value="driving">Driving</option>
+            <option value="loading_unloading">Loading / Unloading</option>
+            <option value="mechanical">Mechanical</option>
+            <option value="electrical">Electrical</option>
+            <option value="lifting_rigging">Lifting &amp; Rigging</option>
+            <option value="working_at_heights">Working at Heights</option>
+            <option value="confined_space">Confined Space</option>
+            <option value="hot_work">Hot Work</option>
+            <option value="chemical">Chemical</option>
+            <option value="cold_weather">Cold Weather</option>
+            <option value="field_service">Field Service</option>
+            <option value="general">General</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">Task Template</label>
+          <select id="tmpl-select" class="form-select" onchange="onTemplateSelectChange()" style="width:100%;padding:12px;background:#101520;color:#e2e8f0;border:1px solid #1A2232;border-radius:8px;font-size:15px;margin-bottom:0;">
+            <option value="">— Select a task template —</option>
+          </select>
+        </div>
+        <div id="tmpl-summary" style="display:none;background:var(--s2);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:11px 14px;margin-bottom:4px"></div>
+
+        <div style="margin:14px 0;display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:10.5px;color:var(--muted)">or describe your task</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Task Title</label>
+          <input type="text" class="form-input" id="f-custom-title" placeholder="e.g. Pre-trip vehicle inspection at Edmonton hub…">
+          <div class="form-hint">Used if no template is selected above</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Site <span class="req">*</span></label>
+            <select class="form-select" id="f-site">
+              <option value="">— Select site —</option>
+              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
+              <option value="Edmonton Hub">Edmonton Hub</option>
+              <option value="Site B Pipeline">Site B Pipeline</option>
+              <option value="Red Deer Terminal">Red Deer Terminal</option>
+              <option value="Highway / En Route">Highway / En Route</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Risk Tier (if no template)</label>
+            <select class="form-select" id="f-risk-tier">
+              <option value="">— Select —</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Work Start Time</label>
+            <input type="datetime-local" class="form-input" id="f-start-time">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Weather Conditions</label>
+            <input type="text" class="form-input" id="f-weather" placeholder="e.g. Overcast, -5°C, wind NW">
+          </div>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-primary" onclick="goStep(2)">Next: Confirm Hazards →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: KNOWN HAZARDS -->
+      <div class="form-section" id="step-2">
+        <div id="step2-header" style="margin-bottom:14px"></div>
+        <div id="step2-hazards">
+          <div class="loading-wrap"><div class="spinner"></div><span>Loading hazards…</span></div>
+        </div>
+        <div id="reflection-prompt-wrap" style="display:none;margin-top:14px">
+          <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:12px 14px">
+            <div style="font-size:9.5px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">💭 Reflection Prompt</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px" id="reflection-prompt-text"></div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Your Response</label>
+              <textarea class="form-textarea" id="f-reflection" rows="2" placeholder="Respond to the prompt above…" oninput="collectFormData()"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px">
+          <label class="form-label">What is different today? <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-what-changed" rows="2" placeholder="Describe any changes from normal conditions — new crew, different equipment, weather, site conditions…" oninput="collectFormData()"></textarea>
+          <div class="form-hint">Required for quality score. Min 10 characters.</div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(3)">Next: Site Hazards →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: SITE-SPECIFIC HAZARDS -->
+      <div class="form-section" id="step-3">
+        <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:7px;padding:12px 14px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:600;color:var(--warn);margin-bottom:3px">⚠️ What else could hurt you today?</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5">Think about the specific conditions at this location right now. What hazards are present that are NOT in the template above?</div>
+        </div>
+        <div id="site-hazards-list"></div>
+        <button class="btn btn-ghost btn-sm" onclick="addSiteHazard()" style="margin-bottom:14px">+ Add Site-Specific Hazard</button>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(4)">Next: Confirm Controls →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: CONFIRM CONTROLS -->
+      <div class="form-section" id="step-4">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5">Confirm each control is in place before starting work. Toggle to confirm.</div>
+        <div id="step4-controls">
+          <div class="loading-wrap"><div class="spinner"></div><span>Loading controls…</span></div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(5)">Next: Crew & Submit →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: CREW & SUBMIT -->
+      <div class="form-section" id="step-5">
+        <div class="form-group">
+          <label class="form-label">Add Crew Members</label>
+          <div class="ac-wrap">
+            <input type="text" class="form-input" id="crew-search" placeholder="Search worker to add to FLHA…" autocomplete="off" oninput="crewSearch(this.value)">
+            <div class="ac-dropdown" id="crew-ac"></div>
+          </div>
+          <div class="form-hint">Worker who submitted is automatically included</div>
+        </div>
+        <div id="crew-list" style="margin-bottom:16px"></div>
+
+        <!-- QUALITY PREVIEW -->
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:600;margin-bottom:10px">Quality Score Preview</div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div class="q-ring-wrap">
+              <div class="q-ring-val" id="quality-preview-score">—</div>
+              <div class="q-ring-lbl">/ 100</div>
+            </div>
+            <div style="flex:1" id="quality-preview-flags"></div>
+          </div>
+        </div>
+
+        <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 13px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.55">
+          By submitting this FLHA, you confirm that you have assessed the hazards present, controls are in place, and all crew members have been briefed.
+        </div>
+
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+          </div>
+          <button class="btn btn-ok" id="submit-btn-flha" onclick="submitFlha()">✓ Submit FLHA</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div id="form-success" style="display:none">
+        <div class="success-card">
+          <div class="success-icon">✅</div>
+          <div class="success-num" id="success-assessment-num">FLHA-2026-0001</div>
+          <div class="success-sub">Assessment submitted successfully</div>
+          <div class="success-score" id="success-quality-score">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:18px">Quality Score</div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="showPanel('dash')">← Back to Dashboard</button>
+            <button class="btn btn-ok" id="view-detail-btn" onclick="viewSubmittedDetail()">View Full FLHA →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 3: DETAIL -->
+  <div class="panel hidden" id="panel-detail">
+    <div class="detail-wrap">
+      <div style="margin-bottom:16px">
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('dash')">← Back to Dashboard</button>
+      </div>
+      <div id="detail-content">
+        <div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const API = 'https://vigil-production-17ca.up.railway.app';
+const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+const LOGGED_IN = {id:'1a549387-4fcd-40f5-838f-9dee721701d2', name:'James Marchetti'};
+
+// ── STATE ─────────────────────────────────────────────────────
+let token = null;
+let assessments = [], templates = [], workers = [];
+let todayStats = null, overallStats = null;
+let formStep = 1;
+let formTemplate = null;
+let formHazardResponses = {};
+let formHazardNotes = {};
+let formSiteHazards = [];
+let formControlResponses = {};
+let formCrewIds = [];
+let formData = {};
+let lastSubmittedId = null;
+
+// ── HELPERS ───────────────────────────────────────────────────
+async function apiGet(path) {
+  const r = await fetch(API + path, {headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}});
+  if (!r.ok) return null;
+  return r.json().catch(() => null);
+}
+async function apiPost(path, body) {
+  const r = await fetch(API + path, {method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return {ok:r.ok, status:r.status, data:await r.json().catch(()=>null)};
+}
+function fmt(s) {
+  if (!s) return '—';
+  return s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtShort(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+}
+function fmtTime(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'});
+}
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='ok' ? 'rgba(16,185,129,.15)' : type==='danger' ? 'rgba(239,68,68,.15)' : 'var(--s3)';
+  t.style.borderColor = type==='ok' ? 'rgba(16,185,129,.3)' : type==='danger' ? 'rgba(239,68,68,.3)' : 'var(--border)';
+  t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+  setTimeout(()=>{t.style.transform='translateY(60px)';t.style.opacity='0';}, 3200);
+}
+
+// ── CHIP HELPERS ──────────────────────────────────────────────
+function riskChip(tier) {
+  const map = {low:['ok','Low'],medium:['accent','Medium'],high:['warn','High'],critical:['danger','Critical']};
+  const [cls, lbl] = map[tier] || ['muted', fmt(tier)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function statusChip(s) {
+  const map = {
+    draft:['muted','Draft'], submitted:['accent','Submitted'], flagged:['danger','Flagged'],
+    supervisor_review:['warn','Pending Review'], returned:['orange','Returned'],
+    approved:['ok','Approved'], closed:['muted','Closed'],
+  };
+  const [cls, lbl] = map[s] || ['muted', fmt(s)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function typeChip(t) {
+  const map = {flha:['warn','FLHA'],jha:['accent','JHA'],swp:['purple','SWP'],fha:['cyan','FHA']};
+  const [cls, lbl] = map[t] || ['muted', fmt(t)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function qualityBadge(score) {
+  if (score == null) return '<span class="chip muted">—</span>';
+  const cls = score >= 86 ? 'ok' : score >= 71 ? 'accent' : score >= 50 ? 'warn' : 'danger';
+  return `<span class="chip ${cls}" style="font-size:11px;font-weight:700;min-width:28px;justify-content:center">${score}</span>`;
+}
+function severityChip(s) {
+  const map = {fatality:['danger','Fatality'],critical:['danger','Critical'],serious:['warn','Serious'],minor:['accent','Minor'],negligible:['muted','Negligible']};
+  const [cls, lbl] = map[s] || ['muted', fmt(s)];
+  return `<span class="chip ${cls}">${lbl}</span>`;
+}
+function taskCatIcon(cat) {
+  const icons = {
+    mechanical:'⚙️',electrical:'⚡',hydraulic:'🔧',lifting_rigging:'🏗️',working_at_heights:'🧗',
+    confined_space:'🕳️',hot_work:'🔥',excavation:'⛏️',driving:'🚛',loading_unloading:'📦',
+    field_service:'🔨',chemical:'🧪',cold_weather:'❄️',customer_site:'🏢',general:'✅',other:'⚠️',
+  };
+  return icons[cat] || '📋';
+}
+function hazCatColor(cat) {
+  const map = {
+    stored_energy:'var(--danger)',line_of_fire:'var(--danger)',pinch_crush:'var(--orange)',
+    slip_trip_fall:'var(--warn)',working_at_heights:'var(--orange)',struck_by:'var(--danger)',
+    caught_in:'var(--warn)',chemical:'var(--purple)',biological:'var(--cyan)',electrical:'var(--warn)',
+    thermal:'var(--orange)',environmental:'var(--ok)',vehicle_traffic:'var(--danger)',
+    ergonomic:'var(--accent)',other:'var(--muted)',
+  };
+  return map[cat] || 'var(--muted)';
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  const ar = await fetch(API + '/api/auth/login', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(AUTH)
+  });
+  if (!ar.ok) { toast('⚠️ Could not connect to Vigil API', 'danger'); return; }
+  const ab = await ar.json();
+  token = ab.token || ab.access_token || (ab.data && ab.data.token);
+  if (!token) return;
+
+  const [asmtData, tmplData, statsData, todayData, workerData] = await Promise.all([
+    apiGet('/api/hazard/assessments?limit=100'),
+    apiGet('/api/hazard/templates?limit=50'),
+    apiGet('/api/hazard/stats'),
+    apiGet('/api/hazard/stats/today'),
+    apiGet('/api/workers?limit=100'),
+  ]);
+
+  assessments = (asmtData && asmtData.assessments) || [];
+  templates   = (tmplData && tmplData.templates)   || [];
+  overallStats = statsData || null;
+  todayStats   = todayData || null;
+  workers      = (workerData && workerData.workers) || [];
+
+  const wc = document.getElementById('worker-pill');
+  if (wc) wc.textContent = `${workers.length} Workers`;
+
+  const today = new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+  const ld = document.getElementById('live-date');
+  if (ld) ld.textContent = today;
+
+  renderKPIs();
+  renderChart();
+  renderAssessmentsTable();
+  renderTemplateLibrary();
+  buildAlertStrip();
+}
+
+// ── KPIs ──────────────────────────────────────────────────────
+function renderKPIs() {
+  const t = (todayStats && todayStats.today) || {};
+  const s = (overallStats && overallStats.stats) || {};
+
+  document.getElementById('kpi-today').textContent    = t.submitted_today ?? assessments.length;
+  document.getElementById('kpi-today-sub').textContent = `${t.high_risk_active ?? '—'} high risk`;
+
+  const avg = s.avg_quality_score ?? null;
+  document.getElementById('kpi-quality').textContent    = avg != null ? avg : '—';
+  document.getElementById('kpi-quality-sub').textContent = avg != null
+    ? (avg >= 71 ? '↑ Good standing' : '↓ Needs improvement')
+    : 'All time';
+  document.getElementById('kpi-quality-sub').className  = 'kpi-sub' + (avg != null && avg >= 71 ? ' up' : avg != null ? ' dn' : '');
+
+  document.getElementById('kpi-flagged').textContent    = t.flagged_today ?? assessments.filter(a=>a.status==='flagged').length;
+  document.getElementById('kpi-flagged-sub').textContent = `${s.flagged_rate ?? '—'}% flag rate`;
+
+  document.getElementById('kpi-pending').textContent    = t.pending_supervisor_review ?? assessments.filter(a=>a.status==='supervisor_review').length;
+
+  // Live stats row
+  document.getElementById('live-high-risk').textContent   = t.high_risk_active ?? '—';
+  document.getElementById('live-workers').textContent     = t.submitted_today ?? '—';
+  document.getElementById('live-flagged-count').textContent = t.flagged_today ?? '—';
+
+  // Live by type
+  const byType = t.by_type || (s.by_type) || [];
+  if (byType.length > 0) {
+    document.getElementById('live-by-type').innerHTML = byType.map(b =>
+      `<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px">
+        <span style="color:var(--muted)">${fmt(b.assessment_type)}</span>
+        <span style="font-weight:600;color:var(--text)">${b.count}</span>
+      </div>`
+    ).join('');
+  } else {
+    document.getElementById('live-by-type').innerHTML = '<div style="font-size:11px;color:var(--muted)">No breakdown available</div>';
+  }
+
+  // Flagged badge
+  const flagged = assessments.filter(a => a.status === 'flagged' || a.status === 'supervisor_review');
+  const fb = document.getElementById('flagged-badge');
+  if (flagged.length > 0) { fb.textContent = `${flagged.length} need attention`; fb.style.display = ''; }
+}
+
+// ── QUALITY CHART ─────────────────────────────────────────────
+function renderChart() {
+  const el = document.getElementById('quality-chart');
+  if (!el || !assessments.length) {
+    if (el) el.innerHTML = '<text x="200" y="60" text-anchor="middle" fill="#4A6880" font-size="12" font-family="DM Sans">No data yet</text>';
+    return;
+  }
+
+  const buckets = [
+    {label:'0–50',  color:'var(--danger)', hex:'#EF4444', count:0},
+    {label:'51–70', color:'var(--warn)',   hex:'#F59E0B', count:0},
+    {label:'71–85', color:'var(--accent)', hex:'#3B82F6', count:0},
+    {label:'86–100',color:'var(--ok)',     hex:'#10B981', count:0},
+  ];
+  for (const a of assessments) {
+    const s = a.quality_score;
+    if (s == null) continue;
+    if (s <= 50) buckets[0].count++;
+    else if (s <= 70) buckets[1].count++;
+    else if (s <= 85) buckets[2].count++;
+    else buckets[3].count++;
+  }
+
+  const avg = overallStats && overallStats.stats ? overallStats.stats.avg_quality_score : null;
+  if (avg != null) document.getElementById('chart-avg-badge').textContent = `Avg: ${avg}`;
+
+  const maxCount = Math.max(...buckets.map(b=>b.count), 1);
+  const W = 400, H = 90, barW = 60;
+  const gap = (W - 4 * barW) / 5;
+  let svg = '';
+  buckets.forEach((b, i) => {
+    const barH = b.count > 0 ? Math.max(Math.round((b.count / maxCount) * 65), 5) : 0;
+    const x = gap + i * (barW + gap);
+    const y = H - 20 - barH;
+    if (barH > 0) {
+      svg += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="${b.hex}" opacity=".8"/>`;
+      svg += `<text x="${x+barW/2}" y="${y-4}" text-anchor="middle" fill="#8AAAC4" font-size="10" font-family="DM Sans">${b.count}</text>`;
+    }
+    svg += `<text x="${x+barW/2}" y="${H-3}" text-anchor="middle" fill="#4A6880" font-size="9" font-family="DM Sans">${b.label}</text>`;
+  });
+  el.innerHTML = svg;
+}
+
+// ── ASSESSMENTS TABLE ─────────────────────────────────────────
+function renderAssessmentsTable(list) {
+  list = list || assessments;
+  const el = document.getElementById('assessments-table');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>No assessments found</div>`;
+    return;
+  }
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Assessment #</th><th>Task</th><th>Type</th><th>Risk</th>
+      <th>Worker</th><th>Site</th><th>Submitted</th><th>Quality</th><th>Status</th><th>Actions</th>
+    </tr></thead>
+    <tbody>${list.map(a => {
+      const worker = a.submitted_by_first_name
+        ? `${a.submitted_by_first_name} ${a.submitted_by_last_name}`
+        : '—';
+      return `<tr class="clickable" onclick="showDetail('${a.id}')">
+        <td><b style="color:var(--warn);font-family:'Syne',sans-serif;font-size:11px">${a.assessment_number}</b></td>
+        <td style="max-width:200px"><div style="font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div>
+          <div style="font-size:9.5px;color:var(--muted)">${a.template_title || ''}</div></td>
+        <td>${typeChip(a.assessment_type)}</td>
+        <td>${riskChip(a.risk_tier)}</td>
+        <td style="font-size:10.5px;color:var(--text2)">${worker}</td>
+        <td style="font-size:10.5px;color:var(--text2)">${a.site || '—'}</td>
+        <td style="font-size:10.5px;color:var(--text2)">${a.submitted_at ? fmtShort(a.submitted_at) : fmtShort(a.created_at)}</td>
+        <td>${qualityBadge(a.quality_score)}</td>
+        <td>${statusChip(a.status)}</td>
+        <td onclick="event.stopPropagation()">
+          <button class="btn btn-ghost btn-sm" onclick="showDetail('${a.id}')">View →</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+function filterAssessments() {
+  const status = document.getElementById('filter-status').value;
+  const risk   = document.getElementById('filter-risk').value;
+  renderAssessmentsTable(assessments.filter(a =>
+    (!status || a.status === status) && (!risk || a.risk_tier === risk)
+  ));
+}
+
+// ── TEMPLATE LIBRARY (DASHBOARD) ─────────────────────────────
+function renderTemplateLibrary() {
+  const el = document.getElementById('tmpl-library');
+  if (!templates.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📚</div>No templates found</div>`;
+    return;
+  }
+  el.innerHTML = templates.slice(0, 9).map(t => `
+    <div class="tmpl-item" onclick="showPanel('form')">
+      <div class="tmpl-item-top">
+        <div class="tmpl-icon">${taskCatIcon(t.task_category)}</div>
+        <div class="tmpl-name">${t.title}</div>
+        ${riskChip(t.risk_tier)}
+      </div>
+      <div class="tmpl-meta">${fmt(t.task_category)} · ${t.hazard_count || 0} hazards · ${t.control_count || 0} controls</div>
+    </div>
+  `).join('');
+}
+
+// ── ALERT STRIP ───────────────────────────────────────────────
+function buildAlertStrip() {
+  const flagged = assessments.filter(a => a.status === 'flagged').length;
+  const pending = assessments.filter(a => a.status === 'supervisor_review').length;
+  const critActive = assessments.filter(a => a.risk_tier === 'critical' && a.status !== 'closed').length;
+  if (!flagged && !pending && !critActive) return;
+  const parts = [];
+  if (critActive > 0) parts.push(`<div class="ai-item" style="color:var(--danger)"><div class="adot" style="background:var(--danger)"></div>${critActive} critical risk FLHA${critActive>1?'s':''} active</div>`);
+  if (flagged > 0) parts.push(`<div class="ai-item" style="color:var(--orange)"><div class="adot" style="background:var(--orange)"></div>${flagged} flagged for quality</div>`);
+  if (pending > 0) parts.push(`<div class="ai-item" style="color:var(--warn)"><div class="adot" style="background:var(--warn)"></div>${pending} awaiting supervisor review</div>`);
+  document.getElementById('astrip-content').innerHTML = parts.join('<span class="asep">·</span>');
+  document.getElementById('astrip').style.display = 'flex';
+}
+
+// ── PANEL NAVIGATION ──────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+  const el = document.getElementById('panel-' + id);
+  if (el) el.classList.remove('hidden');
+  if (id === 'form') resetForm();
+}
+function cancelForm() {
+  resetForm();
+  showPanel('dash');
+}
+
+// ── FORM TEMPLATE GRID ────────────────────────────────────────
+function populateTemplateSelect() {
+  const sel = document.getElementById('tmpl-select');
+  if (!sel || !templates.length) return;
+  const cat = document.getElementById('tmpl-cat-filter')?.value || '';
+
+  // Group by task_category
+  const grouped = {};
+  for (const t of templates) {
+    if (cat && t.task_category !== cat) continue;
+    if (!grouped[t.task_category]) grouped[t.task_category] = [];
+    grouped[t.task_category].push(t);
+  }
+
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">— Select a task template —</option>';
+  for (const [category, list] of Object.entries(grouped)) {
+    const grp = document.createElement('optgroup');
+    grp.label = fmt(category);
+    for (const t of list) {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `${t.title} [${t.risk_tier.toUpperCase()}]`;
+      grp.appendChild(opt);
+    }
+    sel.appendChild(grp);
+  }
+  // Restore selection if it still exists after filter
+  if (currentVal) sel.value = currentVal;
+}
+
+function filterTemplateSelect() {
+  populateTemplateSelect();
+  // If the selected template is now filtered out, clear it
+  const sel = document.getElementById('tmpl-select');
+  if (sel && sel.value === '' && formTemplate) {
+    formTemplate = null;
+    document.getElementById('tmpl-summary').style.display = 'none';
+  }
+}
+
+function onTemplateSelectChange() {
+  const sel = document.getElementById('tmpl-select');
+  const id = sel ? sel.value : '';
+  if (!id) {
+    formTemplate = null;
+    document.getElementById('tmpl-summary').style.display = 'none';
+    return;
+  }
+  const t = templates.find(t => t.id === id);
+  if (!t) return;
+  formTemplate = {...t};
+  const summary = document.getElementById('tmpl-summary');
+  summary.style.display = 'block';
+  summary.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:22px;flex-shrink:0">${taskCatIcon(t.task_category)}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">${t.title}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          ${riskChip(t.risk_tier)}
+          <span class="chip muted">${fmt(t.task_category)}</span>
+          <span style="font-size:10px;color:var(--muted)">${t.hazard_count || 0} hazards · ${t.control_count || 0} controls</span>
+          ${t.requires_permit ? '<span class="chip warn">Permit Required</span>' : ''}
+          ${t.requires_supervisor_approval ? '<span class="chip purple">Supervisor Sign-Off</span>' : ''}
+        </div>
+        ${t.description ? `<div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5">${t.description}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ── FORM RESET ────────────────────────────────────────────────
+function resetForm() {
+  formStep = 1;
+  formTemplate = null;
+  formHazardResponses = {};
+  formHazardNotes = {};
+  formSiteHazards = [];
+  formControlResponses = {};
+  formCrewIds = [];
+  formData = {};
+  lastSubmittedId = null;
+
+  document.getElementById('form-success').style.display = 'none';
+  document.getElementById('step-bar').style.display = 'flex';
+  document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+  const tmplSel = document.getElementById('tmpl-select');
+  if (tmplSel) tmplSel.value = '';
+  document.getElementById('tmpl-summary').style.display = 'none';
+  document.getElementById('reflection-prompt-wrap').style.display = 'none';
+
+  ['f-custom-title','f-weather','f-what-changed','f-reflection','crew-search'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.value = '';
+  });
+  ['f-site','f-risk-tier','tmpl-cat-filter'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.value = '';
+  });
+
+  const st = document.getElementById('f-start-time');
+  if (st) st.value = new Date().toISOString().slice(0,16);
+
+  populateTemplateSelect();
+  renderSiteHazardList();
+  renderCrewList();
+  updateStepIndicator();
+  goStep(1, true);
+}
+
+// ── STEP NAVIGATION ───────────────────────────────────────────
+async function goStep(n, silent) {
+  if (!silent) collectFormData();
+
+  if (!silent && n > formStep) {
+    if (formStep === 1) {
+      if (!formTemplate && !formData.customTitle) { toast('Select a template or enter a task title', 'danger'); return; }
+      if (!formData.site) { toast('Site is required', 'danger'); return; }
+    }
+    if (formStep === 2) {
+      if (!formData.whatChanged || formData.whatChanged.length < 5) {
+        toast('Please complete "What is different today?"', 'danger'); return;
+      }
+    }
+  }
+
+  formStep = n;
+  document.querySelectorAll('.form-section').forEach((s, i) => {
+    s.style.display = i + 1 === n ? 'block' : 'none';
+  });
+  updateStepIndicator();
+
+  if (n === 2) await renderStep2();
+  else if (n === 4) await renderStep4();
+  else if (n === 5) renderStep5();
+}
+
+function updateStepIndicator() {
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.getElementById(`sdot-${i}`);
+    const lbl = document.getElementById(`slbl-${i}`);
+    if (!dot || !lbl) continue;
+    dot.className = 'step-dot' + (i < formStep ? ' done' : i === formStep ? ' active' : '');
+    dot.textContent = i < formStep ? '✓' : String(i);
+    lbl.className = 'step-lbl' + (i < formStep ? ' done' : i === formStep ? ' active' : '');
+  }
+}
+
+function collectFormData() {
+  const get = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+  formData.site        = get('f-site');
+  formData.riskTier    = get('f-risk-tier');
+  formData.customTitle = get('f-custom-title');
+  formData.weather     = get('f-weather');
+  formData.whatChanged = get('f-what-changed');
+  formData.reflection  = get('f-reflection');
+  formData.startTime   = get('f-start-time');
+}
+
+// ── STEP 2: HAZARD CONFIRMATION ───────────────────────────────
+async function renderStep2() {
+  const container = document.getElementById('step2-hazards');
+  const hdr = document.getElementById('step2-header');
+
+  if (!formTemplate) {
+    hdr.innerHTML = `<div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:6px;padding:10px 13px;font-size:11.5px;color:var(--text2)">No template selected — complete the fields below and continue to Step 3 to document site hazards.</div>`;
+    container.innerHTML = '';
+    return;
+  }
+
+  hdr.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:7px">
+    <span style="font-size:20px">${taskCatIcon(formTemplate.task_category)}</span>
+    <div><div style="font-size:13px;font-weight:600">${formTemplate.title}</div>
+    <div style="font-size:10.5px;color:var(--muted)">${fmt(formTemplate.task_category)} · ${riskChip(formTemplate.risk_tier)}</div></div>
+  </div>`;
+
+  // Load full template if needed
+  if (!formTemplate.hazards) {
+    container.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading hazards…</span></div>`;
+    const res = await apiGet(`/api/hazard/templates/${formTemplate.id}`);
+    if (res) {
+      const full = res.template || res;
+      formTemplate = {...formTemplate, ...full};
+    }
+  }
+
+  const hazards = (formTemplate.hazards || []).sort((a,b) => (a.sort_order||0)-(b.sort_order||0));
+  const prompts  = formTemplate.prompts || [];
+
+  if (!hazards.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">✓</div>No pre-defined hazards for this template</div>`;
+  } else {
+    container.innerHTML = hazards.map(h => `
+      <div class="haz-card" id="hcard-${h.id}">
+        <div class="haz-card-top">
+          <div class="haz-cat-dot" style="background:${hazCatColor(h.hazard_category)}"></div>
+          <div style="flex:1">
+            <div class="haz-desc">${h.description}</div>
+            <div class="haz-meta">${fmt(h.hazard_category)} ${h.severity_potential ? '· ' + fmt(h.severity_potential) : ''}</div>
+          </div>
+          ${h.is_required ? '<span class="chip danger" style="flex-shrink:0;font-size:9px">Required</span>' : ''}
+        </div>
+        <div class="haz-actions">
+          <button class="haz-btn ${formHazardResponses[h.id]==='present'?'sel-present':''}" onclick="setHazardResponse('${h.id}','present')">✓ Present</button>
+          <button class="haz-btn ${formHazardResponses[h.id]==='not_present'?'sel-not_present':''}" onclick="setHazardResponse('${h.id}','not_present')">✕ Not Present</button>
+          <button class="haz-btn ${formHazardResponses[h.id]==='unsure'?'sel-unsure':''}" onclick="setHazardResponse('${h.id}','unsure')">? Unsure</button>
+        </div>
+        <textarea class="form-textarea" style="min-height:42px;font-size:11px" placeholder="Notes (optional)…" oninput="formHazardNotes['${h.id}']=this.value">${formHazardNotes[h.id]||''}</textarea>
+      </div>
+    `).join('');
+  }
+
+  // Reflection prompt
+  if (prompts.length > 0) {
+    const p = prompts[Math.floor(Math.random() * prompts.length)];
+    document.getElementById('reflection-prompt-text').textContent = p.prompt_text;
+    document.getElementById('reflection-prompt-wrap').style.display = 'block';
+  }
+}
+
+function setHazardResponse(hazardId, state) {
+  formHazardResponses[hazardId] = state;
+  const card = document.getElementById(`hcard-${hazardId}`);
+  if (!card) return;
+  card.querySelectorAll('.haz-btn').forEach(btn => {
+    const s = btn.getAttribute('onclick').match(/'([^']+)'\)$/)?.[1];
+    btn.className = 'haz-btn' + (s === state ? ` sel-${state}` : '');
+  });
+}
+
+// ── STEP 3: SITE HAZARDS ──────────────────────────────────────
+function renderSiteHazardList() {
+  const el = document.getElementById('site-hazards-list');
+  if (!el) return;
+  if (!formSiteHazards.length) {
+    el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--muted);font-size:11.5px;border:1.5px dashed var(--border);border-radius:7px;margin-bottom:12px">No site-specific hazards added yet</div>`;
+    return;
+  }
+  el.innerHTML = formSiteHazards.map((h, i) => `
+    <div class="site-haz-item">
+      <button class="site-haz-remove" onclick="removeSiteHazard(${i})">✕</button>
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Hazard Description</label>
+          <input type="text" class="form-input" value="${h.description}" oninput="formSiteHazards[${i}].description=this.value" placeholder="Describe the hazard…">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Severity Potential</label>
+          <select class="form-select" onchange="formSiteHazards[${i}].severity_potential=this.value">
+            ${['negligible','minor','serious','critical','fatality'].map(s =>
+              `<option value="${s}" ${h.severity_potential===s?'selected':''}>${fmt(s)}</option>`
+            ).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Hazard Category</label>
+        <select class="form-select" onchange="formSiteHazards[${i}].category=this.value">
+          ${['slip_trip_fall','struck_by','caught_in','stored_energy','line_of_fire','vehicle_traffic','working_at_heights','chemical','electrical','thermal','environmental','ergonomic','weather','other'].map(c =>
+            `<option value="${c}" ${h.category===c?'selected':''}>${fmt(c)}</option>`
+          ).join('')}
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addSiteHazard() {
+  formSiteHazards.push({description:'', category:'other', severity_potential:'minor'});
+  renderSiteHazardList();
+}
+
+function removeSiteHazard(i) {
+  formSiteHazards.splice(i, 1);
+  renderSiteHazardList();
+}
+
+// ── STEP 4: CONTROLS ──────────────────────────────────────────
+async function renderStep4() {
+  const container = document.getElementById('step4-controls');
+
+  if (!formTemplate) {
+    container.innerHTML = `<div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:14px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">No template selected. Confirm general safety controls are in place:</div>
+      ${['PPE donned and inspected','Area assessed for hazards','Emergency procedures reviewed','Communication established'].map((c,i) => `
+        <div class="ctrl-row ${formControlResponses['gen-'+i]?'confirmed':''}">
+          <span class="ctrl-hier administrative">Admin</span>
+          <span class="ctrl-desc">${c}</span>
+          <label class="toggle"><input type="checkbox" ${formControlResponses['gen-'+i]?'checked':''} onchange="setControl('gen-${i}',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+      `).join('')}
+    </div>`;
+    return;
+  }
+
+  // Load controls if not yet loaded
+  if (!formTemplate.controls) {
+    container.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading controls…</span></div>`;
+    const res = await apiGet(`/api/hazard/templates/${formTemplate.id}`);
+    if (res) {
+      const full = res.template || res;
+      formTemplate = {...formTemplate, ...full};
+    }
+  }
+
+  const controls = (formTemplate.controls || []).sort((a,b) => (a.sort_order||0)-(b.sort_order||0));
+
+  if (!controls.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">✓</div>No controls defined for this template</div>`;
+    return;
+  }
+
+  container.innerHTML = controls.map(c => `
+    <div class="ctrl-row ${formControlResponses[c.id]?'confirmed':''}" id="ctrl-${c.id}">
+      <span class="ctrl-hier ${c.control_type||'administrative'}">${fmt(c.control_type||'admin').slice(0,5)}</span>
+      <div style="flex:1">
+        <div class="ctrl-desc">${c.control_description}</div>
+        ${c.is_required ? '<div class="ctrl-req-badge">Required</div>' : ''}
+      </div>
+      <label class="toggle"><input type="checkbox" ${formControlResponses[c.id]?'checked':''} onchange="setControl('${c.id}',this.checked)"><span class="toggle-slider"></span></label>
+    </div>
+  `).join('');
+}
+
+function setControl(id, val) {
+  formControlResponses[id] = val;
+  const row = document.getElementById(`ctrl-${id}`);
+  if (row) row.classList.toggle('confirmed', val);
+}
+
+// ── STEP 5: CREW & QUALITY ────────────────────────────────────
+function renderStep5() {
+  renderCrewList();
+  computeQualityPreview();
+}
+
+function crewSearch(val) {
+  const ac = document.getElementById('crew-ac');
+  if (!val || val.length < 2) { ac.style.display = 'none'; return; }
+  const q = val.toLowerCase();
+  const matches = workers.filter(w =>
+    !formCrewIds.includes(w.id) &&
+    w.id !== LOGGED_IN.id &&
+    `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)
+  ).slice(0, 6);
+  if (!matches.length) { ac.style.display = 'none'; return; }
+  ac.innerHTML = matches.map(w => `
+    <div class="ac-item" onclick="addCrewMember('${w.id}','${w.first_name} ${w.last_name}','${w.job_title||''}')">
+      <div class="ac-name">${w.first_name} ${w.last_name}</div>
+      <div class="ac-sub">${w.job_title||''} · ${w.site||''}</div>
+    </div>
+  `).join('');
+  ac.style.display = 'block';
+}
+
+function addCrewMember(id, name, title) {
+  if (!formCrewIds.includes(id)) formCrewIds.push(id);
+  document.getElementById('crew-search').value = '';
+  document.getElementById('crew-ac').style.display = 'none';
+  renderCrewList();
+  computeQualityPreview();
+}
+
+function removeCrewMember(id) {
+  formCrewIds = formCrewIds.filter(c => c !== id);
+  renderCrewList();
+  computeQualityPreview();
+}
+
+function renderCrewList() {
+  const el = document.getElementById('crew-list');
+  if (!el) return;
+  // Always show the submitter first
+  const submitterHtml = `<div class="crew-member">
+    <div class="crew-avatar">${LOGGED_IN.name.split(' ').map(n=>n[0]).join('')}</div>
+    <div class="crew-name">${LOGGED_IN.name} <span style="font-size:9.5px;color:var(--ok)">· Submitter</span></div>
+  </div>`;
+
+  const crewHtml = formCrewIds.map(id => {
+    const w = workers.find(w => w.id === id);
+    if (!w) return '';
+    const initials = `${w.first_name[0]}${w.last_name[0]}`;
+    return `<div class="crew-member">
+      <div class="crew-avatar">${initials}</div>
+      <div class="crew-name">${w.first_name} ${w.last_name} <span style="font-size:9.5px;color:var(--muted)">· ${w.job_title||'Worker'}</span></div>
+      <button class="crew-remove" onclick="removeCrewMember('${id}')">✕</button>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = submitterHtml + crewHtml;
+}
+
+function computeQualityPreview() {
+  collectFormData();
+  let score = 100;
+  const flags = [];
+
+  if (!formData.whatChanged || formData.whatChanged.length < 10) {
+    score -= 15; flags.push('Missing "What changed today?" (−15)');
+  }
+  if (!formData.reflection || formData.reflection.length < 10) {
+    score -= 15; flags.push('Missing reflection response (−15)');
+  }
+  const tier = formData.riskTier || (formTemplate && formTemplate.risk_tier);
+  if (['medium','high','critical'].includes(tier) && formSiteHazards.length === 0) {
+    score -= 10; flags.push('No site-specific hazards for ' + fmt(tier) + ' risk (−10)');
+  }
+  if (formTemplate && formTemplate.hazards) {
+    for (const h of formTemplate.hazards) {
+      if (h.is_required && formHazardResponses[h.id] === 'not_present') {
+        score -= 5; flags.push(`Required hazard not confirmed: "${h.description.slice(0,28)}…" (−5)`);
+      }
+    }
+  }
+  score = Math.max(0, score);
+
+  const el = document.getElementById('quality-preview-score');
+  const fl = document.getElementById('quality-preview-flags');
+  if (el) {
+    el.textContent = score;
+    const cls = score >= 86 ? '--ok' : score >= 71 ? '--accent' : score >= 50 ? '--warn' : '--danger';
+    el.style.color = `var(${cls})`;
+  }
+  if (fl) {
+    fl.innerHTML = flags.length
+      ? flags.map(f => `<div style="font-size:10.5px;color:var(--warn);margin-bottom:4px;display:flex;align-items:baseline;gap:5px"><span style="color:var(--warn)">⚠</span>${f}</div>`).join('')
+      : '<div style="color:var(--ok);font-size:11.5px">✓ Looking good — ready to submit!</div>';
+  }
+  return score;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+async function submitFlha() {
+  collectFormData();
+  const title = formTemplate ? formTemplate.title : (formData.customTitle || '').trim();
+  if (!title) { toast('Enter a task title or select a template', 'danger'); return; }
+  if (!formData.site) { toast('Site is required', 'danger'); return; }
+
+  const btn = document.getElementById('submit-btn-flha');
+  btn.textContent = '⏳ Submitting…';
+  btn.disabled = true;
+
+  const riskTier = formData.riskTier || (formTemplate && formTemplate.risk_tier) || null;
+  const now = new Date().toISOString();
+
+  const payload = {
+    title,
+    assessment_type: formData.assessmentType || (formTemplate && formTemplate.assessment_type) || 'flha',
+    template_id:     formTemplate ? formTemplate.id : null,
+    risk_tier:       riskTier,
+    site:            formData.site,
+    department:      formData.department || null,
+    submitted_by:    LOGGED_IN.id,
+    weather_conditions: formData.weather || null,
+    work_start_time: formData.startTime ? new Date(formData.startTime).toISOString() : now,
+  };
+
+  const createRes = await apiPost('/api/hazard/assessments', payload);
+
+  if (!createRes.ok || !createRes.data?.assessment) {
+    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    const errDetail = createRes.data?.message || createRes.data?.error || `HTTP ${createRes.status}`;
+    toast(`⚠️ Failed: ${errDetail}`, 'danger');
+    console.error('[Vigil] FLHA create error:', createRes.status, createRes.data);
+    return;
+  }
+
+  const created = createRes.data.assessment;
+  lastSubmittedId = created.id;
+
+  // Submit for quality scoring
+  const submitRes = await apiPost(`/api/hazard/assessments/${created.id}/submit`, {});
+  const final = (submitRes.ok && submitRes.data?.assessment) ? submitRes.data.assessment : created;
+
+  btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+
+  assessments.unshift(final);
+  renderAssessmentsTable();
+  renderKPIs();
+
+  document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+  document.getElementById('step-bar').style.display = 'none';
+  document.getElementById('form-success').style.display = 'block';
+  document.getElementById('success-assessment-num').textContent = final.assessment_number;
+
+  const qs = final.quality_score;
+  const qsEl = document.getElementById('success-quality-score');
+  qsEl.textContent = qs != null ? qs : '—';
+  if (qs != null) {
+    qsEl.style.color = qs >= 86 ? 'var(--ok)' : qs >= 71 ? 'var(--accent)' : qs >= 50 ? 'var(--warn)' : 'var(--danger)';
+  }
+
+  toast(`✅ ${final.assessment_number} submitted`, 'ok');
+}
+
+function viewSubmittedDetail() {
+  if (lastSubmittedId) showDetail(lastSubmittedId);
+}
+
+// ── DETAIL VIEW ───────────────────────────────────────────────
+async function showDetail(id) {
+  showPanel('detail');
+  document.getElementById('detail-content').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading assessment…</span></div>`;
+
+  const res = await apiGet(`/api/hazard/assessments/${id}`);
+  const a = res && (res.assessment || res);
+  if (!a || !a.id) {
+    // Fall back to cached data
+    const cached = assessments.find(x => x.id === id);
+    if (cached) renderDetail(cached);
+    else document.getElementById('detail-content').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assessment</div>`;
+    return;
+  }
+  renderDetail(a);
+}
+
+function renderDetail(a) {
+  const WORKFLOW = [
+    {key:'draft',label:'Draft'},{key:'submitted',label:'Submitted'},
+    {key:'flagged',label:'Flagged'},{key:'supervisor_review',label:'Review'},
+    {key:'approved',label:'Approved'},{key:'closed',label:'Closed'},
+  ];
+  const curIdx = WORKFLOW.findIndex(w => w.key === a.status);
+  if (a.status === 'returned') WORKFLOW[1] = {key:'returned',label:'Returned'};
+
+  const timelineHtml = WORKFLOW.map((w, i) => {
+    const isDone = i < curIdx, isActive = i === curIdx;
+    const lineCls = i < WORKFLOW.length - 1 ? (isDone ? 'tl-line done' : 'tl-line') : '';
+    return `<div class="tl-step"><div class="tl-node ${isDone?'done':isActive?'active':''}">${isDone?'✓':isActive?'●':i+1}</div><div class="tl-lbl ${isDone?'done':isActive?'active':''}">${w.label}</div></div>${i<WORKFLOW.length-1?`<div class="${lineCls}"></div>`:''}`;
+  }).join('');
+
+  const worker = a.submitted_by_first_name ? `${a.submitted_by_first_name} ${a.submitted_by_last_name}` : '—';
+  const supervisor = a.supervisor_first_name ? `${a.supervisor_first_name} ${a.supervisor_last_name}` : '—';
+
+  const factsHtml = [
+    ['Assessment Type', fmt(a.assessment_type)],
+    ['Site', a.site || '—'],
+    ['Template', a.template_title || 'Custom'],
+    ['Submitted By', worker],
+    ['Submitted At', a.submitted_at ? `${fmtDate(a.submitted_at)} ${fmtTime(a.submitted_at)}` : '—'],
+    ['Work Start', a.work_start_time ? `${fmtDate(a.work_start_time)} ${fmtTime(a.work_start_time)}` : '—'],
+    ['Weather', a.weather_conditions || '—'],
+    ['Department', a.department || '—'],
+    ['Supervisor', supervisor],
+    ['Supervisor Review', a.supervisor_reviewed_at ? fmtDate(a.supervisor_reviewed_at) : 'Pending'],
+    ['Permit Required', a.requires_permit ? 'Yes' : 'No'],
+    ['Permit #', a.permit_number || '—'],
+  ].map(([k,v]) => `<div class="detail-fact"><div class="detail-fact-lbl">${k}</div><div class="detail-fact-val">${v}</div></div>`).join('');
+
+  // Quality flags
+  const flags = a.quality_flags || [];
+  const flagsHtml = flags.length
+    ? `<div class="section-title">Quality Flags</div>${flags.map(f => `<div class="flag-item">⚠️ ${fmt(f)}</div>`).join('')}`
+    : '';
+
+  // Hazard confirmations
+  const hazConfs = a.hazard_confirmations || a.assessment_hazard_confirmations || [];
+  const hazHtml = hazConfs.length ? `
+    <div class="section-title">Hazard Confirmations (${hazConfs.length})</div>
+    ${hazConfs.map(h => {
+      const statCls = h.confirmation_status==='present' ? 'danger' : h.confirmation_status==='not_present' ? 'ok' : 'warn';
+      const statLbl = h.confirmation_status==='present' ? '⚠ Present' : h.confirmation_status==='not_present' ? '✓ Not Present' : '? Unsure';
+      return `<div class="haz-card" style="margin-bottom:6px">
+        <div class="haz-card-top">
+          <div class="haz-cat-dot" style="background:${hazCatColor(h.hazard_category)}"></div>
+          <div style="flex:1"><div class="haz-desc">${h.description || h.hazard_description || '—'}</div></div>
+          <span class="chip ${statCls}">${statLbl}</span>
+        </div>
+        ${h.notes ? `<div style="font-size:11px;color:var(--text2);padding-top:4px;line-height:1.5">${h.notes}</div>` : ''}
+      </div>`;
+    }).join('')}
+  ` : '';
+
+  // Site hazards
+  const siteHazards = a.site_hazards || a.assessment_site_hazards || [];
+  const siteHazHtml = siteHazards.length ? `
+    <div class="section-title">Site-Specific Hazards (${siteHazards.length})</div>
+    ${siteHazards.map(h => `
+      <div class="haz-card" style="margin-bottom:6px">
+        <div class="haz-card-top">
+          <div class="haz-cat-dot" style="background:${hazCatColor(h.hazard_category)}"></div>
+          <div style="flex:1"><div class="haz-desc">${h.description}</div>
+          <div class="haz-meta">${fmt(h.hazard_category)} · ${fmt(h.severity_potential)}</div></div>
+        </div>
+      </div>
+    `).join('')}
+  ` : '';
+
+  // Control confirmations
+  const ctrlConfs = a.control_confirmations || a.assessment_control_confirmations || [];
+  const ctrlHtml = ctrlConfs.length ? `
+    <div class="section-title">Control Confirmations (${ctrlConfs.length})</div>
+    ${ctrlConfs.map(c => `
+      <div class="ctrl-row ${c.confirmed?'confirmed':''}">
+        <span class="ctrl-hier ${c.control_type||'administrative'}">${fmt(c.control_type||'admin').slice(0,5)}</span>
+        <span class="ctrl-desc">${c.control_description}</span>
+        <span class="chip ${c.confirmed?'ok':'danger'}">${c.confirmed?'✓ Confirmed':'✕ Not Confirmed'}</span>
+      </div>
+    `).join('')}
+  ` : '';
+
+  // Crew sign-ons
+  const crew = a.crew_signons || a.assessment_crew_signons || [];
+  const crewHtml = crew.length ? `
+    <div class="section-title">Crew Sign-On (${crew.length})</div>
+    ${crew.map(c => {
+      const name = c.first_name ? `${c.first_name} ${c.last_name}` : `Worker`;
+      const initials = name.split(' ').map(n=>n[0]).join('').slice(0,2);
+      return `<div class="crew-member" style="margin-bottom:6px">
+        <div class="crew-avatar">${initials}</div>
+        <div class="crew-name">${name}</div>
+        <span class="chip ok" style="font-size:9.5px">✓ Signed</span>
+      </div>`;
+    }).join('')}
+  ` : '';
+
+  // Supervisor comments
+  const supComments = a.supervisor_comments
+    ? `<div class="section-title">Supervisor Comments</div><div class="desc-box">${a.supervisor_comments}</div>`
+    : '';
+  const returnReason = a.return_reason
+    ? `<div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:6px;padding:10px 13px;font-size:11.5px;color:var(--orange);margin-bottom:10px">↩ Returned: ${a.return_reason}</div>`
+    : '';
+
+  const qs = a.quality_score;
+  const qsCls = qs >= 86 ? 'ok' : qs >= 71 ? 'accent' : qs >= 50 ? 'warn' : 'danger';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
+      <div>
+        <div class="detail-num">${a.assessment_number}</div>
+        <div class="detail-title">${a.title}</div>
+        <div class="detail-badges">
+          ${typeChip(a.assessment_type)}${riskChip(a.risk_tier)}${statusChip(a.status)}
+          ${a.requires_supervisor_approval ? '<span class="chip purple">Supervisor Review Required</span>' : ''}
+        </div>
+      </div>
+      <div style="flex-shrink:0;text-align:center">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Quality</div>
+        <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--${qsCls});line-height:1">${qs!=null?qs:'—'}</div>
+        <div style="font-size:9px;color:var(--muted)">/100</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:0">Workflow Status</div>
+    <div class="timeline">${timelineHtml}</div>
+
+    ${returnReason}
+
+    <div class="section-title">Key Facts</div>
+    <div class="detail-grid">${factsHtml}</div>
+
+    ${a.task_description ? `<div class="section-title">Task Description</div><div class="desc-box">${a.task_description}</div>` : ''}
+    ${a.what_changed_today ? `<div class="section-title">What Changed Today</div><div class="desc-box">${a.what_changed_today}</div>` : ''}
+    ${a.reflection_response ? `<div class="section-title">Reflection Response</div><div class="desc-box">${a.reflection_response}</div>` : ''}
+
+    ${flagsHtml}
+    ${hazHtml}
+    ${siteHazHtml}
+    ${ctrlHtml}
+    ${crewHtml}
+    ${supComments}
+  `;
+}
+
+// Close autocomplete on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ac-wrap')) {
+    document.querySelectorAll('.ac-dropdown').forEach(d => d.style.display = 'none');
+  }
+});
+
+// ── START ─────────────────────────────────────────────────────
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

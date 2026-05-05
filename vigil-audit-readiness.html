@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vigil — Audit Readiness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;
+  --border:#1A2232;--b2:#243044;--b3:#2E3D56;
+  --text:#E2E8F0;--text2:#8BA0B8;--muted:#4A6880;
+  --accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;
+  --cyan:#06B6D4;--purple:#8B5CF6;--orange:#F97316;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.45);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5}
+.app{display:flex;flex-direction:column;height:100%;overflow:hidden}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+.topbar-logo{font-family:var(--font-head);font-size:17px;font-weight:800;letter-spacing:-.3px}
+.topbar-logo span{color:var(--accent)}
+.topbar-module{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:3px 8px;background:var(--s3);border-radius:4px}
+.topbar-center{display:flex;align-items:center;gap:6px;flex:1;justify-content:center}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-pill{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--text2)}
+.alert-strip{display:flex;align-items:center;height:32px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
+.alert-strip-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--accent);padding:0 12px;white-space:nowrap;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.alert-strip-body{display:flex;align-items:center;gap:0;padding:0 10px;flex:1}
+.asep{color:var(--border);margin:0 8px}
+
+/* PANELS */
+.panels{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:20px}
+.panel.hidden{display:none}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-title{font-family:var(--font-head);font-size:13px;font-weight:700;letter-spacing:-.2px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title span{color:var(--muted);font-weight:400;font-family:var(--font-body);font-size:11px}
+
+/* LAYOUT */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+.chip.ok{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.25)}
+.chip.warn{background:rgba(245,158,11,.15);color:var(--warn);border:1px solid rgba(245,158,11,.25)}
+.chip.danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.25)}
+.chip.blue{background:rgba(59,130,246,.15);color:var(--accent);border:1px solid rgba(59,130,246,.25)}
+.chip.purple{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+.chip.muted{background:var(--s3);color:var(--text2);border:1px solid var(--border)}
+.chip.cyan{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.25)}
+.chip.orange{background:rgba(249,115,22,.15);color:var(--orange);border:1px solid rgba(249,115,22,.25)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:13px;font-weight:600;padding:8px 16px;border-radius:7px;border:none;cursor:pointer;transition:all .14s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#2563EB}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--s3);color:var(--text)}
+.btn-sm{padding:5px 11px;font-size:11.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid rgba(26,34,50,.6);vertical-align:middle}
+.tbl tr:hover td{background:rgba(21,28,40,.5)}
+.tbl tr:last-child td{border-bottom:none}
+
+/* LOADING / EMPTY */
+.loading-wrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:30px;color:var(--muted);font-size:12px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:24px 16px;color:var(--muted)}
+.empty-icon{font-size:26px;margin-bottom:6px}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);max-width:360px;animation:slide-in .2s ease}
+.toast.ok{background:#065F46;border:1px solid var(--ok);color:var(--ok)}
+.toast.danger{background:#450A0A;border:1px solid var(--danger);color:var(--danger)}
+.toast.warn{background:#451A03;border:1px solid var(--warn);color:var(--warn)}
+@keyframes slide-in{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* HERO */
+.hero-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.hero-info{flex:1;min-width:200px}
+.hero-title{font-family:var(--font-head);font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
+.hero-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
+.hero-stats{display:flex;gap:20px;align-items:center;margin-left:auto}
+.hero-stat{text-align:center;padding:10px 16px;background:var(--s2);border:1px solid var(--border);border-radius:8px;min-width:72px}
+.hero-stat-val{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1}
+.hero-stat-lbl{font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+
+/* FRAMEWORK CARDS */
+.fw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-bottom:16px}
+.fw-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .15s}
+.fw-card:hover{border-color:var(--accent);background:rgba(59,130,246,.04);transform:translateY(-1px)}
+
+/* METRICS STRIP */
+.metric-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.metric-tile{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;text-align:center}
+.metric-label{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;line-height:1.3}
+.metric-val{font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.5px;line-height:1}
+.metric-sub{font-size:9.5px;color:var(--muted);margin-top:3px}
+
+/* EVIDENCE GRID */
+.ev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ev-tile{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
+.ev-val{font-family:var(--font-head);font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--text);line-height:1;margin-bottom:3px}
+.ev-label{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;line-height:1.3}
+
+/* ELEMENT ROW */
+.el-row{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:6px}
+.el-row:last-child{margin-bottom:0}
+.el-header{display:flex;align-items:center;gap:10px}
+.el-code{font-family:var(--font-head);font-size:12px;font-weight:800;color:var(--accent);width:28px;flex-shrink:0}
+.el-title{font-size:12.5px;font-weight:600;flex:1}
+.el-score{font-size:11px;font-weight:700;white-space:nowrap}
+.el-bar-wrap{height:4px;background:var(--s4);border-radius:2px;margin:8px 0 5px;margin-left:38px}
+.el-bar{height:4px;border-radius:2px;transition:width .3s}
+
+/* GAP ITEM */
+.gap-item{background:var(--s2);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px;margin-bottom:6px}
+.gap-item:last-child{margin-bottom:0}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .row2,.row3{grid-template-columns:1fr}
+  .metric-strip{grid-template-columns:repeat(3,1fr)}
+  .ev-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-stats{margin-left:0;width:100%;justify-content:flex-start}
+}
+@media(max-width:600px){
+  .topbar-center{display:none}
+  .metric-strip{grid-template-columns:repeat(2,1fr)}
+  .fw-grid{grid-template-columns:1fr}
+  .ev-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="topbar-logo">Vigil<span>.</span></div>
+    <div class="topbar-module">Audit Readiness</div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-pill" id="pill-score">— Readiness</div>
+    <div class="topbar-pill" id="pill-frameworks">— Frameworks</div>
+    <div class="topbar-pill" id="pill-audit">— Next Audit</div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-pill" id="auth-pill" style="color:var(--muted)">Connecting…</div>
+  </div>
+</div>
+
+<!-- ALERT STRIP -->
+<div class="alert-strip">
+  <div class="alert-strip-label">🏆 COR</div>
+  <div class="alert-strip-body" id="astrip-content">
+    <span style="color:var(--muted);font-size:10.5px">Loading…</span>
+  </div>
+</div>
+
+<!-- PANELS -->
+<div class="panels">
+
+  <!-- PANEL 1: DASHBOARD -->
+  <div class="panel" id="panel-dash">
+
+    <div class="hero-card" id="hero-section">
+      <div class="loading-wrap" style="padding:16px"><div class="spinner"></div></div>
+    </div>
+
+    <div id="fw-grid-wrap">
+      <div class="loading-wrap"><div class="spinner"></div><span>Loading frameworks…</span></div>
+    </div>
+
+    <div id="metrics-wrap">
+      <div class="loading-wrap"><div class="spinner"></div><span>Loading metrics…</span></div>
+    </div>
+
+    <div class="row2">
+      <div class="card" id="evidence-card">
+        <div class="card-title">📋 Evidence Collected <span>last 12 months</span></div>
+        <div class="loading-wrap"><div class="spinner"></div></div>
+      </div>
+      <div class="card" id="gaps-card">
+        <div class="card-title">⚠️ Priority Gaps</div>
+        <div class="loading-wrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <div class="card" id="findings-card" style="margin-bottom:16px">
+      <div class="loading-wrap"><div class="spinner"></div></div>
+    </div>
+
+  </div>
+
+  <!-- PANEL 2: FRAMEWORK DETAIL -->
+  <div class="panel hidden" id="panel-fw">
+    <div style="max-width:960px;margin:0 auto">
+      <div style="margin-bottom:14px">
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('dash')">← Back to Dashboard</button>
+      </div>
+      <div id="fw-detail-content">
+        <div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panels -->
+</div><!-- /app -->
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const API  = 'https://vigil-production-17ca.up.railway.app';
+const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+
+let token           = null;
+let frameworks      = [];
+let statsData       = {};
+let dashData        = {};
+let metrics         = {};
+let findings        = [];
+let evidenceSummary = null;
+let activeFrameworkId = null;
+let activeElements  = [];
+let activeEvidence  = null;
+
+// ── API ────────────────────────────────────────────────────────
+async function apiGet(path) {
+  try {
+    const r = await fetch(API + path, {headers:{Authorization:'Bearer '+token}});
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+async function apiPost(path, body={}) {
+  try {
+    const r = await fetch(API + path, {
+      method:'POST',
+      headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const text = await r.text();
+    try { return {ok:r.ok, status:r.status, data:JSON.parse(text)}; }
+    catch { return {ok:false, status:r.status, data:{error:text.slice(0,200)}}; }
+  } catch(e) { return {ok:false, status:0, data:{error:String(e)}}; }
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg, type='ok', ms=4000) {
+  const w = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────
+function fmt(s) {
+  if (!s) return '—';
+  return s.replace(/_/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+}
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  return Math.ceil((new Date(dateStr) - Date.now()) / (1000*60*60*24));
+}
+function scoreColor(n) {
+  const v = parseFloat(n)||0;
+  if (v >= 80) return 'var(--ok)';
+  if (v >= 60) return 'var(--warn)';
+  return 'var(--danger)';
+}
+
+const FW_STATUS_CFG = {
+  certified:   {cls:'ok',    label:'Certified'},
+  in_progress: {cls:'warn',  label:'In Progress'},
+  not_started: {cls:'muted', label:'Not Started'},
+  expired:     {cls:'danger',label:'Expired'},
+};
+const EL_STATUS_CFG = {
+  ready:           {cls:'ok',    label:'Ready'},
+  in_progress:     {cls:'blue',  label:'In Progress'},
+  gap_identified:  {cls:'warn',  label:'Gap Identified'},
+  non_conformance: {cls:'danger',label:'Non-Conformance'},
+  not_started:     {cls:'muted', label:'Not Started'},
+};
+const FINDING_TYPE_CFG = {
+  minor_nonconformance: {cls:'warn',   label:'Minor NC'},
+  major_nonconformance: {cls:'danger', label:'Major NC'},
+  observation:          {cls:'blue',   label:'Observation'},
+  opportunity:          {cls:'cyan',   label:'Opportunity'},
+};
+
+function fwChip(s) {
+  const c = FW_STATUS_CFG[s] || {cls:'muted', label:fmt(s)};
+  return `<span class="chip ${c.cls}">${c.label}</span>`;
+}
+function elChip(s) {
+  const c = EL_STATUS_CFG[s] || {cls:'muted', label:fmt(s)};
+  return `<span class="chip ${c.cls}">${c.label}</span>`;
+}
+function findingChip(t) {
+  const c = FINDING_TYPE_CFG[t] || {cls:'muted', label:fmt(t)};
+  return `<span class="chip ${c.cls}">${c.label}</span>`;
+}
+
+// SVG gauge — r=36 small, r=50 big
+function gauge(score, big) {
+  const r   = big ? 50 : 36;
+  const sw  = big ? 9  : 7;
+  const dim = (r + sw) * 2 + 4;
+  const cx  = dim / 2, cy = dim / 2;
+  const circ   = +(2 * Math.PI * r).toFixed(1);
+  const pct    = Math.max(0, Math.min(100, parseFloat(score) || 0));
+  const offset = +(circ * (1 - pct / 100)).toFixed(1);
+  const color  = scoreColor(pct);
+  const fs     = big ? 22 : 14;
+  const sub_fs = big ? 10 : 8;
+  const text_y = cy - (big ? 4 : 3);
+  const sub_y  = cy + (big ? 14 : 10);
+  return `<svg viewBox="0 0 ${dim} ${dim}" width="${dim}" height="${dim}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--s4)" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
+      stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+      stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${text_y}" text-anchor="middle"
+      font-family="'Syne',sans-serif" font-size="${fs}" font-weight="800" fill="${color}">${Math.round(pct)}%</text>
+    <text x="${cx}" y="${sub_y}" text-anchor="middle"
+      font-family="'DM Sans',sans-serif" font-size="${sub_fs}" fill="var(--muted)">Readiness</text>
+  </svg>`;
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+async function init() {
+  const ar = await fetch(API + '/api/auth/login', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(AUTH)
+  });
+  if (!ar.ok) { toast('Could not connect to Vigil API','danger'); return; }
+  const ab = await ar.json();
+  token = ab.token || ab.access_token || (ab.data && ab.data.token);
+  if (!token) { toast('Auth failed','danger'); return; }
+
+  document.getElementById('auth-pill').textContent = 'J. Marchetti · Admin';
+  document.getElementById('auth-pill').style.color = '';
+
+  const [fwRes, dashRes, statsRes, metricsRes, findingsRes] = await Promise.all([
+    apiGet('/api/audit/frameworks'),
+    apiGet('/api/audit/dashboard'),
+    apiGet('/api/audit/stats'),
+    apiGet('/api/audit/metrics/current?hours_worked=94000'),
+    apiGet('/api/audit/findings/open'),
+  ]);
+
+  frameworks = (fwRes  && fwRes.frameworks)        || [];
+  dashData   = dashRes || {};
+  statsData  = statsRes || {};
+  metrics    = metricsRes || {};
+  findings   = (findingsRes && findingsRes.findings) || [];
+
+  // Collect evidence from first framework
+  if (frameworks.length) {
+    const evRes = await apiPost(`/api/audit/frameworks/${frameworks[0].id}/collect-evidence`);
+    if (evRes.ok) evidenceSummary = evRes.data.evidence_summary;
+  }
+
+  renderHero();
+  renderFrameworks();
+  renderMetrics();
+  renderEvidence();
+  renderGaps();
+  renderFindings();
+  buildAlertStrip();
+  showPanel('dash');
+}
+
+// ── HERO ───────────────────────────────────────────────────────
+function renderHero() {
+  const el = document.getElementById('hero-section');
+  const scores = frameworks.map(f => parseFloat(f.computed_score || f.overall_score || 0)).filter(Boolean);
+  const overall = scores.length ? scores.reduce((a,b) => a+b, 0) / scores.length : 0;
+
+  const certified   = frameworks.filter(f => f.status === 'certified').length;
+  const inProgress  = frameworks.filter(f => f.status === 'in_progress').length;
+  const totalGaps   = frameworks.reduce((a,f) => a + parseInt(f.elements_with_gaps || 0), 0);
+  const nextDate    = frameworks.reduce((best, f) => {
+    if (!f.next_audit_date) return best;
+    return !best || new Date(f.next_audit_date) < new Date(best) ? f.next_audit_date : best;
+  }, null);
+  const days = daysUntil(nextDate);
+
+  el.innerHTML = `
+    <div style="flex-shrink:0">${gauge(overall, true)}</div>
+    <div class="hero-info">
+      <div class="hero-title">Northern Express Transport</div>
+      <div class="hero-sub">COR Alberta · Audit Readiness Platform · ${new Date().getFullYear()} Audit Cycle</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${frameworks.map(f => `${fwChip(f.status)}<span style="font-size:11px;color:var(--text2);margin-right:4px">${f.framework_code}</span>`).join('')}
+        ${!frameworks.length ? '<span style="font-size:11.5px;color:var(--muted)">No frameworks configured</span>' : ''}
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:${certified>0?'var(--ok)':'var(--muted)'}">${certified}</div>
+        <div class="hero-stat-lbl">Certified</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:${inProgress>0?'var(--warn)':'var(--muted)'}">${inProgress}</div>
+        <div class="hero-stat-lbl">In Progress</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:${totalGaps>0?'var(--warn)':'var(--ok)'}">${totalGaps}</div>
+        <div class="hero-stat-lbl">Open Gaps</div>
+      </div>
+      ${days !== null ? `
+      <div class="hero-stat">
+        <div class="hero-stat-val" style="color:${days<=30?'var(--danger)':days<=90?'var(--warn)':'var(--text)'}">${days}</div>
+        <div class="hero-stat-lbl">Days to Audit</div>
+      </div>` : ''}
+    </div>`;
+}
+
+// ── FRAMEWORKS GRID ────────────────────────────────────────────
+function renderFrameworks() {
+  const el = document.getElementById('fw-grid-wrap');
+  if (!frameworks.length) {
+    el.innerHTML = `<div class="empty-state" style="margin-bottom:16px"><div class="empty-icon">📋</div>No frameworks configured</div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="fw-grid">${frameworks.map(fw => {
+    const score  = parseFloat(fw.computed_score || fw.overall_score || 0);
+    const days   = daysUntil(fw.next_audit_date);
+    const gaps   = parseInt(fw.elements_with_gaps || 0);
+    const ready  = parseInt(fw.elements_ready || 0);
+    const total  = parseInt(fw.element_count || 0);
+    const certBody = (fw.certification_body || '').replace('Alberta Construction Safety Association','ACSA');
+    return `
+    <div class="fw-card" onclick="viewFramework('${fw.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:-.2px;margin-bottom:6px">${fw.framework_name}</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            <span class="chip blue">${fw.framework_code}</span>
+            ${fw.jurisdiction ? `<span class="chip muted">${fw.jurisdiction}</span>` : ''}
+            ${fwChip(fw.status)}
+          </div>
+        </div>
+        <div style="flex-shrink:0">${gauge(score, false)}</div>
+      </div>
+      ${certBody ? `<div style="font-size:10.5px;color:var(--muted);margin-bottom:10px">${certBody}</div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;text-align:center">
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--ok)">${ready}</div>
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:1px">Ready</div>
+        </div>
+        <div style="background:var(--s2);border:1px solid ${gaps>0?'rgba(245,158,11,.3)':'var(--border)'};border-radius:6px;padding:7px 9px;text-align:center">
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:${gaps>0?'var(--warn)':'var(--text)'}">${gaps}</div>
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:1px">Gaps</div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;text-align:center">
+          <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:${days!==null&&days<=90?'var(--warn)':'var(--text)'}">${days !== null ? days+'d' : '—'}</div>
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:1px">To Audit</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        ${fw.next_audit_date ? `<div style="font-size:10.5px;color:var(--muted)">Next audit: <strong style="color:var(--text2)">${fmtDate(fw.next_audit_date)}</strong></div>` : '<div></div>'}
+        <div style="font-size:10px;color:var(--accent);font-weight:600">${total} elements →</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── METRICS STRIP ──────────────────────────────────────────────
+function renderMetrics() {
+  const el = document.getElementById('metrics-wrap');
+  if (metrics.ltifr == null) { el.innerHTML = ''; return; }
+
+  const m     = metrics;
+  const ltifr = parseFloat(m.ltifr || 0);
+  const trir  = parseFloat(m.trir  || 0);
+  const tc    = parseFloat(m.training_compliance_rate    || 0);
+  const ic    = parseFloat(m.inspection_compliance_rate  || 0);
+  const capa  = parseFloat(m.corrective_action_closure_rate || 0);
+  const pc    = parseFloat(m.permit_compliance_rate      || 0);
+  const lowHours = (parseInt(m.hours_worked) || 0) < 5000;
+
+  function mc(key, val) {
+    if (key==='ltifr')  return val<=1?'var(--ok)':val<=3?'var(--warn)':'var(--danger)';
+    if (key==='trir')   return val<=2?'var(--ok)':val<=5?'var(--warn)':'var(--danger)';
+    if (key==='capa')   return val>=80?'var(--ok)':val>=40?'var(--warn)':'var(--danger)';
+    return val>=90?'var(--ok)':val>=70?'var(--warn)':'var(--danger)';
+  }
+
+  el.innerHTML = `
+    <div class="metric-strip">
+      <div class="metric-tile">
+        <div class="metric-label">LTIFR</div>
+        <div class="metric-val" style="color:${mc('ltifr',ltifr)}">${ltifr>100?ltifr.toFixed(0):ltifr.toFixed(2)}</div>
+        <div class="metric-sub">${lowHours?`${m.hours_worked}h worked`:'per 200k hrs'}</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">TRIR</div>
+        <div class="metric-val" style="color:${mc('trir',trir)}">${trir>100?trir.toFixed(0):trir.toFixed(2)}</div>
+        <div class="metric-sub">${lowHours?'low hours — demo':'per 200k hrs'}</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Training Compliance</div>
+        <div class="metric-val" style="color:${mc('tc',tc)}">${Math.round(tc)}%</div>
+        <div class="metric-sub">of all records</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Inspection Completion</div>
+        <div class="metric-val" style="color:${mc('ic',ic)}">${Math.round(ic)}%</div>
+        <div class="metric-sub">scheduled vs done</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">CAPA Closure</div>
+        <div class="metric-val" style="color:${mc('capa',capa)}">${Math.round(capa)}%</div>
+        <div class="metric-sub">corrective actions</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">Permit Compliance</div>
+        <div class="metric-val" style="color:${mc('pc',pc)}">${Math.round(pc)}%</div>
+        <div class="metric-sub">issued vs closed</div>
+      </div>
+    </div>`;
+}
+
+// ── EVIDENCE ───────────────────────────────────────────────────
+function renderEvidence() {
+  const el = document.getElementById('evidence-card');
+  const ev = evidenceSummary;
+  if (!ev) {
+    el.innerHTML = `<div class="card-title">📋 Evidence Collected <span>last 12 months</span></div>
+      <div class="empty-state"><div class="empty-icon">📋</div>No evidence data available</div>`;
+    return;
+  }
+
+  const tcRate  = parseFloat(ev.training?.compliance_rate || 0);
+  const caRate  = parseFloat(ev.corrective_actions?.closure_rate || 0);
+  const attRate = parseFloat(ev.meetings?.avg_attendance_rate || 0);
+  const qaScore = parseFloat(ev.hazard_assessments?.avg_quality_score || 0);
+  const inScore = parseFloat(ev.inspections?.avg_score || 0);
+
+  el.innerHTML = `
+    <div class="card-title">📋 Evidence Collected <span>last 12 months · ${frameworks[0]?.framework_name||'all frameworks'}</span></div>
+    <div class="ev-grid">
+      <div class="ev-tile">
+        <div class="ev-val">${ev.incidents?.total || 0}</div>
+        <div class="ev-label">Incidents Recorded</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.incidents?.recordable||0} recordable · ${ev.incidents?.near_miss||0} near miss</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.training?.completed || 0}</div>
+        <div class="ev-label">Training Records</div>
+        <div style="font-size:9.5px;color:${tcRate>=90?'var(--ok)':'var(--warn)'};margin-top:3px">${tcRate.toFixed(0)}% compliant</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.inspections?.completed || 0}</div>
+        <div class="ev-label">Inspections</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">avg score ${inScore.toFixed(0)}%</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.observations?.total || 0}</div>
+        <div class="ev-label">Observations</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.observations?.closed||0} closed · ${ev.observations?.high_priority||0} high priority</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.hazard_assessments?.total || 0}</div>
+        <div class="ev-label">FLHAs Completed</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">avg quality ${qaScore.toFixed(0)}%</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.permits?.issued || 0}</div>
+        <div class="ev-label">Permits Issued</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.permits?.total||0} total created</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.meetings?.completed || 0}</div>
+        <div class="ev-label">Meetings Held</div>
+        <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${attRate.toFixed(0)}% avg attendance</div>
+      </div>
+      <div class="ev-tile">
+        <div class="ev-val">${ev.corrective_actions?.closed || 0}</div>
+        <div class="ev-label">CAPAs Closed</div>
+        <div style="font-size:9.5px;color:${caRate>=80?'var(--ok)':'var(--warn)'};margin-top:3px">${caRate.toFixed(0)}% closure rate</div>
+      </div>
+    </div>`;
+}
+
+// ── GAPS ───────────────────────────────────────────────────────
+function renderGaps() {
+  const el   = document.getElementById('gaps-card');
+  const raw  = (statsData.top_gaps || []).concat(dashData.priority_gaps || []);
+  const gaps = raw.filter((g,i) => raw.findIndex(x => x.element_code === g.element_code) === i);
+
+  let html = `<div class="card-title">⚠️ Priority Gaps <span>${gaps.length} identified</span></div>`;
+
+  if (!gaps.length) {
+    html += `<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:20px;text-align:center">
+      <div style="font-size:22px;margin-bottom:6px">✅</div>
+      <div style="font-size:12px;font-weight:700;color:var(--ok)">No priority gaps</div>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:3px">All elements are meeting target scores</div>
+    </div>`;
+  } else {
+    html += gaps.map(g => `
+      <div class="gap-item">
+        <div style="font-size:9.5px;font-weight:600;color:var(--muted);margin-bottom:4px">${g.framework_code || g.framework_name || ''}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <span style="font-size:10.5px;font-weight:800;color:var(--accent);margin-right:6px">${g.element_code}</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text)">${g.element_title}</span>
+          </div>
+          ${elChip(g.status)}
+        </div>
+        ${g.gap_description ? `<div style="font-size:11px;color:var(--muted);margin-top:5px">${g.gap_description}</div>` : ''}
+      </div>`).join('');
+  }
+
+  const fw = frameworks[0];
+  if (fw && fw.target_score) {
+    const cur = parseFloat(fw.computed_score || 0);
+    const tgt = parseFloat(fw.target_score);
+    const diff = tgt - cur;
+    html += `<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted)">
+      Target: <strong style="color:var(--text2)">${tgt}%</strong> ·
+      Current: <strong style="color:${scoreColor(cur)}">${cur.toFixed(0)}%</strong>
+      ${diff>0 ? `· <span style="color:var(--warn)">+${diff.toFixed(0)}% needed</span>` : `· <span style="color:var(--ok)">✓ At target</span>`}
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+// ── FINDINGS ───────────────────────────────────────────────────
+function renderFindings() {
+  const el = document.getElementById('findings-card');
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="card-title" style="margin-bottom:0">🔍 Open Findings &amp; Non-Conformances</div>
+    <span class="chip ${findings.length>0?'warn':'ok'}">${findings.length} open</span>
+  </div>`;
+
+  if (!findings.length) {
+    html += `<div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:20px;text-align:center">
+      <div style="font-size:24px;margin-bottom:6px">🟢</div>
+      <div style="font-size:12px;font-weight:700;color:var(--ok)">No open findings</div>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:4px">All findings have been addressed — audit-ready.</div>
+    </div>`;
+  } else {
+    html += `<div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>Finding #</th><th>Type</th><th>Element</th><th>Description</th>
+        <th>Assigned To</th><th>Due Date</th><th>Status</th>
+      </tr></thead>
+      <tbody>${findings.map(f => `<tr>
+        <td style="font-size:11px;font-family:monospace;color:var(--accent)">${f.finding_number||'—'}</td>
+        <td>${findingChip(f.finding_type)}</td>
+        <td style="font-size:11px;color:var(--text2)">${f.element_code||'—'}</td>
+        <td style="font-size:12px;max-width:220px;color:var(--text2)">${(f.description||'—').slice(0,80)}</td>
+        <td style="font-size:11px;color:var(--text2)">${f.assigned_to_name||'—'}</td>
+        <td style="font-size:11px;color:var(--muted)">${fmtDate(f.due_date)}</td>
+        <td><span class="chip muted">${fmt(f.status)}</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+  el.innerHTML = html;
+}
+
+// ── ALERT STRIP ────────────────────────────────────────────────
+function buildAlertStrip() {
+  const fw    = frameworks[0];
+  const parts = [];
+  if (fw) {
+    const score = parseFloat(fw.computed_score || 0);
+    parts.push(`<span style="color:var(--text2)">${fw.framework_name}</span>`);
+    parts.push(`<span style="color:${scoreColor(score)}">${score.toFixed(0)}% readiness</span>`);
+    if (fw.target_score) parts.push(`<span style="color:var(--muted)">target ${fw.target_score}%</span>`);
+    const days = daysUntil(fw.next_audit_date);
+    if (days !== null) parts.push(`<span style="color:${days<=90?'var(--warn)':'var(--text2)'}">${days} days to audit</span>`);
+  }
+  const gaps = statsData.top_gaps || [];
+  if (gaps.length) parts.push(`<span style="color:var(--warn)">${gaps.length} gap${gaps.length>1?'s':''} to address</span>`);
+  if (!parts.length) parts.push(`<span style="color:var(--muted)">No frameworks configured</span>`);
+  document.getElementById('astrip-content').innerHTML = parts.join('<span class="asep">·</span>');
+
+  const scores   = frameworks.map(f => parseFloat(f.computed_score || 0)).filter(Boolean);
+  const avgScore = scores.length ? scores.reduce((a,b) => a+b, 0) / scores.length : 0;
+  document.getElementById('pill-score').textContent = `${Math.round(avgScore)}% Readiness`;
+  document.getElementById('pill-frameworks').textContent = `${frameworks.length} Framework${frameworks.length!==1?'s':''}`;
+  const nd = frameworks.reduce((b,f) => (!f.next_audit_date?b:(!b||new Date(f.next_audit_date)<new Date(b)?f.next_audit_date:b)), null);
+  document.getElementById('pill-audit').textContent = nd ? `Audit ${fmtDate(nd)}` : 'No Audit Scheduled';
+}
+
+// ── FRAMEWORK DETAIL ───────────────────────────────────────────
+async function viewFramework(id) {
+  activeFrameworkId = id;
+  showPanel('fw');
+  document.getElementById('fw-detail-content').innerHTML =
+    `<div class="loading-wrap"><div class="spinner"></div><span>Loading framework…</span></div>`;
+
+  const [elemRes, evRes] = await Promise.all([
+    apiGet(`/api/audit/frameworks/${id}/elements`),
+    apiPost(`/api/audit/frameworks/${id}/collect-evidence`),
+  ]);
+
+  activeElements = (elemRes && elemRes.elements) || [];
+  activeEvidence = evRes.ok ? evRes.data.evidence_summary : null;
+  renderFrameworkDetail();
+}
+
+function renderFrameworkDetail() {
+  const fw = frameworks.find(f => f.id === activeFrameworkId);
+  if (!fw) return;
+
+  const score = parseFloat(fw.computed_score || fw.overall_score || 0);
+  const days  = daysUntil(fw.next_audit_date);
+  const total = parseInt(fw.element_count || 0);
+  const ready = parseInt(fw.elements_ready || 0);
+
+  // Sort elements by numeric part of element_code
+  const sorted = [...activeElements].sort((a, b) => {
+    const na = parseInt(a.element_code.replace(/\D/g,'') || 0);
+    const nb = parseInt(b.element_code.replace(/\D/g,'') || 0);
+    return na - nb;
+  });
+
+  const elementsHtml = sorted.map(e => {
+    const sc  = parseFloat(e.score || 0);
+    const mx  = parseFloat(e.max_score || 100);
+    const pct = mx > 0 ? Math.round(sc / mx * 100) : 0;
+    const bc  = scoreColor(pct);
+    const who = e.first_name ? `${e.first_name} ${e.last_name}` : null;
+    return `
+    <div class="el-row">
+      <div class="el-header">
+        <div class="el-code">${e.element_code}</div>
+        <div class="el-title">${e.element_title}</div>
+        <div class="el-score" style="color:${bc};margin-right:8px">${sc} / ${mx}</div>
+        ${elChip(e.status)}
+      </div>
+      <div class="el-bar-wrap">
+        <div class="el-bar" style="width:${pct}%;background:${bc}"></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-left:38px">
+        ${who ? `<div style="font-size:10.5px;color:var(--muted)">👤 ${who}</div>` : ''}
+        ${e.gap_description ? `<div style="font-size:10.5px;color:var(--warn)">⚠️ ${e.gap_description}</div>` : ''}
+        ${e.corrective_action_required ? `<span class="chip danger" style="font-size:9px">Action Required</span>` : ''}
+        ${e.target_completion_date ? `<div style="font-size:10.5px;color:var(--muted)">Target: ${fmtDate(e.target_completion_date)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Evidence section (from collect-evidence)
+  const ev = activeEvidence;
+  const evHtml = ev ? (() => {
+    const tcRate  = parseFloat(ev.training?.compliance_rate || 0);
+    const caRate  = parseFloat(ev.corrective_actions?.closure_rate || 0);
+    const attRate = parseFloat(ev.meetings?.avg_attendance_rate || 0);
+    const qaScore = parseFloat(ev.hazard_assessments?.avg_quality_score || 0);
+    const inScore = parseFloat(ev.inspections?.avg_score || 0);
+    return `
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📋 Evidence Available <span>last 12 months · auto-collected from all modules</span></div>
+      <div class="ev-grid">
+        <div class="ev-tile">
+          <div class="ev-val">${ev.incidents?.total||0}</div>
+          <div class="ev-label">Incidents</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.incidents?.recordable||0} recordable</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.training?.completed||0}</div>
+          <div class="ev-label">Training Records</div>
+          <div style="font-size:9.5px;color:${tcRate>=90?'var(--ok)':'var(--warn)'};margin-top:3px">${tcRate.toFixed(0)}% compliant</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.inspections?.completed||0}</div>
+          <div class="ev-label">Inspections</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">avg ${inScore.toFixed(0)}%</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.observations?.total||0}</div>
+          <div class="ev-label">Observations</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.observations?.closed||0} closed</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.hazard_assessments?.total||0}</div>
+          <div class="ev-label">FLHAs</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">avg ${qaScore.toFixed(0)}% quality</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.permits?.issued||0}</div>
+          <div class="ev-label">Permits Issued</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${ev.permits?.total||0} total</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.meetings?.completed||0}</div>
+          <div class="ev-label">Meetings Held</div>
+          <div style="font-size:9.5px;color:var(--muted);margin-top:3px">${attRate.toFixed(0)}% attendance</div>
+        </div>
+        <div class="ev-tile">
+          <div class="ev-val">${ev.corrective_actions?.closed||0}</div>
+          <div class="ev-label">CAPAs Closed</div>
+          <div style="font-size:9.5px;color:${caRate>=80?'var(--ok)':'var(--warn)'};margin-top:3px">${caRate.toFixed(0)}% rate</div>
+        </div>
+      </div>
+    </div>`;
+  })() : '';
+
+  const certBody = (fw.certification_body || '').replace('Alberta Construction Safety Association','ACSA');
+
+  document.getElementById('fw-detail-content').innerHTML = `
+
+    <!-- FRAMEWORK HEADER -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <div style="flex-shrink:0">${gauge(score, true)}</div>
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+            <span class="chip blue">${fw.framework_code}</span>
+            ${fw.jurisdiction?`<span class="chip muted">${fw.jurisdiction}</span>`:''}
+            ${fwChip(fw.status)}
+          </div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px">${fw.framework_name}</div>
+          ${certBody?`<div style="font-size:11.5px;color:var(--text2);margin-bottom:10px">Certification Body: ${certBody}</div>`:''}
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:480px">
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:9px 11px">
+              <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Target Score</div>
+              <div style="font-family:var(--font-head);font-size:17px;font-weight:800">${fw.target_score||'—'}%</div>
+            </div>
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:9px 11px">
+              <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Elements Ready</div>
+              <div style="font-family:var(--font-head);font-size:17px;font-weight:800">${ready}<span style="font-size:12px;font-weight:600;color:var(--muted)"> / ${total}</span></div>
+            </div>
+            <div style="background:var(--s2);border:1px solid ${days!==null&&days<=90?'rgba(245,158,11,.3)':'var(--border)'};border-radius:7px;padding:9px 11px">
+              <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Next Audit</div>
+              <div style="font-size:12px;font-weight:700;color:${days!==null&&days<=90?'var(--warn)':'var(--text)'}">${fmtDate(fw.next_audit_date)}</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="collect-btn" onclick="triggerCollect('${fw.id}')">🔄 Refresh Evidence</button>
+          <button class="btn btn-ghost btn-sm" onclick="toast('Report generation coming soon — this will export a formatted audit package','warn')">📄 Generate Report</button>
+        </div>
+      </div>
+    </div>
+
+    ${evHtml}
+
+    <!-- ELEMENTS -->
+    <div class="card">
+      <div class="card-title">📊 Framework Elements <span>${sorted.length} elements</span></div>
+      ${elementsHtml || `<div class="empty-state"><div class="empty-icon">📊</div>No elements configured</div>`}
+    </div>`;
+}
+
+async function triggerCollect(fwId) {
+  const btn = document.getElementById('collect-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ Collecting…'; }
+  const res = await apiPost(`/api/audit/frameworks/${fwId}/collect-evidence`);
+  if (res.ok) {
+    activeEvidence  = res.data.evidence_summary;
+    evidenceSummary = activeEvidence;
+    renderFrameworkDetail();
+    renderEvidence();
+    toast('Evidence refreshed from all modules','ok');
+  } else {
+    toast('Failed to collect evidence','danger');
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh Evidence'; }
+  }
+}
+
+// ── PANEL NAV ──────────────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+  const el = document.getElementById('panel-'+id);
+  if (el) { el.classList.remove('hidden'); el.scrollTop = 0; }
+}
+
+init();
+</script>
+</body>
+</html>

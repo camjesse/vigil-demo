@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Fleet & Equipment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;
+  --border:#1E2D40;--b2:#263648;
+  --accent:#00C2FF;--a2:#FF6B35;--a3:#00E5A0;--purple:#9B6DFF;
+  --text:#C8DCF0;--text2:#8AAAC4;--muted:#4A6880;
+  --danger:#FF4545;--warn:#FFB800;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(90deg,#090E18,#0C1520);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-shield{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00C2FF,#00E5A0);display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-mod{font-size:11px;color:var(--muted);margin-left:4px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.co-badge{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2)}
+.user-dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(90deg,rgba(255,69,69,.08),rgba(255,184,0,.04));border-bottom:1px solid rgba(255,69,69,.15);padding:6px 24px;display:flex;align-items:center;gap:12px;font-size:11.5px;flex-shrink:0}
+.ab-item{display:flex;align-items:center;gap:5px;cursor:pointer}.ab-item:hover{text-decoration:underline}
+.ab-dot{width:5px;height:5px;border-radius:50%}.ab-sep{color:var(--b2)}
+
+/* LAYOUT */
+.main-area{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidenav{width:210px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);padding:14px 0;overflow-y:auto}
+.nav-sec{padding:0 10px;margin-bottom:6px}
+.nav-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:6px 8px 4px;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;font-size:12.5px;color:var(--muted);margin-bottom:1px}
+.ni:hover{background:var(--s2);color:var(--text)}
+.ni.active{background:rgba(0,194,255,.1);color:var(--accent);font-weight:500}
+.nicon{font-size:13px;width:16px;text-align:center}
+.nbadge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 5px;border-radius:5px}
+.nb-rd{background:rgba(255,69,69,.2);color:var(--danger)}.nb-yw{background:rgba(255,184,0,.2);color:var(--warn)}.nb-bl{background:rgba(0,194,255,.2);color:var(--accent)}.nb-gr{background:rgba(0,229,160,.2);color:var(--a3)}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:22px}
+.panel{display:none}.panel.active{display:block}
+
+/* PAGE HDR */
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
+.page-sub{font-size:12px;color:var(--muted)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:18px}
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.bl::after{background:var(--accent)}.sc.gr::after{background:var(--a3)}.sc.rd::after{background:var(--danger)}.sc.yw::after{background:var(--warn)}.sc.pu::after{background:var(--purple)}.sc.or::after{background:var(--a2)}
+.sl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.sv{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.sv.bl{color:var(--accent)}.sv.gr{color:var(--a3)}.sv.rd{color:var(--danger)}.sv.yw{color:var(--warn)}.sv.pu{color:var(--purple)}.sv.or{color:var(--a2)}
+.sn{font-size:10px;color:var(--muted);margin-top:3px}.sn.up{color:var(--a3)}.sn.dn{color:var(--danger)}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.card.wx-card{border-color:rgba(255,184,0,.25);background:linear-gradient(160deg,#120E05,#0F1520)}
+.ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:13px;font-weight:600}.ca{font-size:11px;color:var(--accent);cursor:pointer}
+.cb{padding:14px}
+
+/* VEHICLE CARD */
+.veh-card{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:15px;margin-bottom:10px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.veh-card:hover{border-color:var(--b2);background:var(--s3)}
+.veh-card.restricted{border-color:rgba(255,69,69,.35);background:rgba(255,69,69,.03)}
+.veh-card.service-due{border-color:rgba(255,184,0,.3)}
+.veh-card.active{border-color:rgba(0,229,160,.25)}
+.veh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.veh-icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;margin-right:10px}
+.veh-info{flex:1}
+.veh-unit{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:2px}
+.veh-type{font-size:11.5px;color:var(--muted)}
+.veh-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.vm-item{background:var(--s3);border:1px solid var(--border);border-radius:5px;padding:7px;text-align:center}
+.vm-val{font-size:13px;font-weight:600;margin-bottom:2px}
+.vm-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.veh-footer{display:flex;gap:7px;align-items:center}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.chip.gr{background:rgba(0,229,160,.15);color:var(--a3)}.chip.rd{background:rgba(255,69,69,.15);color:var(--danger)}.chip.yw{background:rgba(255,184,0,.15);color:var(--warn)}.chip.bl{background:rgba(0,194,255,.15);color:var(--accent)}.chip.pu{background:rgba(155,109,255,.15);color:var(--purple)}.chip.gy{background:rgba(90,110,130,.2);color:var(--muted)}.chip.or{background:rgba(255,107,53,.15);color:var(--a2)}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:7px;font-size:12px;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert.rd{background:rgba(255,69,69,.08);border:1px solid rgba(255,69,69,.2);color:#FF8888}
+.alert.yw{background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.2);color:var(--warn)}
+.alert.gr{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);color:var(--a3)}
+.alert.bl{background:rgba(0,194,255,.08);border:1px solid rgba(0,194,255,.2);color:var(--accent)}
+.alert.wx{background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.2);color:var(--warn)}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.fl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fl .req{color:var(--danger);margin-left:2px}
+.fi{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12.5px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .15s;width:100%}
+.fi:focus{outline:none;border-color:var(--accent);background:var(--s3)}
+.fi::placeholder{color:var(--muted)}
+.fi-ta{resize:vertical;min-height:60px}
+.fi-sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234A6880'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--accent);color:#000}.btn-p:hover{background:#00AADD}
+.btn-rd{background:var(--danger);color:#fff}
+.btn-g{background:transparent;color:var(--accent);border:1px solid rgba(0,194,255,.35)}.btn-g:hover{background:rgba(0,194,255,.08)}
+.btn-yw{background:rgba(255,184,0,.12);color:var(--warn);border:1px solid rgba(255,184,0,.3)}
+.btn-pu{background:linear-gradient(135deg,#9B6DFF,#7040D0);color:#fff}
+.btn-gr{background:var(--a3);color:#000}
+.btn-sm{padding:5px 11px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px}
+
+/* PROGRESS */
+.pw{background:var(--border);border-radius:3px;height:5px;overflow:hidden}
+.pf{height:100%;border-radius:3px}
+
+/* DRAWER */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;backdrop-filter:blur(2px)}
+.overlay.open{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:620px;background:var(--s1);border-left:1px solid var(--border);z-index:101;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;overflow:hidden}
+.drawer.open{transform:translateX(0)}
+.dh{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dt{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.dc{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted)}
+.dc:hover{color:var(--text)}
+.db{flex:1;overflow-y:auto;padding:18px}
+.df{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:150;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-ov.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.6);max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12.5px;z-index:200;transform:translateY(80px);opacity:0;transition:all .25s ease;display:flex;align-items:center;gap:10px;min-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(0,229,160,.3)}.toast.error{border-color:rgba(255,69,69,.3)}.toast.warn{border-color:rgba(255,184,0,.3)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:600}
+.tbl td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
+
+/* TIMELINE */
+.tl-item{display:flex;gap:10px;padding-bottom:12px;position:relative}
+.tl-item::before{content:'';position:absolute;left:11px;top:24px;bottom:0;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:23px;height:23px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:1}
+.tl-body{flex:1}
+.tl-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.tl-meta{font-size:11px;color:var(--muted)}
+
+/* SEC LABEL */
+.sec-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:8px 16px;font-size:12.5px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .12s;font-weight:500}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* WX ROUTE */
+.route-pill{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;font-size:12px}
+
+/* ODOMETER BAR */
+.odo-bar{position:relative;height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:5px}
+.odo-fill{height:100%;border-radius:4px}
+
+/* MAINT ROW */
+.maint-row{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.mr-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.mr-body{flex:1}
+.mr-title{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.mr-meta{font-size:11px;color:var(--muted)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.loading-overlay{position:fixed;inset:0;background:rgba(7,9,15,.92);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
+.loading-spinner{width:40px;height:40px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.api-error-banner{background:rgba(255,69,69,.1);border-bottom:1px solid rgba(255,69,69,.25);padding:10px 24px;display:none;align-items:center;gap:12px;font-size:12px;color:#FF8888;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div style="color:var(--text);font-size:13px;font-weight:600">Loading Fleet</div>
+  <div id="loadingMsg" style="color:var(--muted);font-size:11.5px">Connecting to Vigil API…</div>
+</div>
+
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-shield">🛡️</div>
+    <div><span class="logo-name">VIGIL</span><span class="logo-mod">/ Fleet & Equipment</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="co-badge">🚛 Northern Express Transport Ltd.</div>
+    <div class="user-dot">C</div>
+  </div>
+</div>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner" id="alertBanner">
+  <span style="color:var(--danger);font-weight:700;font-size:11px">⚠️ Fleet Alerts:</span>
+  <div class="ab-item" style="color:var(--muted)"><div class="ab-dot" style="background:var(--muted)"></div>Loading fleet data…</div>
+  <div style="margin-left:auto"><button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button></div>
+</div>
+<div class="api-error-banner" id="apiErrorBanner">
+  ⚠️ <span id="apiErrorMsg">API connection failed.</span>
+  <button class="btn btn-g btn-xs" style="margin-left:auto" onclick="init()">↺ Retry</button>
+</div>
+
+<div class="main-area">
+<!-- SIDEBAR -->
+<div class="sidenav">
+  <div class="nav-sec">
+    <div class="nav-lbl">Fleet</div>
+    <div class="ni active" onclick="showPanel('dashboard')"><span class="nicon">📊</span>Dashboard</div>
+    <div class="ni" onclick="showPanel('fleet')"><span class="nicon">🚛</span>All Vehicles<span class="nbadge nb-bl" id="nav-fleet">0</span></div>
+    <div class="ni" onclick="showPanel('restricted')"><span class="nicon">⛔</span>Restricted<span class="nbadge nb-rd" id="nav-rest">0</span></div>
+    <div class="ni" onclick="showPanel('dispatched')"><span class="nicon">🟢</span>Dispatched<span class="nbadge nb-gr" id="nav-disp">0</span></div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Maintenance</div>
+    <div class="ni" onclick="showPanel('maintenance')"><span class="nicon">🔧</span>Maintenance Schedule<span class="nbadge nb-yw" id="nav-maint">0</span></div>
+    <div class="ni" onclick="showPanel('deficiencies')"><span class="nicon">⚠️</span>Deficiencies<span class="nbadge nb-rd" id="nav-defic">0</span></div>
+    <div class="ni" onclick="showPanel('certifications')"><span class="nicon">🏅</span>Certifications<span class="nbadge nb-yw" id="nav-cert">0</span></div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Roads & Routes</div>
+    <div class="ni" onclick="showPanel('roads')"><span class="nicon">🛣️</span>Road Conditions<span class="nbadge nb-yw">1</span></div>
+    <div class="ni" onclick="showPanel('journey')"><span class="nicon">📍</span>Journey Plans</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Equipment</div>
+    <div class="ni" onclick="showPanel('equipment')"><span class="nicon">⚙️</span>Equipment Registry</div>
+    <div class="ni" onclick="showPanel('analytics')"><span class="nicon">📈</span>Fleet Analytics</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div class="panel active" id="panel-dashboard">
+  <div class="page-hdr">
+    <div><div class="page-title">Fleet & Equipment</div><div class="page-sub">Vehicle safety compliance · Maintenance tracking · Road conditions · Dispatch gating</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-yw btn-sm" onclick="showPanel('roads')">⛅ Road Conditions</button>
+      <button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button>
+    </div>
+  </div>
+
+  <div class="stats" id="dashStats"></div>
+
+  <div class="alert wx" id="roadAlert">⛅ <strong>Active Road Advisory:</strong> Hwy 2 Southbound (Red Deer–Calgary) — Black ice reported. <span style="color:var(--accent);cursor:pointer" onclick="showPanel('roads')">View conditions →</span> Journey plans have been updated for affected routes.</div>
+
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+    <div>
+      <!-- FLEET STATUS -->
+      <div class="card">
+        <div class="ch"><div class="ct">Fleet Status — All Vehicles</div><div class="ca" onclick="showPanel('fleet')">Full Registry →</div></div>
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>Unit</th><th>Type</th><th>Driver</th><th>Location</th><th>Pre-Trip</th><th>Service Due</th><th>Road Cond.</th><th>Status</th></tr></thead>
+          <tbody id="fleetTable"></tbody>
+        </table></div>
+      </div>
+      <!-- MAINTENANCE DUE -->
+      <div class="card">
+        <div class="ch"><div class="ct">🔧 Maintenance Due — Next 30 Days</div><div class="ca" onclick="showPanel('maintenance')">Schedule →</div></div>
+        <div class="cb" style="padding:10px" id="maintDue"></div>
+      </div>
+    </div>
+    <div>
+      <!-- ROAD CONDITIONS SUMMARY -->
+      <div class="card wx-card">
+        <div class="ch"><div class="ct" style="color:var(--warn)">⛅ Active Route Conditions</div><div class="ca" style="color:var(--warn)" onclick="showPanel('roads')">Full View →</div></div>
+        <div class="cb" style="padding:10px" id="roadSummary"></div>
+      </div>
+      <!-- CERT EXPIRING -->
+      <div class="card">
+        <div class="ch"><div class="ct">🏅 Certifications Expiring</div><div class="ca" onclick="showPanel('certifications')">All Certs →</div></div>
+        <div class="cb" style="padding:0" id="certExpiring"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLEET REGISTRY ===== -->
+<div class="panel" id="panel-fleet">
+  <div class="page-hdr">
+    <div><div class="page-title">Fleet Registry</div><div class="page-sub">All vehicles · Safety status · Maintenance history · Driver assignment</div></div>
+    <div style="display:flex;gap:8px">
+      <select class="fi fi-sel" style="width:auto;font-size:11px;padding:5px 26px 5px 10px" onchange="filterFleet(this.value)">
+        <option value="">All Vehicles</option>
+        <option>Class 1 Semi</option><option>Class 3 Truck</option><option>Service Truck</option><option>Pickup 4x4</option><option>Van</option>
+      </select>
+      <button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button>
+    </div>
+  </div>
+  <div id="fleetRegistry"></div>
+</div>
+
+<!-- ===== RESTRICTED ===== -->
+<div class="panel" id="panel-restricted">
+  <div class="page-hdr"><div><div class="page-title">Restricted Vehicles</div><div class="page-sub">Vehicles out of service due to safety deficiency or failed inspection — cannot be dispatched</div></div></div>
+  <div id="restrictedPanel"></div>
+</div>
+
+<!-- ===== DISPATCHED ===== -->
+<div class="panel" id="panel-dispatched">
+  <div class="page-hdr"><div><div class="page-title">Currently Dispatched</div><div class="page-sub">Active vehicles on route — live status with road condition overlay</div></div></div>
+  <div id="dispatchedPanel"></div>
+</div>
+
+<!-- ===== MAINTENANCE ===== -->
+<div class="panel" id="panel-maintenance">
+  <div class="page-hdr">
+    <div><div class="page-title">Maintenance Schedule</div><div class="page-sub">Scheduled services · Overdue maintenance · Work orders</div></div>
+    <button class="btn btn-p btn-sm" onclick="openAddMaintenance()">+ Schedule Service</button>
+  </div>
+  <div class="stats" id="maintStats"></div>
+  <div id="maintPanel"></div>
+</div>
+
+<!-- ===== DEFICIENCIES ===== -->
+<div class="panel" id="panel-deficiencies">
+  <div class="page-hdr"><div><div class="page-title">Fleet Deficiencies</div><div class="page-sub">Open deficiencies from pre-trip inspections and maintenance — vehicle restrictions active</div></div></div>
+  <div id="deficPanel"></div>
+</div>
+
+<!-- ===== CERTIFICATIONS ===== -->
+<div class="panel" id="panel-certifications">
+  <div class="page-hdr">
+    <div><div class="page-title">Vehicle Certifications</div><div class="page-sub">Annual safety certs · CVIP · Licensing · Insurance · Weights permits</div></div>
+  </div>
+  <div id="certPanel"></div>
+</div>
+
+<!-- ===== ROAD CONDITIONS ===== -->
+<div class="panel" id="panel-roads">
+  <div class="page-hdr">
+    <div><div class="page-title">Road Conditions <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--warn);margin-left:8px">⛅ 511 Live Feed</span></div>
+    <div class="page-sub">Alberta 511 · BC DriveBC · Manitoba 511 · Route-matched to active fleet</div></div>
+    <button class="btn btn-yw btn-sm" onclick="issueAdvisory()">📢 Issue Driver Advisory</button>
+  </div>
+  <div id="roadsPanel"></div>
+</div>
+
+<!-- ===== JOURNEY PLANS ===== -->
+<div class="panel" id="panel-journey">
+  <div class="page-hdr">
+    <div><div class="page-title">Journey Plans</div><div class="page-sub">Pre-trip route approval · Check-in schedule · Weather acknowledgement</div></div>
+    <button class="btn btn-p btn-sm" onclick="openNewJourneyPlan()">+ New Journey Plan</button>
+  </div>
+  <div id="journeyPanel"></div>
+</div>
+
+<!-- ===== EQUIPMENT ===== -->
+<div class="panel" id="panel-equipment">
+  <div class="page-hdr">
+    <div><div class="page-title">Equipment Registry</div><div class="page-sub">Forklifts · Cranes · Lifting gear · Safety equipment · Power tools</div></div>
+    <button class="btn btn-p btn-sm" onclick="showToast('success','+ Equipment record created')">+ Add Equipment</button>
+  </div>
+  <div id="equipPanel"></div>
+</div>
+
+<!-- ===== ANALYTICS ===== -->
+<div class="panel" id="panel-analytics">
+  <div class="page-hdr"><div><div class="page-title">Fleet Analytics</div><div class="page-sub">Utilization · Incident correlation · Maintenance costs · Compliance trends</div></div></div>
+  <div id="analyticsPanel"></div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="dh"><div class="dt" id="drawerTitle">Vehicle</div><div class="dc" onclick="closeDrawer()">✕</div></div>
+  <div class="db" id="drawerBody"></div>
+  <div class="df" id="drawerFooter"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modalOv">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
+
+<script>
+// ─── API ──────────────────────────────────────────────────────
+const API_BASE = 'https://vigil-production-17ca.up.railway.app';
+const LOGIN_EMAIL = 'j.marchetti@northernexpress.ca';
+const LOGIN_PASS  = 'Test1234!';
+let authToken = null;
+
+async function apiLogin() {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email: LOGIN_EMAIL, password: LOGIN_PASS}),
+  });
+  if (!res.ok) throw new Error(`Login failed (${res.status})`);
+  authToken = (await res.json()).token;
+}
+
+async function apiFetch(path, opts={}, _retry=true) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...opts,
+    headers: {'Content-Type':'application/json', 'Authorization':`Bearer ${authToken}`, ...(opts.headers||{})},
+  });
+  if (res.status === 401 && _retry) { await apiLogin(); return apiFetch(path, opts, false); }
+  if (!res.ok) throw new Error(`API ${res.status} — ${path}`);
+  return res.json();
+}
+
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loadingMsg');
+  if (el) el.textContent = msg;
+}
+
+function showLoading(on) {
+  document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
+}
+
+function showApiError(msg) {
+  const b = document.getElementById('apiErrorBanner');
+  document.getElementById('apiErrorMsg').textContent = msg;
+  b.style.display = 'flex';
+}
+
+function hideApiError() {
+  document.getElementById('apiErrorBanner').style.display = 'none';
+}
+
+// ─── DATA ─────────────────────────────────────────────────────
+function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
+function fmtDate(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
+function fmtDateShort(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
+
+const ROAD_CONDITIONS = [
+  {route:'Hwy 2 Southbound',region:'Red Deer — Calgary',status:'advisory',condition:'Black ice reported — multiple locations',temp:'-8°C',wind:'31 km/h',vis:'4.2 km',activeDrivers:['P. Whitehorse','A. Reyes']},
+  {route:'Hwy 63 North',region:'Edmonton — Fort McMurray',status:'clear',condition:'Bare and dry',temp:'-4°C',wind:'18 km/h',vis:'Good',activeDrivers:['D. Mensah']},
+  {route:'Hwy 16 West',region:'Edmonton — Jasper',status:'caution',condition:'Compact snow — reduced traction',temp:'-10°C',wind:'24 km/h',vis:'6.1 km',activeDrivers:[]},
+  {route:'Hwy 2 Northbound',region:'Calgary — Red Deer',status:'caution',condition:'Slushy — treated',temp:'-5°C',wind:'22 km/h',vis:'Good',activeDrivers:[]},
+  {route:'Hwy 1 East',region:'Calgary — Medicine Hat',status:'clear',condition:'Clear and dry',temp:'-2°C',wind:'15 km/h',vis:'Good',activeDrivers:[]},
+  {route:'Hwy 43 West',region:'Edmonton — Grande Prairie',status:'clear',condition:'Bare and dry',temp:'-6°C',wind:'20 km/h',vis:'Good',activeDrivers:[]},
+];
+
+// ─── MAPPING ──────────────────────────────────────────────────
+function mapAssetStatus(a) {
+  if (a.fitness_for_service === 'unfit' || a.status === 'out_of_service') return 'Restricted';
+  if (a.status === 'maintenance') return 'Service Due';
+  if (a.current_operator_id || (a.operator_first_name && a.operator_last_name)) return 'Dispatched';
+  return 'Available';
+}
+
+function mapAsset(a, assetDefects=[]) {
+  const openDefects = assetDefects.filter(d => !['verified','will_not_repair'].includes(d.status));
+  return {
+    id: a.id,
+    unit: a.asset_number || a.name,
+    type: a.category || a.asset_type || 'Vehicle',
+    make: a.make || '',
+    model: a.model || '',
+    year: a.year || '',
+    vin: a.vin_serial || '',
+    plate: a.license_plate || '—',
+    status: mapAssetStatus(a),
+    driver: [a.operator_first_name, a.operator_last_name].filter(Boolean).join(' ') || '',
+    route: '',
+    site: a.site || '—',
+    odometer: a.odometer_km || 0,
+    lastService: a.last_service_date || null,
+    nextService: a.next_service_date || rd(90),
+    nextServiceKm: a.next_service_km || null,
+    pretripToday: 'Pending',
+    pretripScore: null,
+    deficiencies: openDefects.map(d => d.title),
+    certs: {
+      cvip:         a.next_inspection_date  || rd(365),
+      insurance:    a.insurance_expiry      || rd(365),
+      registration: a.registration_expiry   || rd(365),
+    },
+    notes: a.notes || '',
+    color: '#00C2FF',
+    _fitnessStatus: a.fitness_for_service,
+  };
+}
+
+function mapMaintenance(m) {
+  const today = new Date().toISOString().split('T')[0];
+  let status = 'Upcoming';
+  if (m.status === 'in_progress') status = 'Due Today';
+  else if (m.scheduled_date && m.scheduled_date < today) status = 'Overdue';
+  else if (m.scheduled_date === today) status = 'Due Today';
+  return {
+    id: m.maintenance_number || m.id,
+    vehId: m.asset_id,
+    unit: m.asset_name || m.asset_number || '—',
+    type: m.title || m.maintenance_type || 'Service',
+    priority: 'Medium',
+    dueDate: m.scheduled_date || rd(14),
+    status,
+    estimatedHours: '—',
+    cost: m.cost || 0,
+    notes: m.description || '',
+  };
+}
+
+// ─── API DATA LOAD ────────────────────────────────────────────
+async function loadData() {
+  setLoadingMsg('Fetching fleet assets…');
+  const [assetsData, defectsData, maintData] = await Promise.all([
+    apiFetch('/api/fleet/assets'),
+    apiFetch('/api/fleet/defects'),
+    apiFetch('/api/fleet/maintenance'),
+  ]);
+
+  const defectsByAsset = {};
+  (defectsData.defects || []).forEach(d => {
+    if (!defectsByAsset[d.asset_id]) defectsByAsset[d.asset_id] = [];
+    defectsByAsset[d.asset_id].push(d);
+  });
+
+  vehicles = (assetsData.assets || []).map(a => mapAsset(a, defectsByAsset[a.id] || []));
+  maintenance = (maintData.maintenance || []).map(mapMaintenance);
+
+  setLoadingMsg('Loading dashboard…');
+  try {
+    const dash = await apiFetch('/api/fleet/dashboard');
+    updateAlertBanner(dash);
+  } catch(_) {}
+}
+
+function updateAlertBanner(dash) {
+  const oos = dash.out_of_service || [];
+  const crit = dash.critical_defects || [];
+  const maint = dash.upcoming_maintenance || [];
+  const parts = [];
+  if (oos.length) parts.push(`<div class="ab-item" style="color:var(--danger)" onclick="showPanel('restricted')"><div class="ab-dot" style="background:var(--danger)"></div>${oos.length} vehicle${oos.length>1?'s':''} out of service</div><span class="ab-sep">·</span>`);
+  if (crit.length) parts.push(`<div class="ab-item" style="color:var(--danger)" onclick="showPanel('deficiencies')"><div class="ab-dot" style="background:var(--danger)"></div>${crit.length} critical defect${crit.length>1?'s':''} open</div><span class="ab-sep">·</span>`);
+  if (maint.length) parts.push(`<div class="ab-item" style="color:var(--warn)" onclick="showPanel('maintenance')"><div class="ab-dot" style="background:var(--warn)"></div>${maint.length} service${maint.length>1?'s':''} due this week</div><span class="ab-sep">·</span>`);
+  const banner = document.getElementById('alertBanner');
+  if (banner && parts.length) {
+    banner.innerHTML = `<span style="color:var(--danger);font-weight:700;font-size:11px">⚠️ Fleet Alerts:</span>
+      ${parts.join('')}
+      <div style="margin-left:auto"><button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button></div>`;
+  }
+}
+
+async function init() {
+  showLoading(true);
+  hideApiError();
+  try {
+    setLoadingMsg('Authenticating…');
+    await apiLogin();
+    await loadData();
+    showLoading(false);
+    renderAll();
+  } catch(err) {
+    showLoading(false);
+    showApiError(err.message + ' — is the Vigil API running at ' + API_BASE + '?');
+  }
+}
+
+let vehicles = [];
+let maintenance = [];
+
+let journeyPlans = [
+  {id:'JP-018',driver:'Diallo Mensah',unit:'Unit 08',origin:'Calgary Hub',dest:'Fort McMurray',route:'Hwy 2 N → Hwy 63 N',departure:new Date(new Date().setHours(5,30,0,0)),eta:'14:30',distance:'746 km',checkIns:['08:00','11:00','14:00'],routeStatus:'clear',fatigue:'Low',approved:true,approvedBy:'Sandra Larsson'},
+  {id:'JP-017',driver:'Ana Reyes',unit:'Unit 22',origin:'Calgary Hub',dest:'Red Deer',route:'Hwy 2 N',departure:new Date(new Date().setHours(8,0,0,0)),eta:'10:30',distance:'148 km',checkIns:['09:15'],routeStatus:'advisory',fatigue:'Low',approved:true,approvedBy:'Sandra Larsson'},
+  {id:'JP-016',driver:'Patrick Whitehorse',unit:'Unit 05',origin:'Red Deer',dest:'Calgary Hub',route:'Hwy 2 S',departure:new Date(new Date().setHours(14,0,0,0)),eta:'16:00',distance:'148 km',checkIns:['15:00'],routeStatus:'advisory',fatigue:'High',approved:false,approvedBy:''},
+];
+
+const EQUIPMENT = [
+  {id:'EQ-001',name:'Overhead Crane — Bay 1',type:'Crane',site:'Calgary Hub',cert:rd(25),lastInsp:rd(-60),status:'Active',capacity:'5 Tonne'},
+  {id:'EQ-002',name:'Forklift #1 — 4,000 lb',type:'Forklift',site:'Calgary Hub',cert:rd(180),lastInsp:rd(-14),status:'Active',capacity:'4,000 lb'},
+  {id:'EQ-003',name:'Harness Set #1',type:'Fall Protection',site:'Calgary Hub',cert:rd(300),lastInsp:rd(-7),status:'Active',capacity:'N/A'},
+  {id:'EQ-004',name:'Harness Set #3',type:'Fall Protection',site:'Calgary Hub',cert:rd(-3),lastInsp:rd(-4),status:'Out of Service',capacity:'N/A'},
+  {id:'EQ-005',name:'Forklift #2 — 6,000 lb',type:'Forklift',site:'Edmonton Hub',cert:rd(210),lastInsp:rd(-21),status:'Active',capacity:'6,000 lb'},
+  {id:'EQ-006',name:'Chain Hoist — 2 Tonne',type:'Lifting Equipment',site:'Site B',cert:rd(45),lastInsp:rd(-90),status:'Inspection Due',capacity:'2,000 kg'},
+];
+
+// ─── UTILITIES ────────────────────────────────────────────────
+function statusChip(s){
+  const m={Dispatched:'gr',Available:'bl',Restricted:'rd','Service Due':'yw','Out of Service':'rd',Active:'gr','Inspection Due':'yw',Overdue:'rd',Urgent:'rd','Due Today':'yw',Upcoming:'bl',advisory:'yw',clear:'gr',caution:'yw'};
+  return`<span class="chip ${m[s]||'gy'}">${s}</span>`;
+}
+function roadStatusColor(s){return{clear:'var(--a3)',caution:'var(--warn)',advisory:'var(--danger)'}[s]||'var(--muted)'}
+function roadStatusIcon(s){return{clear:'✅',caution:'⚠️',advisory:'🚨'}[s]||'📍'}
+function daysUntil(dt){return Math.round((new Date(dt)-new Date())/86400000)}
+function certColor(dt){const d=daysUntil(dt);return d<0?'var(--danger)':d<30?'var(--warn)':d<60?'var(--accent)':'var(--a3)'}
+function odomPct(v){if(!v.nextServiceKm||!v.odometer) return 0;return Math.min(98,Math.round((v.odometer/v.nextServiceKm)*100))}
+
+// ─── RENDER STATS ─────────────────────────────────────────────
+function renderStats(){
+  const total=vehicles.length;
+  const dispatched=vehicles.filter(v=>v.status==='Dispatched').length;
+  const available=vehicles.filter(v=>v.status==='Available').length;
+  const restricted=vehicles.filter(v=>v.status==='Restricted').length;
+  const serviceDue=vehicles.filter(v=>v.status==='Service Due'||maintenance.some(m=>m.vehId===v.id&&(m.status==='Overdue'||m.status==='Due Today'))).length;
+  const certExpiring=vehicles.filter(v=>Object.values(v.certs).some(c=>daysUntil(c)<30)).length;
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="sc bl"><div class="sl">Total Fleet</div><div class="sv bl">${total}</div><div class="sn">Active vehicles</div></div>
+    <div class="sc gr"><div class="sl">Dispatched</div><div class="sv gr">${dispatched}</div><div class="sn up">En route</div></div>
+    <div class="sc bl"><div class="sl">Available</div><div class="sv bl">${available}</div><div class="sn">Ready for dispatch</div></div>
+    <div class="sc rd"><div class="sl">Restricted</div><div class="sv rd">${restricted}</div><div class="sn dn">Out of service</div></div>
+    <div class="sc yw"><div class="sl">Service / Maint Due</div><div class="sv yw">${serviceDue}</div><div class="sn dn">Action needed</div></div>
+    <div class="sc yw"><div class="sl">Certs Expiring 30d</div><div class="sv yw">${certExpiring}</div><div class="sn">Renewal required</div></div>
+  `;
+
+  document.getElementById('nav-fleet').textContent=total;
+  document.getElementById('nav-rest').textContent=restricted;
+  document.getElementById('nav-disp').textContent=dispatched;
+  document.getElementById('nav-maint').textContent=maintenance.filter(m=>m.status==='Overdue'||m.status==='Urgent'||m.status==='Due Today').length;
+  document.getElementById('nav-defic').textContent=vehicles.reduce((a,v)=>a+v.deficiencies.length,0);
+  document.getElementById('nav-cert').textContent=certExpiring;
+}
+
+// ─── FLEET TABLE ──────────────────────────────────────────────
+function renderFleetTable(){
+  const tbody=document.getElementById('fleetTable');
+  if(!tbody) return;
+  tbody.innerHTML=vehicles.map(v=>{
+    const route=ROAD_CONDITIONS.find(r=>r.activeDrivers.includes(v.driver));
+    return`<tr onclick="openVehicleDetail('${v.id}')">
+      <td><strong style="color:var(--accent)">${v.unit}</strong><div style="font-size:10px;color:var(--muted)">${v.make} ${v.model}</div></td>
+      <td style="font-size:11.5px">${v.type}</td>
+      <td style="font-size:11.5px">${v.driver||'<span style="color:var(--muted)">Unassigned</span>'}</td>
+      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.site}</td>
+      <td>${v.pretripToday==='Pass'?'<span class="chip gr">Pass</span>':v.pretripToday==='Pass w/ Note'?'<span class="chip yw">Pass*</span>':v.pretripToday==='Fail'?'<span class="chip rd">Fail</span>':'<span class="chip gy">Pending</span>'}</td>
+      <td style="font-size:11px;color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</td>
+      <td>${route?`<span class="chip ${route.status==='clear'?'gr':route.status==='advisory'?'rd':'yw'}">${roadStatusIcon(route.status)} ${route.status==='advisory'?'Advisory':route.status==='caution'?'Caution':'Clear'}</span>`:'<span class="chip gy">N/A</span>'}</td>
+      <td>${statusChip(v.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── MAINTENANCE DUE ─────────────────────────────────────────
+function renderMaintDue(){
+  const el=document.getElementById('maintDue');
+  if(!el) return;
+  const due=maintenance.filter(m=>m.status!=='Complete').slice(0,4);
+  el.innerHTML=due.map(m=>`
+    <div class="maint-row" style="border-color:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.25)':m.status==='Due Today'?'rgba(255,184,0,.25)':'var(--border)'}">
+      <div class="mr-icon" style="background:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.1)':m.status==='Due Today'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}">🔧</div>
+      <div class="mr-body">
+        <div class="mr-title">${m.unit} — ${m.type}</div>
+        <div class="mr-meta">Due: <span style="color:${m.status==='Overdue'||m.status==='Urgent'?'var(--danger)':m.status==='Due Today'?'var(--warn)':'var(--text)'}">${fmtDate(m.dueDate)}</span> · Est. ${m.estimatedHours}h${m.cost>0?' · $'+m.cost.toLocaleString():''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        ${statusChip(m.status)}
+        <button class="btn btn-g btn-xs" onclick="event.stopPropagation();scheduleMaintenance('${m.id}')">Schedule</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── ROAD SUMMARY ─────────────────────────────────────────────
+function renderRoadSummary(){
+  const el=document.getElementById('roadSummary');
+  if(!el) return;
+  const active=ROAD_CONDITIONS.filter(r=>r.status!=='clear'||r.activeDrivers.length>0);
+  el.innerHTML=active.map(r=>`
+    <div class="route-pill" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.2)':r.status==='caution'?'rgba(255,184,0,.2)':'var(--border)'}">
+      <div>
+        <div style="font-size:12px;font-weight:600">${roadStatusIcon(r.status)} ${r.route}</div>
+        <div style="font-size:10px;color:var(--muted)">${r.condition}</div>
+        ${r.activeDrivers.length>0?`<div style="font-size:10px;color:var(--accent);margin-top:2px">👤 ${r.activeDrivers.join(', ')}</div>`:''}
+      </div>
+      <span class="chip ${r.status==='advisory'?'rd':r.status==='caution'?'yw':'gr'}">${r.status}</span>
+    </div>
+  `).join('');
+}
+
+// ─── CERT EXPIRING ────────────────────────────────────────────
+function renderCertExpiring(){
+  const el=document.getElementById('certExpiring');
+  if(!el) return;
+  const rows=[];
+  vehicles.forEach(v=>{
+    Object.entries(v.certs).forEach(([type,dt])=>{
+      const d=daysUntil(dt);
+      if(d<60) rows.push({unit:v.unit,type:type.toUpperCase(),expiry:dt,days:d});
+    });
+  });
+  rows.sort((a,b)=>a.days-b.days);
+  if(rows.length===0){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px">All certifications current</div>';return;}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Unit</th><th>Cert Type</th><th>Expires</th></tr></thead><tbody>
+    ${rows.slice(0,6).map(r=>`<tr>
+      <td style="font-weight:600">${r.unit}</td>
+      <td style="font-size:11px">${r.type}</td>
+      <td><span class="chip ${r.days<0?'rd':r.days<30?'yw':'bl'}">${r.days<0?Math.abs(r.days)+'d overdue':r.days+'d'}</span></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ─── FLEET REGISTRY PANEL ─────────────────────────────────────
+function renderFleetRegistry(filter=''){
+  const el=document.getElementById('fleetRegistry');
+  if(!el) return;
+  const filtered=filter?vehicles.filter(v=>v.type===filter):vehicles;
+
+  el.innerHTML=filtered.map(v=>{
+    const pct=odomPct(v);
+    const hasMaint=maintenance.some(m=>m.vehId===v.id&&m.status!=='Complete');
+    const certIssue=Object.values(v.certs).some(c=>daysUntil(c)<30);
+    return`
+    <div class="veh-card ${v.status==='Restricted'?'restricted':v.status==='Service Due'?'service-due':v.status==='Dispatched'?'active':''}" onclick="openVehicleDetail('${v.id}')">
+      <div class="veh-top">
+        <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
+          <div class="veh-icon" style="background:${v.status==='Restricted'?'rgba(255,69,69,.1)':v.status==='Service Due'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}">${v.type.includes('Semi')||v.type.includes('Class 1')?'🚛':v.type.includes('Pickup')?'🛻':v.type.includes('Van')?'🚐':v.type.includes('Crane')?'🏗️':'🚚'}</div>
+          <div class="veh-info">
+            <div class="veh-unit">${v.unit}</div>
+            <div class="veh-type">${v.year} ${v.make} ${v.model} · ${v.type}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+          ${statusChip(v.status)}
+          ${v.driver?`<span class="chip bl">👤 ${v.driver}</span>`:''}
+        </div>
+      </div>
+      <div class="veh-meta">
+        <div class="vm-item">
+          <div class="vm-val" style="color:${v.pretripToday==='Pass'?'var(--a3)':v.pretripToday==='Fail'?'var(--danger)':v.pretripToday==='Pass w/ Note'?'var(--warn)':'var(--muted)'}">${v.pretripToday==='Pass'?'✅ Pass':v.pretripToday==='Fail'?'❌ Fail':v.pretripToday==='Pass w/ Note'?'⚠️ Pass*':'⏳ Pending'}</div>
+          <div class="vm-lbl">Pre-Trip Today</div>
+        </div>
+        <div class="vm-item">
+          <div class="vm-val" style="color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</div>
+          <div class="vm-lbl">Next Service</div>
+        </div>
+        <div class="vm-item">
+          <div class="vm-val" style="color:${v.odometer.toLocaleString().length>8?'var(--text2)':'var(--text)'}">${v.odometer.toLocaleString()} km</div>
+          <div class="vm-lbl">Odometer</div>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px"><span>Distance to next service</span><span>${v.nextServiceKm?((v.nextServiceKm-v.odometer).toLocaleString()+' km remaining'):'km interval TBD'}</span></div>
+        <div class="odo-bar"><div class="odo-fill" style="width:${pct}%;background:${pct>90?'var(--danger)':pct>75?'var(--warn)':'var(--a3)'}"></div></div>
+      </div>
+      ${v.deficiencies.length>0?`<div class="alert rd" style="margin-bottom:8px;padding:7px 10px">⚠️ ${v.deficiencies.length} open deficien${v.deficiencies.length>1?'cies':'cy'}: ${v.deficiencies.join(' · ')}</div>`:''}
+      ${certIssue?`<div class="alert yw" style="margin-bottom:8px;padding:7px 10px">🏅 Certification expiring within 30 days — renewal required</div>`:''}
+      <div class="veh-footer">
+        <button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">View Details</button>
+        ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="event.stopPropagation();dispatchVehicle('${v.id}')">Dispatch →</button>`:''}
+        ${v.status==='Restricted'?`<button class="btn btn-rd btn-sm" onclick="event.stopPropagation()">⛔ Restricted</button>`:''}
+        ${v.status==='Service Due'?`<button class="btn btn-yw btn-sm" onclick="event.stopPropagation();openAddMaintenance('${v.id}')">🔧 Schedule Service</button>`:''}
+        <div style="margin-left:auto;font-size:10px;color:var(--muted)">${v.plate} · VIN ${v.vin.slice(-6)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── VEHICLE DETAIL DRAWER ────────────────────────────────────
+function openVehicleDetail(id){
+  const v=vehicles.find(x=>x.id===id);
+  if(!v) return;
+  const maintItems=maintenance.filter(m=>m.vehId===id);
+  const route=ROAD_CONDITIONS.find(r=>r.activeDrivers.includes(v.driver));
+
+  document.getElementById('drawerTitle').innerHTML=`<span style="color:var(--accent)">${v.unit}</span> — ${v.make} ${v.model}`;
+  document.getElementById('drawerBody').innerHTML=`
+    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">${statusChip(v.status)}${v.driver?`<span class="chip bl">👤 ${v.driver}</span>`:''}${route?`<span class="chip ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}">${roadStatusIcon(route.status)} ${route.route}</span>`:''}</div>
+
+    ${v.status==='Restricted'?`<div class="alert rd">⛔ <strong>RESTRICTED FROM SERVICE:</strong> ${v.deficiencies.join(', ')}. Vehicle cannot be dispatched until deficiencies are resolved and re-inspection passed.</div>`:''}
+    ${v.status==='Service Due'?`<div class="alert yw">🔧 <strong>SERVICE OVERDUE:</strong> Schedule maintenance immediately. Vehicle should not be dispatched on long routes until serviced.</div>`:''}
+    ${route&&route.status==='advisory'?`<div class="alert wx">⛅ <strong>Road Advisory:</strong> Driver ${v.driver} is on ${route.route} — ${route.condition}. Last check-in required.</div>`:''}
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'vd-info')">Details</div>
+      <div class="tab" onclick="switchTab(this,'vd-maint')">Maintenance</div>
+      <div class="tab" onclick="switchTab(this,'vd-certs')">Certifications</div>
+      <div class="tab" onclick="switchTab(this,'vd-history')">History</div>
+    </div>
+
+    <!-- DETAILS -->
+    <div id="vd-info">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+        <div class="vm-item"><div class="vm-val" style="color:${v.pretripToday==='Pass'?'var(--a3)':v.pretripToday==='Fail'?'var(--danger)':'var(--warn)'}">${v.pretripToday||'Pending'}</div><div class="vm-lbl">Pre-Trip Today</div></div>
+        <div class="vm-item"><div class="vm-val" style="color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</div><div class="vm-lbl">Next Service</div></div>
+        <div class="vm-item"><div class="vm-val">${v.odometer.toLocaleString()}</div><div class="vm-lbl">Odometer (km)</div></div>
+      </div>
+      <div class="sec-lbl" style="margin-top:0">Vehicle Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px">
+        ${[['Unit',v.unit],['Type',v.type],['Make / Model',v.make+' '+v.model],['Year',v.year],['VIN',v.vin],['Plate',v.plate],['Site',v.site],['Assigned Driver',v.driver||'Unassigned']].map(([l,val])=>`<div><span style="color:var(--muted)">${l}</span><div style="font-weight:600;margin-top:2px">${val}</div></div>`).join('')}
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Distance to next service</span><span>${v.nextServiceKm?((v.nextServiceKm-v.odometer).toLocaleString()+' km remaining'):'km interval TBD'}</span></div>
+        <div class="odo-bar" style="height:10px"><div class="odo-fill" style="width:${odomPct(v)}%;background:${odomPct(v)>90?'var(--danger)':odomPct(v)>75?'var(--warn)':'var(--a3)'}"></div></div>
+      </div>
+      ${v.deficiencies.length>0?`<div class="sec-lbl">Open Deficiencies</div>${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:7px;padding:8px 12px">⚠️ ${d}</div>`).join('')}`:''}
+    </div>
+
+    <!-- MAINTENANCE -->
+    <div id="vd-maint" style="display:none">
+      <button class="btn btn-p btn-sm" style="margin-bottom:12px" onclick="openAddMaintenance('${id}')">+ Schedule Service</button>
+      ${maintItems.length===0?`<div style="text-align:center;padding:24px;color:var(--muted)">No maintenance records</div>`:
+      maintItems.map(m=>`
+        <div class="maint-row" style="border-color:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.25)':'var(--border)'}">
+          <div class="mr-icon" style="background:rgba(0,194,255,.08)">🔧</div>
+          <div class="mr-body">
+            <div class="mr-title">${m.type}</div>
+            <div class="mr-meta">Due: ${fmtDate(m.dueDate)} · ${m.estimatedHours}h · ${m.cost>0?'$'+m.cost.toLocaleString():'Cost TBD'}</div>
+            ${m.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${m.notes}</div>`:''}
+          </div>
+          ${statusChip(m.status)}
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- CERTS -->
+    <div id="vd-certs" style="display:none">
+      <div class="alert bl">🏅 All certifications must be current for vehicle to be legally operated. Expired certifications restrict the vehicle from service immediately.</div>
+      ${Object.entries(v.certs).map(([type,dt])=>{
+        const d=daysUntil(dt);
+        return`<div class="maint-row" style="border-color:${d<0?'rgba(255,69,69,.25)':d<30?'rgba(255,184,0,.2)':'var(--border)'}">
+          <div class="mr-icon" style="background:rgba(155,109,255,.1)">🏅</div>
+          <div class="mr-body">
+            <div class="mr-title">${type.toUpperCase()}</div>
+            <div class="mr-meta">Expires: <span style="color:${certColor(dt)}">${fmtDate(dt)}</span> · ${d<0?Math.abs(d)+' days overdue':d+' days remaining'}</div>
+          </div>
+          <span class="chip ${d<0?'rd':d<30?'yw':d<60?'bl':'gr'}">${d<0?'Expired':d<30?'Renew Now':d<60?'Due Soon':'Current'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- HISTORY -->
+    <div id="vd-history" style="display:none">
+      <div>
+        ${[
+          {icon:'🔧',title:'Scheduled Service — 275k km',date:rd(-18),color:'rgba(0,194,255,.1)',tc:'var(--accent)'},
+          {icon:'✅',title:'Pre-Trip Inspection — Pass',date:rd(-1),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
+          {icon:'✅',title:'Pre-Trip Inspection — Pass',date:rd(0),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
+          {icon:'🏅',title:'CVIP Certificate Renewed',date:rd(-180),color:'rgba(155,109,255,.1)',tc:'var(--purple)'},
+          {icon:'🔧',title:'Tire Replacement — Front Axle',date:rd(-65),color:'rgba(255,184,0,.1)',tc:'var(--warn)'},
+        ].map(h=>`
+          <div class="tl-item">
+            <div class="tl-dot" style="background:${h.color};color:${h.tc}">${h.icon}</div>
+            <div class="tl-body"><div class="tl-title">${h.title}</div><div class="tl-meta">${fmtDate(h.date)}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('drawerFooter').innerHTML=`
+    <button class="btn btn-g btn-sm" onclick="showToast('success','🖨 Vehicle record exported')">🖨 Export Record</button>
+    ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="dispatchVehicle('${id}')">Dispatch →</button>`:''}
+    ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="showToast('success','Maintenance work order opened for '+v.unit)">🔧 Open Work Order</button>`:''}
+    <button class="btn btn-g" style="margin-left:auto" onclick="closeDrawer()">Close</button>
+  `;
+  openDrawerEl();
+}
+
+function switchTab(el, tabId){
+  const db=el.closest('.db');
+  db.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['vd-info','vd-maint','vd-certs','vd-history'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.style.display=id===tabId?'block':'none';
+  });
+}
+
+// ─── MAINTENANCE PANEL ────────────────────────────────────────
+function renderMaintPanel(){
+  const el=document.getElementById('maintPanel');
+  if(!el) return;
+  const overdue=maintenance.filter(m=>m.status==='Overdue'||m.status==='Urgent');
+  const upcoming=maintenance.filter(m=>m.status==='Upcoming'||m.status==='Due Today');
+
+  const mStats=document.getElementById('maintStats');
+  if(mStats) mStats.innerHTML=`
+    <div class="sc rd"><div class="sl">Overdue / Urgent</div><div class="sv rd">${overdue.length}</div></div>
+    <div class="sc yw"><div class="sl">Due This Month</div><div class="sv yw">${upcoming.length}</div></div>
+    <div class="sc bl"><div class="sl">Total Scheduled</div><div class="sv bl">${maintenance.length}</div></div>
+    <div class="sc gr"><div class="sl">Est. Monthly Cost</div><div class="sv gr">$${maintenance.filter(m=>m.status!=='Complete').reduce((a,m)=>a+m.cost,0).toLocaleString()}</div></div>
+  `;
+
+  el.innerHTML=`
+    ${overdue.length>0?`<div class="alert rd">🔧 ${overdue.length} maintenance item${overdue.length>1?'s are':' is'} overdue — schedule immediately to maintain roadworthiness.</div>`:''}
+    <div class="card">
+      <div class="ch"><div class="ct">Maintenance Work Orders</div><div class="ca" onclick="openAddMaintenance()">+ New Work Order</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>WO #</th><th>Vehicle</th><th>Service Type</th><th>Priority</th><th>Due Date</th><th>Est. Hours</th><th>Est. Cost</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${maintenance.map(m=>`<tr>
+            <td style="color:var(--accent);font-weight:600">${m.id}</td>
+            <td style="font-weight:600">${m.unit}</td>
+            <td>${m.type}</td>
+            <td><span class="chip ${m.priority==='Critical'?'rd':m.priority==='High'?'or':m.priority==='Medium'?'yw':'bl'}">${m.priority}</span></td>
+            <td style="color:${daysUntil(m.dueDate)<0?'var(--danger)':daysUntil(m.dueDate)<7?'var(--warn)':'var(--text)'};font-weight:${daysUntil(m.dueDate)<0?'700':'400'}">${fmtDate(m.dueDate)}</td>
+            <td>${m.estimatedHours}h</td>
+            <td>${m.cost>0?'$'+m.cost.toLocaleString():'TBD'}</td>
+            <td>${statusChip(m.status)}</td>
+            <td><button class="btn btn-gr btn-xs" onclick="completeMaint('${m.id}')">✅ Complete</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+function completeMaint(id){
+  const m=maintenance.find(x=>x.id===id);
+  if(m){m.status='Complete';}
+  renderAll();showToast('success',`✅ ${id} marked complete — service record updated`);
+}
+
+function scheduleMaintenance(id){
+  showToast('success','📅 Service scheduled — notifications sent to fleet manager');
+}
+
+function openAddMaintenance(vehId=''){
+  showModal('Schedule Maintenance',`
+    <div class="fg"><div class="fl">Vehicle</div><select class="fi fi-sel" id="new-maint-veh">
+      ${vehicles.map(v=>`<option value="${v.id}" ${v.id===vehId?'selected':''}>${v.unit} — ${v.make} ${v.model}</option>`).join('')}
+    </select></div>
+    <div class="fg"><div class="fl">Service Type</div><select class="fi fi-sel" id="new-maint-type"><option>Scheduled Service</option><option>Brake Inspection</option><option>Tire Replacement</option><option>Oil Change</option><option>Certification Renewal</option><option>Repair — specify in notes</option></select></div>
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Priority</div><select class="fi fi-sel" id="new-maint-pri"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+      <div class="fg"><div class="fl">Due Date</div><input class="fi" type="date" id="new-maint-due" value="${rd(7)}"></div>
+    </div>
+    <div class="fg"><div class="fl">Notes</div><textarea class="fi fi-ta" id="new-maint-notes" placeholder="Service details, parts required..."></textarea></div>
+  `,[
+    {label:'Schedule',cls:'btn-p',action:'saveNewMaint()'},
+    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
+  ]);
+}
+
+function saveNewMaint(){
+  const veh=vehicles.find(v=>v.id===document.getElementById('new-maint-veh')?.value);
+  const type=document.getElementById('new-maint-type')?.value||'Service';
+  const id='MWO-'+String(maintenance.length+1).padStart(3,'0');
+  maintenance.push({id,vehId:veh?.id||'',unit:veh?.unit||'Unknown',type,priority:document.getElementById('new-maint-pri')?.value||'Medium',dueDate:document.getElementById('new-maint-due')?.value||rd(7),status:'Upcoming',estimatedHours:3,cost:0,notes:document.getElementById('new-maint-notes')?.value||''});
+  closeModal();renderAll();
+  showToast('success',`🔧 ${id} created — ${veh?.unit||''} ${type}`);
+}
+
+// ─── ROADS PANEL ──────────────────────────────────────────────
+function renderRoadsPanel(){
+  const el=document.getElementById('roadsPanel');
+  if(!el) return;
+  const advisory=ROAD_CONDITIONS.filter(r=>r.status==='advisory');
+
+  el.innerHTML=`
+    ${advisory.length>0?`<div class="alert rd">🚨 <strong>${advisory.length} active road advisory${advisory.length>1?'s':''}</strong> — all affected drivers have been notified. Journey plans updated.</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      ${ROAD_CONDITIONS.map(r=>`
+        <div class="card" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.25)':r.status==='caution'?'rgba(255,184,0,.2)':'var(--border)'}">
+          <div class="ch" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.15)':'var(--border)'}">
+            <div class="ct">${roadStatusIcon(r.status)} ${r.route}</div>
+            <span class="chip ${r.status==='advisory'?'rd':r.status==='caution'?'yw':'gr'}">${r.status}</span>
+          </div>
+          <div class="cb">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px">${r.region}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;font-size:11.5px">
+              <div><span style="color:var(--muted)">Condition:</span><div style="font-weight:600;margin-top:1px;color:${r.status==='advisory'?'var(--danger)':r.status==='caution'?'var(--warn)':'var(--a3)'}">${r.condition}</div></div>
+              <div><span style="color:var(--muted)">Temperature:</span><div style="font-weight:600;margin-top:1px">${r.temp}</div></div>
+              <div><span style="color:var(--muted)">Wind:</span><div style="font-weight:600;margin-top:1px">${r.wind}</div></div>
+              <div><span style="color:var(--muted)">Visibility:</span><div style="font-weight:600;margin-top:1px">${r.vis}</div></div>
+            </div>
+            ${r.activeDrivers.length>0?`
+              <div style="background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:11.5px">
+                <span style="color:var(--muted)">Drivers on this route:</span>
+                <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap">
+                  ${r.activeDrivers.map(d=>`<span class="chip bl">👤 ${d}</span>`).join('')}
+                </div>
+              </div>
+            `:'<div style="font-size:11px;color:var(--muted)">No active drivers on this route</div>'}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Journey Plan Check-in Requirements</div></div>
+      <div class="cb">
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          ✅ All drivers on <strong>advisory routes</strong> must check in every 2 hours via radio or phone<br>
+          ✅ Dispatchers must confirm check-in received — missed check-ins trigger supervisor notification<br>
+          ✅ Drivers may adjust speed or pull over if conditions deteriorate — no schedule pressure overrides safety<br>
+          ✅ Any driver may call stop and await conditions to improve without dispatcher override
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── JOURNEY PLANS PANEL ─────────────────────────────────────
+function renderJourneyPanel(){
+  const el=document.getElementById('journeyPanel');
+  if(!el) return;
+  el.innerHTML=`
+    <div class="alert bl">📍 <strong>Journey Plan Policy:</strong> All long-haul dispatches require an approved journey plan before departure. Plan must include route, check-in schedule, weather acknowledgement, and rest verification. Plans on advisory routes require HSE Manager approval.</div>
+    <div class="card">
+      <div class="ch"><div class="ct">Active Journey Plans — Today</div><div class="ca" onclick="openNewJourneyPlan()">+ New Plan</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>Plan ID</th><th>Driver</th><th>Vehicle</th><th>Route</th><th>Departure</th><th>ETA</th><th>Route Status</th><th>Fatigue</th><th>Approved</th></tr></thead>
+        <tbody>
+          ${journeyPlans.map(jp=>`<tr onclick="openJourneyDetail('${jp.id}')">
+            <td style="color:var(--accent);font-weight:600">${jp.id}</td>
+            <td style="font-weight:600">${jp.driver}</td>
+            <td>${jp.unit}</td>
+            <td style="font-size:11px">${jp.origin} → ${jp.dest}</td>
+            <td style="font-size:11px">${jp.departure.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}</td>
+            <td style="font-size:11px">${jp.eta}</td>
+            <td><span class="chip ${jp.routeStatus==='clear'?'gr':jp.routeStatus==='advisory'?'rd':'yw'}">${jp.routeStatus}</span></td>
+            <td><span class="chip ${jp.fatigue==='High'?'rd':jp.fatigue==='Medium'?'yw':'gr'}">${jp.fatigue}</span></td>
+            <td>${jp.approved?`<span class="chip gr">✅ ${jp.approvedBy}</span>`:'<span class="chip rd">⏳ Pending</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+function openNewJourneyPlan(){
+  showModal('New Journey Plan',`
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Driver</div><select class="fi fi-sel" id="jp-driver"><option>Diallo Mensah</option><option>Patrick Whitehorse</option><option>Ana Reyes</option></select></div>
+      <div class="fg"><div class="fl">Vehicle</div><select class="fi fi-sel">${vehicles.filter(v=>v.status!=='Restricted').map(v=>`<option>${v.unit}</option>`).join('')}</select></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Origin</div><select class="fi fi-sel"><option>Calgary Hub</option><option>Edmonton Hub</option><option>Red Deer</option></select></div>
+      <div class="fg"><div class="fl">Destination</div><input class="fi" id="jp-dest" placeholder="e.g. Fort McMurray"></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Departure Time</div><input class="fi" type="time"></div>
+      <div class="fg"><div class="fl">Expected Arrival</div><input class="fi" type="time"></div>
+    </div>
+    <div class="fg"><div class="fl">Check-in Schedule</div><input class="fi" placeholder="e.g. Every 2 hours: 10:00, 12:00, 14:00"></div>
+    <div class="fg"><div class="fl">Driver acknowledges route conditions and confirms adequate rest</div>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;cursor:pointer" onclick="this.style.background='rgba(0,229,160,.05)';this.style.borderColor='rgba(0,229,160,.3)'">
+        <div style="width:16px;height:16px;border-radius:3px;border:2px solid var(--border)">✓</div>
+        Driver sign-off — I have reviewed conditions and confirm I am fit for duty
+      </div>
+    </div>
+  `,[
+    {label:'Submit Journey Plan',cls:'btn-p',action:"closeModal();showToast('success','📍 Journey plan submitted — pending supervisor approval')"},
+    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
+  ]);
+}
+
+function openJourneyDetail(id){
+  const jp=journeyPlans.find(x=>x.id===id);
+  if(!jp) return;
+  showModal(`Journey Plan — ${jp.id}`,`
+    <div style="font-size:13px;line-height:1.8;color:var(--text2)">
+      <strong style="color:var(--text)">Driver:</strong> ${jp.driver} · ${jp.unit}<br>
+      <strong style="color:var(--text)">Route:</strong> ${jp.origin} → ${jp.dest} via ${jp.route}<br>
+      <strong style="color:var(--text)">Distance:</strong> ${jp.distance}<br>
+      <strong style="color:var(--text)">Departure:</strong> ${jp.departure.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})} · <strong style="color:var(--text)">ETA:</strong> ${jp.eta}<br>
+      <strong style="color:var(--text)">Check-ins:</strong> ${jp.checkIns.join(', ')}<br>
+      <strong style="color:var(--text)">Route Status:</strong> <span style="color:${jp.routeStatus==='advisory'?'var(--danger)':'var(--a3)'}">${jp.routeStatus.toUpperCase()}</span><br>
+      <strong style="color:var(--text)">Fatigue Level:</strong> <span style="color:${jp.fatigue==='High'?'var(--danger)':'var(--a3)'}">${jp.fatigue}</span><br>
+      <strong style="color:var(--text)">Approved:</strong> ${jp.approved?jp.approvedBy:'PENDING APPROVAL'}
+    </div>
+    ${!jp.approved?`<div class="alert rd" style="margin-top:10px">⚠️ This journey plan has not been approved. ${jp.fatigue==='High'?'Driver fatigue level is HIGH — approval required before dispatch.':'Supervisor approval required.'}</div>`:''}
+  `,[
+    jp.approved?{label:'Close',cls:'btn-g',action:'closeModal()'}:{label:'Approve Plan',cls:'btn-p',action:`approveJP('${id}')`},
+    jp.approved?null:{label:'Deny',cls:'btn-rd',action:'closeModal()'},
+  ].filter(Boolean));
+}
+
+function approveJP(id){
+  const jp=journeyPlans.find(x=>x.id===id);
+  if(jp){jp.approved=true;jp.approvedBy='HSE Manager';}
+  closeModal();renderAll();
+  showToast('success',`✅ Journey plan ${id} approved — driver notified`);
+}
+
+// ─── EQUIPMENT PANEL ─────────────────────────────────────────
+function renderEquipPanel(){
+  const el=document.getElementById('equipPanel');
+  if(!el) return;
+  el.innerHTML=`
+    <div class="card">
+      <div class="ch"><div class="ct">Equipment Registry</div></div>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>ID</th><th>Equipment</th><th>Type</th><th>Site</th><th>Certification</th><th>Last Inspection</th><th>Status</th></tr></thead>
+        <tbody>
+          ${EQUIPMENT.map(e=>`<tr>
+            <td style="color:var(--accent);font-weight:600">${e.id}</td>
+            <td><div style="font-weight:600">${e.name}</div><div style="font-size:10.5px;color:var(--muted)">${e.capacity}</div></td>
+            <td>${e.type}</td>
+            <td>${e.site}</td>
+            <td><span style="color:${certColor(e.cert)};font-weight:600">${fmtDate(e.cert)}</span><div style="font-size:10px;color:var(--muted)">${daysUntil(e.cert)} days</div></td>
+            <td style="font-size:11.5px">${fmtDate(e.lastInsp)}</td>
+            <td>${statusChip(e.status)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ─── ANALYTICS PANEL ─────────────────────────────────────────
+function renderAnalyticsPanel(){
+  const el=document.getElementById('analyticsPanel');
+  if(!el) return;
+  el.innerHTML=`
+    <div class="stats">
+      <div class="sc bl"><div class="sl">Fleet Utilization</div><div class="sv bl">71%</div><div class="sn up">↑ vs 64% last month</div></div>
+      <div class="sc gr"><div class="sl">Pre-Trip Pass Rate</div><div class="sv gr">86%</div><div class="sn">6 of 7 vehicles</div></div>
+      <div class="sc yw"><div class="sl">Avg Days Between Service</div><div class="sv yw">47</div><div class="sn">Target: 60 days</div></div>
+      <div class="sc or"><div class="sl">Maintenance Cost / Vehicle</div><div class="sv or">$620</div><div class="sn">Monthly average</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="card">
+        <div class="ch"><div class="ct">Vehicle Incidents (12 months)</div></div>
+        <div class="cb">
+          ${[['Unit 08',0,'gr'],['Unit 14',1,'yw'],['Unit 22',0,'gr'],['Unit 31',0,'gr'],['Unit 07',1,'yw'],['Unit 19',0,'gr'],['Unit 03',0,'gr']].map(([u,i,c])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+              <span>${u}</span>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div class="pw" style="width:80px"><div class="pf" style="width:${i===0?0:30}%;background:var(--danger)"></div></div>
+                <span class="chip ${c}">${i} incident${i!==1?'s':''}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Deficiency Trend (12 months)</div></div>
+        <div class="cb">
+          <div style="display:flex;align-items:flex-end;gap:5px;height:80px">
+            ${[2,3,1,4,2,3,2,1,3,2,4,3].map((v,i)=>`
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="width:100%;border-radius:2px 2px 0 0;height:${v/4*100}%;background:${v>=4?'var(--danger)':v>=3?'var(--warn)':'var(--a3)'}"></div>
+                <div style="font-size:8.5px;color:var(--muted)">${['A','M','J','J','A','S','O','N','D','J','F','M'][i]}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── RESTRICTED & DISPATCHED ──────────────────────────────────
+function renderRestrictedPanel(){
+  const el=document.getElementById('restrictedPanel');
+  if(!el) return;
+  const restricted=vehicles.filter(v=>v.status==='Restricted');
+  if(restricted.length===0){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">No vehicles currently restricted</div>';return;}
+  el.innerHTML=restricted.map(v=>`
+    <div class="veh-card restricted">
+      <div class="veh-top">
+        <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
+          <div class="veh-icon" style="background:rgba(255,69,69,.1)">🚫</div>
+          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div></div>
+        </div>
+        ${statusChip(v.status)}
+      </div>
+      <div style="margin-bottom:10px">${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:5px;padding:7px 10px">⚠️ ${d}</div>`).join('')}</div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-g btn-sm" onclick="openVehicleDetail('${v.id}')">View Details</button>
+        <button class="btn btn-yw btn-sm" onclick="openAddMaintenance('${v.id}')">🔧 Schedule Repair</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDispatchedPanel(){
+  const el=document.getElementById('dispatchedPanel');
+  if(!el) return;
+  const dispatched=vehicles.filter(v=>v.status==='Dispatched');
+  el.innerHTML=dispatched.map(v=>{
+    const route=ROAD_CONDITIONS.find(r=>r.activeDrivers.includes(v.driver));
+    return`<div class="veh-card active" onclick="openVehicleDetail('${v.id}')">
+      <div class="veh-top">
+        <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
+          <div class="veh-icon" style="background:rgba(0,229,160,.08)">🚛</div>
+          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">${statusChip(v.status)}<span class="chip bl">👤 ${v.driver}</span></div>
+      </div>
+      ${route?`<div class="alert ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}" style="margin-bottom:8px;padding:7px 10px">${roadStatusIcon(route.status)} Route: ${route.route} — ${route.condition}</div>`:''}
+      <div style="display:flex;gap:7px"><button class="btn btn-g btn-sm">Check In Status</button><button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">Vehicle Details</button></div>
+    </div>`;
+  }).join('');
+}
+
+function renderCertPanel(){
+  const el=document.getElementById('certPanel');
+  if(!el) return;
+  const rows=[];
+  vehicles.forEach(v=>{
+    Object.entries(v.certs).forEach(([type,dt])=>{
+      rows.push({unit:v.unit,vehId:v.id,type:type.toUpperCase(),expiry:dt,days:daysUntil(dt)});
+    });
+  });
+  rows.sort((a,b)=>a.days-b.days);
+  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="showToast('success','📄 Certification report exported')">⬇ Export</div></div>
+    <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Unit</th><th>Certification</th><th>Expiry Date</th><th>Days Remaining</th><th>Status</th></tr></thead>
+      <tbody>
+        ${rows.map(r=>`<tr onclick="openVehicleDetail('${r.vehId}')">
+          <td style="font-weight:600">${r.unit}</td>
+          <td>${r.type}</td>
+          <td style="font-weight:600;color:${certColor(r.expiry)}">${fmtDate(r.expiry)}</td>
+          <td>${r.days<0?`<span style="color:var(--danger);font-weight:700">${Math.abs(r.days)}d overdue</span>`:`${r.days}d`}</td>
+          <td><span class="chip ${r.days<0?'rd':r.days<30?'yw':r.days<60?'bl':'gr'}">${r.days<0?'EXPIRED':r.days<30?'Renew Now':r.days<60?'Due Soon':'Current'}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+function renderDeficPanel(){
+  const el=document.getElementById('deficPanel');
+  if(!el) return;
+  const allDefics=vehicles.flatMap(v=>v.deficiencies.map(d=>({unit:v.unit,vehId:v.id,defic:d})));
+  el.innerHTML=allDefics.length===0?'<div style="text-align:center;padding:32px;color:var(--muted)">No open deficiencies</div>':`
+    <div class="card"><div class="ch"><div class="ct">Open Fleet Deficiencies — ${allDefics.length} items</div></div>
+    <div style="overflow-x:auto"><table class="tbl">
+      <thead><tr><th>Vehicle</th><th>Deficiency</th><th>Severity</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${allDefics.map(d=>`<tr>
+          <td style="font-weight:600">${d.unit}</td>
+          <td>${d.defic}</td>
+          <td><span class="chip rd">High</span></td>
+          <td><span class="chip rd">Open</span></td>
+          <td><button class="btn btn-gr btn-xs" onclick="resolveDefic('${d.vehId}','${d.defic}')">✅ Resolve</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div></div>
+  `;
+}
+
+function resolveDefic(vehId, defic){
+  const v=vehicles.find(x=>x.id===vehId);
+  if(v){v.deficiencies=v.deficiencies.filter(d=>d!==defic);if(v.deficiencies.length===0&&v.status==='Restricted') v.status='Available';}
+  renderAll();showToast('success','✅ Deficiency resolved — vehicle status updated');
+}
+
+function dispatchVehicle(id){
+  showModal('Dispatch Vehicle',`
+    <div class="fg"><div class="fl">Assign Driver</div><select class="fi fi-sel" id="disp-driver"><option>Patrick Whitehorse</option><option>Diallo Mensah</option><option>Ana Reyes</option></select></div>
+    <div class="fg"><div class="fl">Destination</div><input class="fi" id="disp-dest" placeholder="e.g. Fort McMurray, Edmonton Hub"></div>
+    <div class="fg"><div class="fl">Route</div><select class="fi fi-sel" id="disp-route"><option>Hwy 2 N</option><option>Hwy 2 S</option><option>Hwy 63 N</option><option>Hwy 16 W</option><option>Local</option></select></div>
+  `,[
+    {label:'Dispatch',cls:'btn-p',action:`doDispatch('${id}')`},
+    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
+  ]);
+}
+
+function doDispatch(id){
+  const v=vehicles.find(x=>x.id===id);
+  const driver=document.getElementById('disp-driver')?.value||'Driver';
+  if(v){v.status='Dispatched';v.driver=driver.split(' — ')[0];v.site='En Route';}
+  closeModal();closeDrawer();renderAll();
+  showToast('success',`✅ ${v?.unit} dispatched — ${driver}`);
+}
+
+function issueAdvisory(){showToast('warn','📢 Driver advisory issued — all active drivers notified of route conditions');}
+function openAddVehicle(){showModal('Add Vehicle',`<div class="fg"><div class="fl">Unit Number</div><input class="fi" placeholder="e.g. Unit 42"></div><div class="fgrid"><div class="fg"><div class="fl">Make</div><input class="fi" placeholder="e.g. Peterbilt"></div><div class="fg"><div class="fl">Model</div><input class="fi" placeholder="e.g. 579"></div></div><div class="fgrid"><div class="fg"><div class="fl">Year</div><input class="fi" type="number" placeholder="2024"></div><div class="fg"><div class="fl">Vehicle Type</div><select class="fi fi-sel"><option>Class 1 Semi</option><option>Class 3 Truck</option><option>Service Truck</option><option>Pickup 4x4</option><option>Van</option></select></div></div>`,[{label:'Add Vehicle',cls:'btn-p',action:"closeModal();showToast('success','✅ Vehicle added to fleet registry')"},{label:'Cancel',cls:'btn-g',action:'closeModal()'}]);}
+
+function filterFleet(type){renderFleetRegistry(type);}
+
+// ─── PANEL SYSTEM ─────────────────────────────────────────────
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('panel-'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n=>{if((n.getAttribute('onclick')||'').includes("'"+id+"'")) n.classList.add('active');});
+  if(id==='fleet') renderFleetRegistry();
+  if(id==='restricted') renderRestrictedPanel();
+  if(id==='dispatched') renderDispatchedPanel();
+  if(id==='maintenance') renderMaintPanel();
+  if(id==='deficiencies') renderDeficPanel();
+  if(id==='certifications') renderCertPanel();
+  if(id==='roads') renderRoadsPanel();
+  if(id==='journey') renderJourneyPanel();
+  if(id==='equipment') renderEquipPanel();
+  if(id==='analytics') renderAnalyticsPanel();
+}
+
+function openDrawerEl(){document.getElementById('overlay').classList.add('open');document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open')}
+function showModal(title,body,actions){
+  document.getElementById('modalTitle').innerHTML=title;
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalActions').innerHTML=actions.map(a=>`<button class="btn ${a.cls}" onclick="${a.action}">${a.label}</button>`).join('');
+  document.getElementById('modalOv').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOv').classList.remove('open')}
+function showToast(type,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show '+(typeof type==='string'&&['success','error','warn'].includes(type)?type:'success');
+  setTimeout(()=>t.classList.remove('show'),3400);
+}
+
+function renderAll(){
+  renderStats();
+  renderFleetTable();
+  renderMaintDue();
+  renderRoadSummary();
+  renderCertExpiring();
+  const cur=document.querySelector('.panel.active')?.id.replace('panel-','');
+  if(cur==='fleet') renderFleetRegistry();
+  if(cur==='restricted') renderRestrictedPanel();
+  if(cur==='dispatched') renderDispatchedPanel();
+  if(cur==='maintenance') renderMaintPanel();
+  if(cur==='deficiencies') renderDeficPanel();
+  if(cur==='certifications') renderCertPanel();
+  if(cur==='roads') renderRoadsPanel();
+  if(cur==='journey') renderJourneyPanel();
+  if(cur==='equipment') renderEquipPanel();
+  if(cur==='analytics') renderAnalyticsPanel();
+}
+
+init();
+</script>
+
+<script>
+// ── JURISDICTION AWARENESS ───────────────────────────────────
+let VIGIL_JUR = 'ca';
+
+const FLEET_TERMS = {
+  ca: {
+    inspection: 'CVIP', inspectionFull: 'Commercial Vehicle Inspection Program (CVIP)',
+    operatingAuth: 'Safety Fitness Certificate', licence: 'Class 1 / Class 3',
+    roadFeed: 'Alberta 511', regulator: 'NSC / Transport Canada',
+    workerComp: 'WCB', registration: 'Provincial Registration',
+    certTypes: ['CVIP','Insurance','Registration','Safety Fitness'],
+  },
+  us: {
+    inspection: 'DOT Annual', inspectionFull: 'DOT Annual Inspection (FMCSA Part 396)',
+    operatingAuth: 'FMCSA Operating Authority (MC #)', licence: 'CDL Class A / B',
+    roadFeed: 'State 511 / FHWA', regulator: 'FMCSA / DOT',
+    workerComp: "Workers' Comp", registration: 'State Registration',
+    certTypes: ['DOT Annual Inspection','Insurance','State Registration','FMCSA Authority'],
+  }
+};
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'VIGIL_JUR') {
+    VIGIL_JUR = e.data.jur;
+    updateFleetJurBanner();
+    renderAll();
+  }
+});
+
+function getFleetTerms() {
+  return FLEET_TERMS[VIGIL_JUR] || FLEET_TERMS.ca;
+}
+
+function updateFleetJurBanner() {
+  const t = getFleetTerms();
+  let banner = document.getElementById('fleet-jur-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'fleet-jur-banner';
+    banner.style.cssText = 'margin:0 0 14px;padding:8px 14px;border-radius:7px;font-size:12px;display:flex;align-items:center;gap:10px;';
+    const dash = document.getElementById('panel-dashboard');
+    if (dash) dash.insertBefore(banner, dash.querySelector('.page-hdr').nextSibling);
+  }
+  const isUS = VIGIL_JUR === 'us';
+  banner.style.background = isUS ? 'rgba(0,194,255,.07)' : 'rgba(255,107,53,.07)';
+  banner.style.border = isUS ? '1px solid rgba(0,194,255,.2)' : '1px solid rgba(255,107,53,.2)';
+  banner.style.color = isUS ? '#00C2FF' : '#FF8C52';
+  banner.innerHTML = (isUS ? '🇺🇸' : '🍁') + ' <strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Vehicle Inspection: ' + t.inspectionFull + ' · Operating Authority: ' + t.operatingAuth + ' · Road Conditions: ' + t.roadFeed + ' · Regulator: ' + t.regulator;
+}
+</script>
+</body>
+</html>

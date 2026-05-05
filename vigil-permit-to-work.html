@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vigil — Permit to Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;
+  --border:#1A2232;--b2:#243044;--b3:#2E3D56;
+  --text:#E2E8F0;--text2:#8BA0B8;--muted:#4A6880;
+  --accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;
+  --cyan:#06B6D4;--purple:#8B5CF6;--pink:#EC4899;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.45);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5}
+.app{display:flex;flex-direction:column;height:100%;overflow:hidden}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+.topbar-logo{font-family:var(--font-head);font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.topbar-logo span{color:var(--accent)}
+.topbar-module{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:3px 8px;background:var(--s3);border-radius:4px}
+.topbar-center{display:flex;align-items:center;gap:6px;flex:1;justify-content:center}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-pill{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--text2)}
+.alert-strip{display:flex;align-items:center;gap:0;height:32px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
+.alert-strip-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--warn);padding:0 12px;white-space:nowrap;border-right:1px solid var(--border);height:100%;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.alert-strip-body{display:flex;align-items:center;gap:0;overflow:hidden;height:100%;flex:1;padding:0 10px}
+.asep{color:var(--border);margin:0 8px}
+
+/* PANELS */
+.panels{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:20px}
+.panel.hidden{display:none}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-title{font-family:var(--font-head);font-size:13px;font-weight:700;letter-spacing:-.2px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title span{color:var(--muted);font-weight:400;font-family:var(--font-body);font-size:11px}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.kpi-label{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi-val{font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-sub{font-size:10.5px;color:var(--muted);margin-top:4px}
+.kpi-sub.up{color:var(--ok)}.kpi-sub.dn{color:var(--danger)}.kpi-sub.warn{color:var(--warn)}
+
+/* LAYOUT */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.row3{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px}
+
+/* PERMIT BOARD */
+.permit-board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.permit-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 13px;cursor:pointer;transition:border-color .14s,background .14s}
+.permit-card:hover{border-color:var(--b3);background:var(--s3)}
+.pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.pc-num{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px}
+.pc-icon{font-size:18px}
+.pc-title{font-size:12.5px;font-weight:600;line-height:1.35;margin-bottom:5px;color:var(--text)}
+.pc-site{font-size:10.5px;color:var(--text2);margin-bottom:7px}
+.pc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pc-expiry{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,.12);color:var(--warn)}
+.pc-expiry.critical{background:rgba(239,68,68,.15);color:var(--danger);animation:pulse-border 1.5s infinite}
+.pc-lead{font-size:10.5px;color:var(--text2)}
+.pc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+@keyframes pulse-border{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid rgba(26,34,50,.6);vertical-align:middle}
+.tbl tr:hover td{background:rgba(21,28,40,.5)}
+.tbl tr:last-child td{border-bottom:none}
+
+/* CHIPS / BADGES */
+.chip{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+.chip.ok{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.25)}
+.chip.warn{background:rgba(245,158,11,.15);color:var(--warn);border:1px solid rgba(245,158,11,.25)}
+.chip.danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.25)}
+.chip.blue{background:rgba(59,130,246,.15);color:var(--accent);border:1px solid rgba(59,130,246,.25)}
+.chip.purple{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+.chip.muted{background:var(--s3);color:var(--text2);border:1px solid var(--border)}
+.chip.cyan{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.25)}
+.chip.orange{background:rgba(249,115,22,.15);color:#F97316;border:1px solid rgba(249,115,22,.25)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:13px;font-weight:600;padding:8px 16px;border-radius:7px;border:none;cursor:pointer;transition:all .14s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#2563EB}
+.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover{background:#059669}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#DC2626}
+.btn-warn{background:var(--warn);color:#07090F}.btn-warn:hover{background:#D97706}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{background:var(--s3);color:var(--text)}
+.btn-sm{padding:5px 11px;font-size:11.5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* FORM */
+.form-wrap{max-width:720px;margin:0 auto}
+.form-title{font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.4px}
+.form-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.form-section{display:none}
+.form-section.active{display:block}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.req{color:var(--danger)}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:9px 12px;width:100%;transition:border-color .14s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-textarea{resize:vertical;min-height:70px}
+.form-hint{font-size:10.5px;color:var(--muted)}
+.form-nav{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* STEP BAR */
+.step-bar{display:flex;align-items:center;justify-content:center;margin-bottom:22px;padding:14px 0;background:var(--s2);border-radius:8px;border:1px solid var(--border)}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.step-dot{width:26px;height:26px;border-radius:50%;background:var(--s3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);transition:all .2s}
+.step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.step-lbl{font-size:9px;color:var(--muted);font-weight:600;text-align:center;line-height:1.2}
+.step-lbl.active{color:var(--accent)}.step-lbl.done{color:var(--ok)}
+.tl-line{width:40px;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px}
+
+/* PERMIT TYPE CARDS */
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px}
+.type-card{background:var(--s2);border:2px solid var(--border);border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .14s;text-align:center}
+.type-card:hover{border-color:var(--b3);background:var(--s3)}
+.type-card.selected{border-color:var(--accent);background:rgba(59,130,246,.07)}
+.type-icon{font-size:28px;margin-bottom:8px}
+.type-name{font-size:11.5px;font-weight:700;margin-bottom:4px;line-height:1.2}
+.type-desc{font-size:9.5px;color:var(--muted);line-height:1.4}
+.type-risk{margin-top:6px}
+
+/* CONTROLS CHECKLIST */
+.ctrl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:7px}
+.ctrl-item.ok{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.03)}
+.ctrl-label{flex:1;font-size:12.5px;color:var(--text);line-height:1.4}
+.ctrl-label small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.ctrl-input-wrap{min-width:140px;max-width:200px}
+
+/* TOGGLE */
+.toggle{position:relative;display:inline-flex;width:36px;height:20px;flex-shrink:0;margin-top:1px}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:var(--s4);border-radius:20px;transition:.2s;border:1px solid var(--border);cursor:pointer}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--ok);border-color:var(--ok)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(16px);background:#fff}
+
+/* WORKFLOW TIMELINE */
+.wf-line{display:flex;align-items:center;gap:0;overflow-x:auto;padding:14px 0;margin-bottom:16px;scrollbar-width:none}
+.wf-line::-webkit-scrollbar{display:none}
+.wf-node{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
+.wf-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--muted)}
+.wf-dot.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.wf-dot.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+.wf-dot.warn{background:var(--warn);border-color:var(--warn);color:#07090F}
+.wf-dot.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.wf-label{font-size:9px;color:var(--muted);font-weight:600;text-align:center;line-height:1.2}
+.wf-label.active{color:var(--accent)}.wf-label.done{color:var(--ok)}
+.wf-connector{width:36px;height:2px;background:var(--border);margin-bottom:14px;flex-shrink:0}
+.wf-connector.done{background:var(--ok)}
+
+/* DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.detail-field{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 12px}
+.detail-field-label{font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.detail-field-val{font-size:12.5px;color:var(--text);font-weight:500}
+.section-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 8px}
+
+/* SIMOPS */
+.simops-card{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 14px}
+.simops-empty{background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:10px 14px;font-size:11.5px;color:var(--ok)}
+
+/* FIELD VERIFY */
+.verify-box{background:rgba(245,158,11,.06);border:2px solid var(--warn);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.verify-box.done{background:rgba(16,185,129,.06);border-color:var(--ok)}
+
+/* REVIEW SUMMARY */
+.summary-row{display:flex;gap:8px;margin-bottom:6px;font-size:12.5px}
+.summary-key{color:var(--muted);min-width:160px;flex-shrink:0}
+.summary-val{color:var(--text);font-weight:500}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:6px 10px;outline:none}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--accent)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);max-width:360px;animation:slide-in .2s ease}
+.toast.ok{background:#065F46;border:1px solid var(--ok);color:var(--ok)}
+.toast.danger{background:#450A0A;border:1px solid var(--danger);color:var(--danger)}
+.toast.warn{background:#451A03;border:1px solid var(--warn);color:var(--warn)}
+@keyframes slide-in{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* EMPTY / LOADING */
+.loading-wrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:30px;color:var(--muted);font-size:12px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:28px 16px;color:var(--muted)}
+.empty-icon{font-size:28px;margin-bottom:8px}
+.empty-sub{font-size:11px;margin-top:4px}
+
+/* SUCCESS */
+.success-banner{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:24px 20px;text-align:center}
+
+/* AC */
+.ac-wrap{position:relative}
+.ac-drop{position:absolute;top:100%;left:0;right:0;background:var(--s3);border:1px solid var(--b2);border-radius:7px;z-index:100;max-height:200px;overflow-y:auto;display:none;box-shadow:var(--shadow)}
+.ac-item{padding:9px 12px;cursor:pointer;font-size:12.5px;border-bottom:1px solid var(--border)}
+.ac-item:hover{background:var(--s4)}
+.ac-item:last-child{border-bottom:none}
+.ac-name{font-weight:600;color:var(--text)}
+.ac-sub{font-size:10.5px;color:var(--muted)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .permit-board{grid-template-columns:1fr 1fr}
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .row2,.row3{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .topbar-center{display:none}
+  .permit-board{grid-template-columns:1fr}
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .detail-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="topbar-logo">Vigil<span>.</span></div>
+    <div class="topbar-module">Permit to Work</div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-pill" id="active-pill">— Active</div>
+    <div class="topbar-pill" id="expiring-pill">— Expiring Today</div>
+    <div class="topbar-pill" id="conflict-pill">— SIMOPS</div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-pill" id="worker-pill">Northern Express</div>
+    <button class="btn btn-primary btn-sm" onclick="showPanel('form')">+ New Permit</button>
+  </div>
+</div>
+
+<!-- ALERT STRIP -->
+<div class="alert-strip">
+  <div class="alert-strip-label">⚡ Live</div>
+  <div class="alert-strip-body" id="astrip-content">
+    <span style="color:var(--muted);font-size:10.5px">Loading…</span>
+  </div>
+</div>
+
+<!-- PANELS -->
+<div class="panels">
+
+  <!-- PANEL 1: DASHBOARD -->
+  <div class="panel" id="panel-dash">
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-label">Active Permits</div>
+        <div class="kpi-val" id="kpi-active">—</div>
+        <div class="kpi-sub" id="kpi-active-sub">right now</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Expiring Today</div>
+        <div class="kpi-val" id="kpi-expiring">—</div>
+        <div class="kpi-sub warn" id="kpi-expiring-sub">within 24h</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Pending Closeout</div>
+        <div class="kpi-val" id="kpi-closeout">—</div>
+        <div class="kpi-sub" id="kpi-closeout-sub">awaiting completion</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">SIMOPS Conflicts</div>
+        <div class="kpi-val" id="kpi-simops">—</div>
+        <div class="kpi-sub" id="kpi-simops-sub">open conflicts</div>
+      </div>
+    </div>
+
+    <!-- LIVE PERMIT BOARD + SIMOPS -->
+    <div class="row3">
+      <div class="card" style="overflow:hidden">
+        <div class="card-title">🔴 Active Permit Board <span id="active-count-label"></span></div>
+        <div id="permit-board">
+          <div class="loading-wrap"><div class="spinner"></div><span>Loading permits…</span></div>
+        </div>
+      </div>
+      <div>
+        <!-- SIMOPS CONFLICTS -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">⚡ SIMOPS Analysis</div>
+          <div id="simops-panel">
+            <div class="loading-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <!-- QUICK STATS -->
+        <div class="card">
+          <div class="card-title">📊 By Type</div>
+          <div id="type-breakdown" style="display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL PERMITS TABLE -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">All Permits</div>
+        <button class="btn btn-primary btn-sm" onclick="showPanel('form')">+ New Permit</button>
+      </div>
+      <div class="filter-bar">
+        <select id="filter-type" onchange="renderPermitsTable()">
+          <option value="">All Types</option>
+          <option value="hot_work">Hot Work</option>
+          <option value="confined_space">Confined Space</option>
+          <option value="energy_isolation">Energy Isolation</option>
+          <option value="excavation">Excavation</option>
+          <option value="working_at_heights">Working at Heights</option>
+          <option value="critical_lift">Critical Lift</option>
+          <option value="line_breaking">Line Breaking</option>
+          <option value="cold_work">Cold Work</option>
+        </select>
+        <select id="filter-status" onchange="renderPermitsTable()">
+          <option value="">All Statuses</option>
+          <option value="draft">Draft</option>
+          <option value="submitted">Submitted</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="issued">Issued</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+          <option value="closed">Closed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="expired">Expired</option>
+        </select>
+        <select id="filter-site" onchange="renderPermitsTable()">
+          <option value="">All Sites</option>
+          <option value="Calgary Hub HQ">Calgary Hub HQ</option>
+          <option value="Edmonton Hub">Edmonton Hub</option>
+          <option value="Site B Pipeline">Site B Pipeline</option>
+          <option value="Red Deer Terminal">Red Deer Terminal</option>
+          <option value="Highway / En Route">Highway / En Route</option>
+        </select>
+        <input type="text" id="filter-search" placeholder="Search title or number…" oninput="renderPermitsTable()" style="flex:1;min-width:160px">
+      </div>
+      <div class="tbl-wrap">
+        <div id="permits-table-wrap">
+          <div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 2: NEW PERMIT FORM -->
+  <div class="panel hidden" id="panel-form">
+    <div class="form-wrap">
+
+      <!-- HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div>
+          <div class="form-title">New Permit to Work</div>
+          <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+      </div>
+
+      <!-- STEP BAR -->
+      <div class="step-bar" id="step-bar">
+        <div class="step-item"><div class="step-dot active" id="sdot-1">1</div><div class="step-lbl active" id="slbl-1">Permit<br>Type</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-2">2</div><div class="step-lbl" id="slbl-2">Work<br>Details</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-3">3</div><div class="step-lbl" id="slbl-3">Controls<br>Verify</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-4">4</div><div class="step-lbl" id="slbl-4">Field<br>Verify</div></div>
+        <div class="tl-line"></div>
+        <div class="step-item"><div class="step-dot" id="sdot-5">5</div><div class="step-lbl" id="slbl-5">Review<br>&amp; Issue</div></div>
+      </div>
+
+      <!-- SUCCESS SCREEN -->
+      <div id="form-success" style="display:none">
+        <div class="success-banner">
+          <div style="font-size:40px;margin-bottom:10px">✅</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:6px">Permit Issued</div>
+          <div style="font-size:22px;font-family:var(--font-head);color:var(--ok);font-weight:800;margin-bottom:12px" id="success-permit-num"></div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:16px">The permit is now active. Workers may begin once signed on.</div>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button class="btn btn-ghost" onclick="cancelForm()">Back to Dashboard</button>
+            <button class="btn btn-primary" id="success-view-btn">View Permit →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: PERMIT TYPE -->
+      <div class="form-section active" id="step-1">
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:14px">Select the permit type that best describes the work being performed.</div>
+        <div class="type-grid" id="type-grid"></div>
+        <div class="form-nav">
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-primary" onclick="goStep(2)">Next: Work Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: WORK DETAILS -->
+      <div class="form-section" id="step-2">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Permit Title <span class="req">*</span></label>
+            <input type="text" class="form-input" id="f-title" placeholder="e.g. Hot work on pipeline flange…">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" class="form-input" id="f-dept" placeholder="e.g. Field Services">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Description</label>
+          <textarea class="form-textarea" id="f-desc" rows="2" placeholder="Describe the scope of work…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Site <span class="req">*</span></label>
+            <select class="form-select" id="f-site">
+              <option value="">— Select site —</option>
+              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
+              <option value="Edmonton Hub">Edmonton Hub</option>
+              <option value="Site B Pipeline">Site B Pipeline</option>
+              <option value="Red Deer Terminal">Red Deer Terminal</option>
+              <option value="Highway / En Route">Highway / En Route</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Location Detail</label>
+            <input type="text" class="form-input" id="f-location" placeholder="e.g. Tank Farm Bay 3">
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Planned Start <span class="req">*</span></label>
+            <input type="datetime-local" class="form-input" id="f-start">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Planned End <span class="req">*</span></label>
+            <input type="datetime-local" class="form-input" id="f-end">
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-group">
+            <label class="form-label">Worker Lead <span class="req">*</span></label>
+            <div class="ac-wrap">
+              <input type="text" class="form-input" id="f-lead-search" placeholder="Search worker name…" autocomplete="off" oninput="workerSearch(this.value,'lead')">
+              <div class="ac-drop" id="lead-ac"></div>
+            </div>
+            <div id="lead-selected" style="display:none;margin-top:6px;padding:8px 10px;background:var(--s3);border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Link to Hazard Assessment <span style="color:var(--muted)">(Optional)</span></label>
+            <select class="form-select" id="f-assessment">
+              <option value="">— None —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(3)">Next: Control Verification →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: CONTROL VERIFICATION -->
+      <div class="form-section" id="step-3">
+        <div id="step3-header" style="margin-bottom:14px"></div>
+        <div id="step3-controls"></div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(4)">Next: Field Verification →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: FIELD VERIFICATION -->
+      <div class="form-section" id="step-4">
+        <div class="verify-box" id="verify-box">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:26px">🦺</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--warn);margin-bottom:2px">Field Walk-Down Required</div>
+              <div style="font-size:11.5px;color:var(--text2)">The permit issuer must physically walk down the job site before this permit can be issued. This cannot be skipped.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <label class="toggle">
+              <input type="checkbox" id="f-verified" onchange="toggleVerify(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+            <span style="font-size:12.5px;font-weight:600" id="verify-label">I have NOT walked down the job site</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Field Verification Notes <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-verify-notes" rows="3" placeholder="Describe your site walkdown — conditions observed, confirmations made, any concerns noted…" disabled></textarea>
+          <div class="form-hint">Required before permit can be issued.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issuer Name</label>
+          <input type="text" class="form-input" id="f-issuer-name" value="James Marchetti" disabled>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+          </div>
+          <button class="btn btn-primary" onclick="goStep(5)">Next: Review &amp; Issue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: REVIEW & ISSUE -->
+      <div class="form-section" id="step-5">
+        <div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">📋 Permit Summary — Review Before Issuing</div>
+          <div id="review-summary"></div>
+        </div>
+        <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px;margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:4px">✓ Field Verification Confirmed</div>
+          <div style="font-size:11px;color:var(--text2)" id="review-verify-note"></div>
+        </div>
+        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:3px">⚠️ Issuing this permit confirms you have authority to authorize this work</div>
+          <div style="font-size:10.5px;color:var(--text2)">All control verifications above are your responsibility. This action is logged and timestamped.</div>
+        </div>
+        <div class="form-nav">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+          </div>
+          <button class="btn btn-ok" id="issue-btn" onclick="submitAndIssuePermit()">✓ Issue Permit</button>
+        </div>
+      </div>
+
+    </div><!-- /form-wrap -->
+  </div><!-- /panel-form -->
+
+  <!-- PANEL 3: PERMIT DETAIL -->
+  <div class="panel hidden" id="panel-detail">
+    <div style="max-width:860px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button class="btn btn-ghost btn-sm" onclick="showPanel('dash')">← Back to Dashboard</button>
+      </div>
+      <div id="detail-content">
+        <div class="loading-wrap"><div class="spinner"></div><span>Loading permit…</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panels -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const API  = 'https://vigil-production-17ca.up.railway.app';
+const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+let token = null;
+let LOGGED_IN = {};
+
+let permits = [];
+let activePermits = [];
+let workers = [];
+let assessments = [];
+let formStep = 1;
+let formData = {};
+let selectedType = null;
+let formControls = {};
+let fieldVerified = false;
+let selectedLeadId = null;
+let lastIssuedId = null;
+
+// ── API ────────────────────────────────────────────────────────
+async function apiGet(path) {
+  try {
+    const r = await fetch(API + path, {headers:{Authorization:'Bearer '+token}});
+    return await r.json();
+  } catch(e) { return null; }
+}
+async function apiPost(path, body) {
+  try {
+    const r = await fetch(API + path, {
+      method:'POST', headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    return {ok:r.ok, status:r.status, data:await r.json()};
+  } catch(e) { return {ok:false, status:0, data:{}} }
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg, type='ok', ms=4000) {
+  const w = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────
+const PERMIT_TYPES = {
+  hot_work:           {icon:'🔥', name:'Hot Work',           desc:'Welding, cutting, grinding, open flame',  risk:'high'},
+  confined_space:     {icon:'🕳️', name:'Confined Space',     desc:'Entry into tanks, vessels, manholes',     risk:'critical'},
+  energy_isolation:   {icon:'⚡', name:'Energy Isolation',   desc:'LOTO — electrical, hydraulic, mechanical', risk:'high'},
+  excavation:         {icon:'⛏️', name:'Excavation',         desc:'Trenching, digging, ground disturbance',  risk:'high'},
+  working_at_heights: {icon:'🏗️', name:'Working at Heights', desc:'Work above 3m or near unprotected edges', risk:'high'},
+  critical_lift:      {icon:'🏋️', name:'Critical Lift',      desc:'Crane lifts >75% capacity or complex',    risk:'critical'},
+  line_breaking:      {icon:'🔧', name:'Line Breaking',      desc:'Opening pressurized piping/vessels',       risk:'high'},
+  cold_work:          {icon:'❄️', name:'Cold Work',          desc:'Non-sparking work in hazardous areas',     risk:'medium'},
+};
+
+const STATUS_CFG = {
+  draft:      {cls:'muted',  label:'Draft'},
+  submitted:  {cls:'blue',   label:'Submitted'},
+  reviewed:   {cls:'cyan',   label:'Reviewed'},
+  issued:     {cls:'warn',   label:'Issued'},
+  active:     {cls:'ok',     label:'Active'},
+  suspended:  {cls:'danger', label:'Suspended'},
+  closed:     {cls:'muted',  label:'Closed'},
+  cancelled:  {cls:'danger', label:'Cancelled'},
+  expired:    {cls:'danger', label:'Expired'},
+};
+
+const RISK_CFG = {
+  low:      {cls:'ok',     label:'Low'},
+  medium:   {cls:'warn',   label:'Medium'},
+  high:     {cls:'orange', label:'High'},
+  critical: {cls:'danger', label:'Critical'},
+};
+
+function statusChip(s) {
+  const c = STATUS_CFG[s] || {cls:'muted', label:s||'—'};
+  return `<span class="chip ${c.cls}">${c.label}</span>`;
+}
+function riskChip(r) {
+  const c = RISK_CFG[r] || {cls:'muted', label:r||'—'};
+  return `<span class="chip ${c.cls}">${c.label}</span>`;
+}
+function typeChip(t) {
+  const cfg = PERMIT_TYPES[t];
+  return cfg ? `<span class="chip blue">${cfg.icon} ${cfg.name}</span>` : `<span class="chip muted">${t||'—'}</span>`;
+}
+function fmt(s) {
+  if (!s) return '—';
+  return s.replace(/_/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function fmtShort(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function countdown(expires) {
+  if (!expires) return null;
+  const diff = new Date(expires) - Date.now();
+  if (diff <= 0) return {label:'Expired', critical:true};
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const critical = diff < 7200000;
+  if (h > 23) return {label:`${Math.floor(h/24)}d ${h%24}h remaining`, critical:false};
+  return {label:`${h}h ${m}m remaining`, critical};
+}
+function expiringToday(p) {
+  if (!p.permit_expires_at) return false;
+  const now = new Date(), exp = new Date(p.permit_expires_at);
+  return exp.toDateString() === now.toDateString();
+}
+function needsCloseout(p) {
+  return (p.status === 'active' || p.status === 'issued') && !p.closeout_completed;
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+async function init() {
+  const ar = await fetch(API+'/api/auth/login',{
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(AUTH)
+  });
+  if (!ar.ok) { toast('Could not connect to Vigil API','danger'); return; }
+  const ab = await ar.json();
+  token = ab.token || ab.access_token || (ab.data&&ab.data.token);
+  if (!token) { toast('Auth failed','danger'); return; }
+
+  LOGGED_IN = {id: parseJwt(token)?.userId || '', name:'James Marchetti'};
+
+  const [pData, aData, wData, haData] = await Promise.all([
+    apiGet('/api/permits?limit=100'),
+    apiGet('/api/permits/dashboard'),
+    apiGet('/api/workers?limit=100'),
+    apiGet('/api/hazard/assessments?limit=50'),
+  ]);
+
+  permits      = (pData&&pData.permits)   || [];
+  activePermits= (aData&&aData.active_permits) || [];
+  workers      = (wData&&wData.workers)   || [];
+  assessments  = (haData&&haData.assessments) || [];
+
+  document.getElementById('worker-pill').textContent =
+    `${workers.length} Workers`;
+
+  renderKPIs();
+  renderPermitBoard();
+  renderPermitsTable();
+  renderSimops();
+  renderTypeBreakdown();
+  buildAlertStrip();
+  populateAssessmentDropdown();
+  renderTypeGrid();
+  showPanel('dash');
+}
+
+function parseJwt(t) {
+  try { return JSON.parse(atob(t.split('.')[1])); } catch{ return {}; }
+}
+
+// ── KPIs ───────────────────────────────────────────────────────
+function renderKPIs() {
+  const active = activePermits.length;
+  const expiring = permits.filter(expiringToday).length;
+  const closeout = permits.filter(needsCloseout).length;
+  let conflicts = 0;
+  activePermits.forEach(p => { if ((p.simops_conflicts||[]).length > 0) conflicts++; });
+
+  document.getElementById('kpi-active').textContent = active;
+  document.getElementById('kpi-active-sub').textContent =
+    active === 1 ? '1 permit live' : `${active} permits live`;
+
+  const kpiExp = document.getElementById('kpi-expiring');
+  kpiExp.textContent = expiring;
+  kpiExp.closest('.kpi-card').querySelector('.kpi-sub').className =
+    'kpi-sub' + (expiring > 0 ? ' warn' : '');
+
+  document.getElementById('kpi-closeout').textContent = closeout;
+  document.getElementById('kpi-closeout-sub').textContent = closeout
+    ? `${closeout} need attention` : 'all clear';
+
+  const kpiSim = document.getElementById('kpi-simops');
+  kpiSim.textContent = conflicts;
+  kpiSim.closest('.kpi-card').querySelector('.kpi-sub').className =
+    'kpi-sub' + (conflicts > 0 ? ' dn' : '');
+
+  // topbar pills
+  document.getElementById('active-pill').textContent = `${active} Active`;
+  const expiringToday_ = permits.filter(expiringToday);
+  document.getElementById('expiring-pill').textContent = `${expiringToday_.length} Expiring Today`;
+  document.getElementById('conflict-pill').textContent = `${conflicts} SIMOPS`;
+}
+
+// ── PERMIT BOARD ───────────────────────────────────────────────
+function renderPermitBoard() {
+  const el = document.getElementById('permit-board');
+  const label = document.getElementById('active-count-label');
+  if (!activePermits.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🟢</div>No active permits right now<div class="empty-sub">All clear</div></div>`;
+    label.textContent = '';
+    return;
+  }
+  label.textContent = `(${activePermits.length})`;
+  el.innerHTML = `<div class="permit-board">${activePermits.map(p => {
+    const cfg = PERMIT_TYPES[p.permit_type] || {icon:'📋', name:p.permit_type};
+    const cd = countdown(p.permit_expires_at);
+    const lead = p.lead_first_name ? `${p.lead_first_name} ${p.lead_last_name}` :
+                 (p.worker_lead_first_name ? `${p.worker_lead_first_name} ${p.worker_lead_last_name}` : '—');
+    return `
+    <div class="permit-card" onclick="viewPermit('${p.id}')">
+      <div class="pc-head">
+        <span class="pc-num">${p.permit_number}</span>
+        <span class="pc-icon">${cfg.icon}</span>
+      </div>
+      <div class="pc-title">${p.title}</div>
+      <div class="pc-site">📍 ${p.site||'—'}${p.location_detail?` · ${p.location_detail}`:''}</div>
+      <div class="pc-meta">
+        ${statusChip(p.status)}
+        ${riskChip(p.risk_tier)}
+        ${cd ? `<span class="pc-expiry${cd.critical?' critical':''}">${cd.label}</span>` : ''}
+      </div>
+      <div class="pc-lead">👷 ${lead}</div>
+      <div class="pc-foot">
+        <span style="font-size:10px;color:var(--muted)">Issued ${fmtShort(p.permit_issued_at)}</span>
+        <span class="chip blue btn-sm" style="cursor:pointer">View →</span>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── SIMOPS ─────────────────────────────────────────────────────
+function renderSimops() {
+  const el = document.getElementById('simops-panel');
+  const conflicts = [];
+  const bySite = {};
+  activePermits.forEach(p => {
+    if (!bySite[p.site]) bySite[p.site] = [];
+    bySite[p.site].push(p);
+  });
+  Object.entries(bySite).forEach(([site, ps]) => {
+    if (ps.length > 1) {
+      conflicts.push({site, permits:ps});
+    }
+  });
+
+  if (!conflicts.length) {
+    el.innerHTML = `<div class="simops-empty">✓ No SIMOPS conflicts detected — no concurrent permits at the same site</div>`;
+    document.getElementById('kpi-simops').textContent = '0';
+    return;
+  }
+
+  el.innerHTML = conflicts.map(c => `
+    <div class="simops-card" style="margin-bottom:8px">
+      <div style="font-size:11.5px;font-weight:700;color:var(--warn);margin-bottom:6px">⚠️ ${c.site} — ${c.permits.length} concurrent permits</div>
+      ${c.permits.map(p => {
+        const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋'};
+        return `<div style="font-size:11px;color:var(--text2);padding:3px 0">${cfg.icon} ${p.permit_number} · ${p.title}</div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+// ── TYPE BREAKDOWN ─────────────────────────────────────────────
+function renderTypeBreakdown() {
+  const el = document.getElementById('type-breakdown');
+  const counts = {};
+  permits.forEach(p => { counts[p.permit_type] = (counts[p.permit_type]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if (!sorted.length) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--muted)">No data</div>`;
+    return;
+  }
+  const max = sorted[0][1];
+  el.innerHTML = sorted.map(([type, count]) => {
+    const cfg = PERMIT_TYPES[type]||{icon:'📋', name:fmt(type)};
+    const pct = Math.round(count/max*100);
+    return `
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:11px;color:var(--text2)">${cfg.icon} ${cfg.name}</span>
+        <span style="font-size:10.5px;font-weight:700;color:var(--text)">${count}</span>
+      </div>
+      <div style="height:4px;background:var(--s4);border-radius:2px">
+        <div style="height:4px;width:${pct}%;background:var(--accent);border-radius:2px"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ALERT STRIP ────────────────────────────────────────────────
+function buildAlertStrip() {
+  const parts = [];
+  const active = activePermits.length;
+  if (active) parts.push(`<span style="color:var(--ok)">${active} active permit${active>1?'s':''}</span>`);
+
+  const criticals = activePermits.filter(p=>p.risk_tier==='critical');
+  if (criticals.length) parts.push(`<span style="color:var(--danger)">${criticals.length} critical risk</span>`);
+
+  const expiring = activePermits.filter(p => {
+    const cd = countdown(p.permit_expires_at);
+    return cd && cd.critical;
+  });
+  if (expiring.length) parts.push(`<span style="color:var(--warn)">${expiring.length} expiring soon</span>`);
+
+  const pending = permits.filter(p=>p.status==='submitted'||p.status==='reviewed').length;
+  if (pending) parts.push(`<span style="color:var(--cyan)">${pending} pending review</span>`);
+
+  if (!parts.length) parts.push(`<span style="color:var(--muted)">All clear</span>`);
+
+  document.getElementById('astrip-content').innerHTML =
+    parts.join('<span class="asep">·</span>');
+}
+
+// ── PERMITS TABLE ──────────────────────────────────────────────
+function renderPermitsTable() {
+  const el = document.getElementById('permits-table-wrap');
+  const fType   = document.getElementById('filter-type').value;
+  const fStatus = document.getElementById('filter-status').value;
+  const fSite   = document.getElementById('filter-site').value;
+  const fSearch = (document.getElementById('filter-search').value||'').toLowerCase();
+
+  let rows = permits.filter(p => {
+    if (fType   && p.permit_type !== fType)   return false;
+    if (fStatus && p.status      !== fStatus) return false;
+    if (fSite   && p.site        !== fSite)   return false;
+    if (fSearch && !`${p.permit_number} ${p.title}`.toLowerCase().includes(fSearch)) return false;
+    return true;
+  });
+
+  if (!rows.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📋</div>No permits match filters</div>`;
+    return;
+  }
+
+  el.innerHTML = `<table class="tbl">
+    <thead><tr>
+      <th>Permit #</th><th>Type</th><th>Title</th><th>Site</th>
+      <th>Issued</th><th>Expires</th><th>Status</th><th>Risk</th><th></th>
+    </tr></thead>
+    <tbody>${rows.map(p => {
+      const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋', name:fmt(p.permit_type)};
+      return `<tr>
+        <td style="font-size:11px;font-family:monospace;color:var(--accent)">${p.permit_number}</td>
+        <td>${cfg.icon} <span style="font-size:11px">${cfg.name}</span></td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</td>
+        <td style="font-size:11.5px;color:var(--text2)">${p.site||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${fmtShort(p.permit_issued_at)}</td>
+        <td style="font-size:11px;color:var(--text2)">${fmtShort(p.permit_expires_at)}</td>
+        <td>${statusChip(p.status)}</td>
+        <td>${riskChip(p.risk_tier)}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="viewPermit('${p.id}')">View</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ── PANEL NAVIGATION ───────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+  const el = document.getElementById('panel-'+id);
+  if (el) el.classList.remove('hidden');
+  if (id==='form') { resetForm(); }
+  el.scrollTop = 0;
+}
+function cancelForm() {
+  resetForm();
+  showPanel('dash');
+}
+
+// ── FORM: TYPE GRID ────────────────────────────────────────────
+function renderTypeGrid() {
+  const el = document.getElementById('type-grid');
+  el.innerHTML = Object.entries(PERMIT_TYPES).map(([type, cfg]) => `
+    <div class="type-card ${selectedType===type?'selected':''}" id="tc-${type}" onclick="selectType('${type}')">
+      <div class="type-icon">${cfg.icon}</div>
+      <div class="type-name">${cfg.name}</div>
+      <div class="type-desc">${cfg.desc}</div>
+      <div class="type-risk">${riskChip(cfg.risk)}</div>
+    </div>
+  `).join('');
+}
+
+function selectType(type) {
+  selectedType = type;
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  const el = document.getElementById('tc-'+type);
+  if (el) el.classList.add('selected');
+}
+
+// ── FORM: WORKER AUTOCOMPLETE ──────────────────────────────────
+function workerSearch(val, field) {
+  const ac = document.getElementById(`${field}-ac`);
+  if (!val || val.length < 2) { ac.style.display='none'; return; }
+  const q = val.toLowerCase();
+  const matches = workers.filter(w =>
+    w.status==='active' &&
+    `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)
+  ).slice(0,6);
+  if (!matches.length) { ac.style.display='none'; return; }
+  ac.innerHTML = matches.map(w=>`
+    <div class="ac-item" onclick="selectWorker('${w.id}','${w.first_name} ${w.last_name}','${w.job_title||''}','${field}')">
+      <div class="ac-name">${w.first_name} ${w.last_name}</div>
+      <div class="ac-sub">${w.job_title||''} · ${w.site||''}</div>
+    </div>
+  `).join('');
+  ac.style.display='block';
+}
+
+function selectWorker(id, name, title, field) {
+  if (field==='lead') {
+    selectedLeadId = id;
+    document.getElementById('f-lead-search').value = name;
+    const sel = document.getElementById('lead-selected');
+    sel.style.display = 'flex';
+    sel.innerHTML = `<span>👷 <strong>${name}</strong> — ${title}</span><button class="btn btn-ghost btn-sm" onclick="clearLead()" style="padding:2px 6px">✕</button>`;
+  }
+  document.getElementById(`${field}-ac`).style.display = 'none';
+}
+function clearLead() {
+  selectedLeadId = null;
+  document.getElementById('f-lead-search').value = '';
+  document.getElementById('lead-selected').style.display = 'none';
+}
+
+// ── FORM: ASSESSMENT DROPDOWN ──────────────────────────────────
+function populateAssessmentDropdown() {
+  const sel = document.getElementById('f-assessment');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— None —</option>';
+  assessments.filter(a=>a.status==='approved'||a.status==='submitted').forEach(a=>{
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = `${a.assessment_number} · ${a.title}`;
+    sel.appendChild(opt);
+  });
+}
+
+// ── FORM: STEP 3 CONTROLS ──────────────────────────────────────
+const CONTROLS_DEF = {
+  hot_work: [
+    {key:'combustibles_removed',      label:'Combustibles removed / cleared from area',     type:'toggle'},
+    {key:'fire_extinguisher_present',  label:'Fire extinguisher present and inspected',       type:'toggle'},
+    {key:'fire_watch_assigned',        label:'Fire watch assigned',                           type:'toggle'},
+    {key:'fire_watch_name',            label:'Fire watch name',                               type:'text', placeholder:'Name of fire watch worker'},
+    {key:'gas_testing_required',       label:'Atmospheric gas testing required',              type:'toggle'},
+    {key:'gas_test_result',            label:'Gas test result / LEL reading',                 type:'text', placeholder:'e.g. 0% LEL, pass'},
+    {key:'gas_test_time',              label:'Gas test time',                                 type:'datetime'},
+    {key:'area_inspected_before',      label:'Area inspected before work began',              type:'toggle'},
+    {key:'post_work_fire_watch_duration_minutes', label:'Post-work fire watch duration (min)', type:'number', placeholder:'e.g. 60'},
+  ],
+  confined_space: [
+    {key:'space_classified',           label:'Space classified as confined space',            type:'toggle'},
+    {key:'atmosphere_tested',          label:'Atmosphere tested before entry',                type:'toggle'},
+    {key:'o2_reading',                 label:'O₂ reading (%)',                                type:'text', placeholder:'e.g. 20.9'},
+    {key:'lel_reading',                label:'LEL reading (%)',                               type:'text', placeholder:'e.g. 0'},
+    {key:'h2s_reading',                label:'H₂S reading (ppm)',                             type:'text', placeholder:'e.g. 0'},
+    {key:'co_reading',                 label:'CO reading (ppm)',                              type:'text', placeholder:'e.g. 0'},
+    {key:'ventilation_in_place',       label:'Mechanical ventilation in place',               type:'toggle'},
+    {key:'ventilation_type',           label:'Ventilation type',                              type:'text', placeholder:'e.g. forced air, blower'},
+    {key:'attendant_assigned',         label:'Attendant assigned at entry point',             type:'toggle'},
+    {key:'attendant_name',             label:'Attendant name',                                type:'text', placeholder:'Name of attendant'},
+    {key:'rescue_plan_documented',     label:'Rescue plan documented',                        type:'toggle'},
+    {key:'rescue_method',              label:'Rescue method',                                 type:'text', placeholder:'e.g. non-entry retrieval'},
+    {key:'communication_method',       label:'Communication method',                          type:'text', placeholder:'e.g. radio, signal rope'},
+    {key:'isolation_complete',         label:'Energy isolation complete',                     type:'toggle'},
+  ],
+  energy_isolation: [
+    {key:'energy_sources_identified',  label:'All energy sources identified',                 type:'toggle'},
+    {key:'energy_sources_list',        label:'List energy sources',                           type:'text', placeholder:'e.g. 480V motor, hydraulic accumulator'},
+    {key:'isolation_points_confirmed', label:'Isolation points confirmed',                    type:'toggle'},
+    {key:'lockbox_location',           label:'Lockbox location',                              type:'text', placeholder:'e.g. Breaker panel B-14'},
+    {key:'group_lockbox_used',         label:'Group lockbox used',                            type:'toggle'},
+    {key:'stored_energy_released',     label:'Stored energy fully released / blocked',        type:'toggle'},
+    {key:'zero_energy_verified',       label:'Zero energy state verified',                    type:'toggle'},
+    {key:'verification_method',        label:'Verification method',                           type:'text', placeholder:'e.g. voltmeter test, pressure gauge'},
+    {key:'worker_locks_applied',       label:'Individual worker locks applied',               type:'toggle'},
+    {key:'shift_transfer_process',     label:'Shift transfer process documented',             type:'toggle'},
+  ],
+  excavation: [
+    {key:'utility_locates_obtained',   label:'Utility locates obtained',                      type:'toggle'},
+    {key:'locate_ticket_number',       label:'Locate ticket number',                          type:'text', placeholder:'e.g. AB-2026-00482'},
+    {key:'locate_provider',            label:'Locate provider / contact',                     type:'text', placeholder:'e.g. Alberta One-Call'},
+    {key:'potholing_required',         label:'Potholing required',                            type:'toggle'},
+    {key:'potholing_complete',         label:'Potholing complete',                            type:'toggle'},
+    {key:'soil_classification',        label:'Soil classification',                           type:'text', placeholder:'e.g. Type A, cohesive'},
+    {key:'shoring_required',           label:'Shoring / trench box required',                 type:'toggle'},
+    {key:'shoring_type',               label:'Shoring type used',                             type:'text', placeholder:'e.g. hydraulic shores, trench box'},
+    {key:'barricading_in_place',       label:'Barricading and signage in place',              type:'toggle'},
+    {key:'access_egress_confirmed',    label:'Safe access and egress confirmed',              type:'toggle'},
+    {key:'spoil_pile_distance_metres', label:'Spoil pile distance from edge (m)',             type:'number', placeholder:'e.g. 1.2'},
+    {key:'equipment_exclusion_zone_metres', label:'Equipment exclusion zone (m)',             type:'number', placeholder:'e.g. 5'},
+  ],
+  working_at_heights: [
+    {key:'fall_protection_plan',       label:'Fall protection plan in place',                 type:'toggle'},
+    {key:'anchor_points_confirmed',    label:'Anchor points confirmed / load-tested',         type:'toggle'},
+    {key:'harness_inspected',          label:'Harness inspected and tagged current',          type:'toggle'},
+    {key:'lanyard_inspected',          label:'Lanyard / SRL inspected',                      type:'toggle'},
+    {key:'equipment_inspected',        label:'All equipment inspected',                       type:'toggle'},
+    {key:'rescue_plan_documented',     label:'Rescue plan documented',                        type:'toggle'},
+    {key:'rescue_method',              label:'Rescue method',                                 type:'text', placeholder:'e.g. aerial platform, rope rescue'},
+    {key:'drop_zone_controlled',       label:'Drop zone controlled / barricaded below',       type:'toggle'},
+    {key:'max_wind_speed_kmh',         label:'Max acceptable wind speed (km/h)',              type:'number', placeholder:'e.g. 40'},
+    {key:'worker_competency_verified', label:'Worker competency / fall protection cert verified', type:'toggle'},
+  ],
+  critical_lift: [
+    {key:'lift_plan_completed',        label:'Critical lift plan completed and approved',     type:'toggle'},
+    {key:'crane_inspection_current',   label:'Crane inspection current (annual)',             type:'toggle'},
+    {key:'rated_capacity_checked',     label:'Rated capacity and load chart reviewed',        type:'toggle'},
+    {key:'ground_conditions_assessed', label:'Ground bearing conditions assessed',            type:'toggle'},
+    {key:'exclusion_zone_established', label:'Exclusion zone established',                   type:'toggle'},
+    {key:'rigger_competency_verified', label:'Rigger competency verified',                   type:'toggle'},
+    {key:'weather_acceptable',         label:'Weather conditions acceptable',                 type:'toggle'},
+    {key:'pre_lift_meeting_held',      label:'Pre-lift meeting held with crew',               type:'toggle'},
+  ],
+  line_breaking: [
+    {key:'system_depressurized',       label:'System depressurized / zero pressure confirmed', type:'toggle'},
+    {key:'pressure_reading',           label:'Pressure reading before breaking',              type:'text', placeholder:'e.g. 0 kPa confirmed'},
+    {key:'fluid_type_identified',      label:'Fluid/material type identified',                type:'text', placeholder:'e.g. crude oil, steam, chemical'},
+    {key:'ppe_required',               label:'Required PPE (chemical/thermal) in use',        type:'toggle'},
+    {key:'containment_in_place',       label:'Drip trays / containment in place',             type:'toggle'},
+    {key:'isolation_upstream',         label:'Upstream and downstream isolation confirmed',   type:'toggle'},
+    {key:'blind_flanging_required',    label:'Blind flanging required',                       type:'toggle'},
+  ],
+  cold_work: [
+    {key:'non_sparking_tools',         label:'Non-sparking tools confirmed in use',           type:'toggle'},
+    {key:'area_classified',            label:'Area hazardous area classification confirmed',  type:'toggle'},
+    {key:'gas_monitoring',             label:'Continuous gas monitoring in place',            type:'toggle'},
+    {key:'ignition_sources_removed',   label:'All ignition sources removed from area',       type:'toggle'},
+    {key:'housekeeping_complete',      label:'Housekeeping complete before start',            type:'toggle'},
+  ],
+};
+
+function renderStep3Controls() {
+  const el = document.getElementById('step3-controls');
+  const hdr = document.getElementById('step3-header');
+  const defs = CONTROLS_DEF[selectedType] || [];
+  const cfg = PERMIT_TYPES[selectedType] || {};
+
+  hdr.innerHTML = `
+    <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 13px">
+      <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:2px">${cfg.icon||''} ${cfg.name||''} — Control Verification</div>
+      <div style="font-size:11px;color:var(--text2)">Verify all applicable controls before proceeding. These are recorded on the permit.</div>
+    </div>`;
+
+  if (!defs.length) {
+    el.innerHTML = `<div style="font-size:12px;color:var(--text2);padding:16px 0">No specific controls defined for this permit type.</div>`;
+    return;
+  }
+
+  el.innerHTML = defs.map(d => {
+    const val = formControls[d.key];
+    if (d.type === 'toggle') {
+      const checked = val === true || val === 'true';
+      return `
+      <div class="ctrl-item${checked?' ok':''}" id="ci-${d.key}">
+        <div class="ctrl-label">${d.label}</div>
+        <label class="toggle">
+          <input type="checkbox" ${checked?'checked':''} onchange="setControl('${d.key}',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>`;
+    } else if (d.type === 'text') {
+      return `
+      <div class="ctrl-item" id="ci-${d.key}">
+        <div class="ctrl-label">${d.label}</div>
+        <div class="ctrl-input-wrap">
+          <input type="text" class="form-input" style="font-size:12px;padding:6px 8px"
+            value="${val||''}" placeholder="${d.placeholder||''}"
+            oninput="setControl('${d.key}',this.value)">
+        </div>
+      </div>`;
+    } else if (d.type === 'number') {
+      return `
+      <div class="ctrl-item" id="ci-${d.key}">
+        <div class="ctrl-label">${d.label}</div>
+        <div class="ctrl-input-wrap">
+          <input type="number" class="form-input" style="font-size:12px;padding:6px 8px"
+            value="${val||''}" placeholder="${d.placeholder||''}"
+            oninput="setControl('${d.key}',this.value)">
+        </div>
+      </div>`;
+    } else if (d.type === 'datetime') {
+      return `
+      <div class="ctrl-item" id="ci-${d.key}">
+        <div class="ctrl-label">${d.label}</div>
+        <div class="ctrl-input-wrap">
+          <input type="datetime-local" class="form-input" style="font-size:12px;padding:6px 8px"
+            value="${val||''}" onchange="setControl('${d.key}',this.value)">
+        </div>
+      </div>`;
+    }
+    return '';
+  }).join('');
+}
+
+function setControl(key, val) {
+  formControls[key] = val;
+  const row = document.getElementById('ci-'+key);
+  if (row && typeof val === 'boolean') {
+    row.classList.toggle('ok', val);
+  }
+}
+
+// ── FIELD VERIFY ───────────────────────────────────────────────
+function toggleVerify(checked) {
+  fieldVerified = checked;
+  const box = document.getElementById('verify-box');
+  const notes = document.getElementById('f-verify-notes');
+  const lbl = document.getElementById('verify-label');
+  box.className = 'verify-box' + (checked ? ' done' : '');
+  notes.disabled = !checked;
+  lbl.textContent = checked
+    ? '✓ I confirm I have physically walked down the job site'
+    : 'I have NOT walked down the job site';
+  lbl.style.color = checked ? 'var(--ok)' : 'var(--text2)';
+}
+
+// ── REVIEW SUMMARY ─────────────────────────────────────────────
+function renderReviewSummary() {
+  const cfg = PERMIT_TYPES[selectedType]||{};
+  const lead = selectedLeadId
+    ? workers.find(w=>w.id===selectedLeadId)
+    : null;
+  const leadName = lead ? `${lead.first_name} ${lead.last_name}` : '—';
+
+  const rows = [
+    ['Permit Type', `${cfg.icon||''} ${cfg.name||'—'}`],
+    ['Title', formData.title||'—'],
+    ['Site', formData.site||'—'],
+    ['Location', formData.location||'—'],
+    ['Planned Start', formData.start ? fmtDate(formData.start) : '—'],
+    ['Planned End',   formData.end   ? fmtDate(formData.end)   : '—'],
+    ['Worker Lead', leadName],
+    ['Department', formData.dept||'—'],
+    ['Risk Tier', fmt(cfg.risk||'—')],
+  ];
+
+  const defs = CONTROLS_DEF[selectedType]||[];
+  const confirmedCount = defs.filter(d=>d.type==='toggle' && formControls[d.key]).length;
+  const toggleCount = defs.filter(d=>d.type==='toggle').length;
+  rows.push(['Controls Confirmed', `${confirmedCount} / ${toggleCount}`]);
+
+  document.getElementById('review-summary').innerHTML = rows.map(([k,v])=>`
+    <div class="summary-row">
+      <span class="summary-key">${k}</span>
+      <span class="summary-val">${v}</span>
+    </div>`).join('');
+
+  document.getElementById('review-verify-note').textContent =
+    `"${formData.verifyNotes||'Field walkdown completed.'}"`;
+}
+
+// ── STEP NAVIGATION ────────────────────────────────────────────
+function goStep(n, silent) {
+  if (!silent) collectFormData();
+
+  if (!silent && n > formStep) {
+    if (formStep === 1) {
+      if (!selectedType) { toast('Select a permit type','danger'); return; }
+    }
+    if (formStep === 2) {
+      if (!formData.title) { toast('Enter a permit title','danger'); return; }
+      if (!formData.site)  { toast('Select a site','danger'); return; }
+      if (!formData.start) { toast('Enter planned start time','danger'); return; }
+      if (!formData.end)   { toast('Enter planned end time','danger'); return; }
+      if (!selectedLeadId) { toast('Select a worker lead','danger'); return; }
+    }
+    if (formStep === 4) {
+      if (!fieldVerified) { toast('Confirm you have completed the field walk-down','danger'); return; }
+      if (!formData.verifyNotes || formData.verifyNotes.length < 5) {
+        toast('Enter field verification notes','danger'); return;
+      }
+    }
+  }
+
+  formStep = n;
+  document.querySelectorAll('.form-section').forEach((s,i) => {
+    s.style.display = i+1===n ? 'block' : 'none';
+  });
+  updateStepIndicator();
+
+  if (n === 3) renderStep3Controls();
+  if (n === 5) renderReviewSummary();
+}
+
+function updateStepIndicator() {
+  for (let i=1;i<=5;i++) {
+    const dot = document.getElementById('sdot-'+i);
+    const lbl = document.getElementById('slbl-'+i);
+    if (!dot||!lbl) continue;
+    dot.className = 'step-dot'+(i<formStep?' done':i===formStep?' active':'');
+    dot.textContent = i<formStep ? '✓' : String(i);
+    lbl.className = 'step-lbl'+(i<formStep?' done':i===formStep?' active':'');
+  }
+}
+
+function collectFormData() {
+  const g = id => { const e=document.getElementById(id); return e?e.value:''; };
+  formData.title        = g('f-title');
+  formData.desc         = g('f-desc');
+  formData.site         = g('f-site');
+  formData.location     = g('f-location');
+  formData.dept         = g('f-dept');
+  formData.start        = g('f-start');
+  formData.end          = g('f-end');
+  formData.assessment   = g('f-assessment');
+  formData.verifyNotes  = g('f-verify-notes');
+}
+
+// ── SUBMIT & ISSUE ─────────────────────────────────────────────
+async function submitAndIssuePermit() {
+  const btn = document.getElementById('issue-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating permit…';
+
+  const payload = {
+    permit_type:        selectedType,
+    title:              formData.title,
+    description:        formData.desc || undefined,
+    site:               formData.site,
+    location_detail:    formData.location || undefined,
+    department:         formData.dept || undefined,
+    work_start_planned: formData.start ? new Date(formData.start).toISOString() : undefined,
+    work_end_planned:   formData.end   ? new Date(formData.end).toISOString()   : undefined,
+    worker_lead:        selectedLeadId || undefined,
+    assessment_id:      formData.assessment || undefined,
+    permit_type_controls: formControls,
+  };
+
+  const createRes = await apiPost('/api/permits', payload);
+  if (!createRes.ok || !createRes.data?.permit) {
+    const err = createRes.data?.error || createRes.data?.message || `HTTP ${createRes.status}`;
+    toast(`Failed to create permit: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    return;
+  }
+  const pid = createRes.data.permit.id;
+  const pnum = createRes.data.permit.permit_number;
+
+  btn.textContent = 'Submitting…';
+  const submitRes = await apiPost(`/api/permits/${pid}/submit`, {worker_lead: selectedLeadId});
+  if (!submitRes.ok) {
+    const err = submitRes.data?.error || `HTTP ${submitRes.status}`;
+    toast(`Submit failed: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    return;
+  }
+
+  btn.textContent = 'Reviewing…';
+  await apiPost(`/api/permits/${pid}/review`, {});
+
+  btn.textContent = 'Field verifying…';
+  const fvRes = await apiPost(`/api/permits/${pid}/field-verify`, {
+    notes: formData.verifyNotes
+  });
+  if (!fvRes.ok) {
+    const err = fvRes.data?.error || `HTTP ${fvRes.status}`;
+    toast(`Field verify failed: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    return;
+  }
+
+  btn.textContent = 'Issuing…';
+  const issueRes = await apiPost(`/api/permits/${pid}/issue`, {});
+  if (!issueRes.ok) {
+    const err = issueRes.data?.error || issueRes.data?.message || `HTTP ${issueRes.status}`;
+    toast(`Issue failed: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    return;
+  }
+
+  lastIssuedId = pid;
+
+  // Refresh data
+  const [pData, aData] = await Promise.all([
+    apiGet('/api/permits?limit=100'),
+    apiGet('/api/permits/dashboard'),
+  ]);
+  permits       = (pData&&pData.permits)||[];
+  activePermits = (aData&&aData.active_permits)||[];
+  renderKPIs();
+  renderPermitBoard();
+  renderPermitsTable();
+  renderSimops();
+  renderTypeBreakdown();
+  buildAlertStrip();
+
+  // Show success
+  document.getElementById('step-bar').style.display = 'none';
+  document.querySelectorAll('.form-section').forEach(s=>s.style.display='none');
+  document.getElementById('form-success').style.display = 'block';
+  document.getElementById('success-permit-num').textContent = pnum;
+  document.getElementById('success-view-btn').onclick = () => viewPermit(pid);
+}
+
+// ── RESET FORM ─────────────────────────────────────────────────
+function resetForm() {
+  formStep = 1;
+  formData = {};
+  selectedType = null;
+  formControls = {};
+  fieldVerified = false;
+  selectedLeadId = null;
+
+  document.getElementById('form-success').style.display = 'none';
+  document.getElementById('step-bar').style.display = 'flex';
+  document.querySelectorAll('.form-section').forEach(s=>s.style.display='none');
+
+  const fields = ['f-title','f-desc','f-location','f-dept','f-lead-search','f-verify-notes'];
+  fields.forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  ['f-site','f-assessment'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+
+  const ls = document.getElementById('lead-selected');
+  if (ls) ls.style.display = 'none';
+
+  const now = new Date();
+  const start = new Date(now.getTime()+3600000);
+  const end   = new Date(now.getTime()+39600000);
+  const iso = d => d.toISOString().slice(0,16);
+  const sf = document.getElementById('f-start');
+  const ef = document.getElementById('f-end');
+  if (sf) sf.value = iso(start);
+  if (ef) ef.value = iso(end);
+
+  const vn = document.getElementById('f-verify-notes');
+  if (vn) vn.disabled = true;
+  const vc = document.getElementById('f-verified');
+  if (vc) vc.checked = false;
+  const vb = document.getElementById('verify-box');
+  if (vb) vb.className = 'verify-box';
+  const vl = document.getElementById('verify-label');
+  if (vl) { vl.textContent = 'I have NOT walked down the job site'; vl.style.color=''; }
+
+  const ib = document.getElementById('issue-btn');
+  if (ib) { ib.disabled=false; ib.textContent='✓ Issue Permit'; }
+
+  renderTypeGrid();
+  goStep(1, true);
+}
+
+// ── PERMIT DETAIL ──────────────────────────────────────────────
+async function viewPermit(id) {
+  showPanel('detail');
+  const el = document.getElementById('detail-content');
+  el.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading permit…</span></div>`;
+
+  const res = await apiGet(`/api/permits/${id}`);
+  if (!res || !res.permit) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load permit</div>`;
+    return;
+  }
+  const p = res.permit;
+  const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋',name:fmt(p.permit_type)};
+
+  const WORKFLOW = ['draft','submitted','reviewed','issued','active','closed'];
+  const wfIdx = WORKFLOW.indexOf(p.status);
+
+  const leadName = p.lead_first_name
+    ? `${p.lead_first_name} ${p.lead_last_name}`
+    : (p.worker_lead_first_name ? `${p.worker_lead_first_name} ${p.worker_lead_last_name}` : '—');
+  const issuerName = p.issuer_first_name
+    ? `${p.issuer_first_name} ${p.issuer_last_name}` : '—';
+
+  // Control summary
+  const ptc = p.permit_type_controls || {};
+  const defs = CONTROLS_DEF[p.permit_type]||[];
+  const ctrlHtml = defs.length ? `
+    <div class="section-title">Control Verification (${p.permit_type})</div>
+    <div>${defs.map(d => {
+      const val = ptc[d.key];
+      let display = '—';
+      if (d.type==='toggle') display = val===true || val==='true'
+        ? '<span class="chip ok">✓ Yes</span>'
+        : (val===false||val==='false'?'<span class="chip muted">No / N/A</span>':'<span class="chip muted">Not set</span>');
+      else display = `<span style="font-size:12px;color:var(--text)">${val||'—'}</span>`;
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px">
+        <span style="font-size:12px;color:var(--text2)">${d.label}</span>
+        ${display}
+      </div>`;
+    }).join('')}</div>` : '';
+
+  // Workflow timeline
+  const wfNodes = ['Draft','Submitted','Reviewed','Issued','Active','Closed'];
+  const wfStatuses = ['draft','submitted','reviewed','issued','active','closed'];
+  const wfHtml = `
+    <div class="wf-line">
+      ${wfNodes.map((lbl,i) => {
+        const isDone = i < wfIdx;
+        const isActive = i === wfIdx || (p.status==='suspended' && i===4);
+        const isSuspended = p.status==='suspended' && i===4;
+        const dotCls = isSuspended?'warn':(isDone?'done':(isActive?'active':''));
+        const lblCls = isDone?'done':(isActive?'active':'');
+        return `
+          ${i>0?`<div class="wf-connector${isDone||isActive?' done':''}"></div>`:''}
+          <div class="wf-node">
+            <div class="wf-dot${dotCls?' '+dotCls:''}">${isDone?'✓':String(i+1)}</div>
+            <div class="wf-label${lblCls?' '+lblCls:''}">${lbl}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
+  // Signatories
+  const sigs = p.signatories||[];
+  const sigsHtml = sigs.length ? `
+    <div class="section-title">Signatories</div>
+    ${sigs.map(s=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;font-size:12px">
+      <span style="color:var(--ok)">✓</span>
+      <span>${s.first_name||''} ${s.last_name||''} — <span style="color:var(--muted)">${s.role||'Signatory'}</span></span>
+      <span style="margin-left:auto;font-size:10.5px;color:var(--muted)">${fmtShort(s.signed_at)}</span>
+    </div>`).join('')}` : '';
+
+  // Workers
+  const crew = p.workers||[];
+  const crewHtml = crew.length ? `
+    <div class="section-title">Signed-On Workers (${crew.length})</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${crew.map(w=>`
+      <span class="chip blue">👷 ${w.first_name||''} ${w.last_name||''}</span>
+    `).join('')}</div>` : '';
+
+  // Revalidations
+  const revals = p.revalidations||[];
+  const revalHtml = revals.length ? `
+    <div class="section-title">Revalidation History (${revals.length})</div>
+    ${revals.map(r=>`
+    <div style="padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;font-size:12px">
+      <div style="font-weight:600;margin-bottom:2px">${fmtShort(r.revalidated_at||r.created_at)} — ${r.reason||'Revalidated'}</div>
+      ${r.notes?`<div style="color:var(--text2)">${r.notes}</div>`:''}
+    </div>`).join('')}` : '';
+
+  // Closeout
+  const closeout = p.closeout;
+  const closeoutHtml = closeout ? `
+    <div class="section-title">Closeout</div>
+    <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:7px;padding:12px 14px">
+      <div style="font-size:12px;font-weight:600;color:var(--ok);margin-bottom:5px">✓ Permit Closed ${fmtShort(p.closeout_at)}</div>
+      ${p.closeout_notes?`<div style="font-size:12px;color:var(--text2)">${p.closeout_notes}</div>`:''}
+      ${p.deficiencies_found?`<div style="font-size:12px;color:var(--danger);margin-top:5px">⚠️ Deficiencies found: ${p.deficiency_notes||''}</div>`:''}
+    </div>` : '';
+
+  // SIMOPS
+  const simops = (p.simops_conflicts||[]);
+  const simopsHtml = simops.length ? `
+    <div class="section-title">SIMOPS Conflicts</div>
+    <div class="simops-card">${simops.map(s=>
+      `<div style="font-size:11.5px;color:var(--warn);padding:2px 0">⚠️ ${s}</div>`
+    ).join('')}</div>` : '';
+
+  // Action buttons
+  const isActive_ = p.status==='active'||p.status==='issued';
+  const isSuspended_ = p.status==='suspended';
+  const actionHtml = isActive_ ? `
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-warn btn-sm" onclick="suspendPermit('${p.id}')">⏸ Suspend</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">✓ Close Permit</button>
+    </div>` :
+    isSuspended_ ? `
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="padding:8px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:7px;font-size:11.5px;color:var(--warn)">
+        ⏸ Suspended: ${p.suspension_reason||'No reason given'}
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">✓ Close Permit</button>
+    </div>` : '';
+
+  el.innerHTML = `
+    <!-- HEADER -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${p.permit_number}</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px">${cfg.icon} ${p.title}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+            ${statusChip(p.status)}${riskChip(p.risk_tier)}${typeChip(p.permit_type)}
+            <span class="chip muted">📍 ${p.site||'—'}</span>
+            ${p.location_detail?`<span class="chip muted">${p.location_detail}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          ${actionHtml}
+        </div>
+      </div>
+      ${wfHtml}
+    </div>
+
+    <!-- DETAIL GRID -->
+    <div class="detail-grid" style="margin-bottom:12px">
+      <div class="detail-field">
+        <div class="detail-field-label">Worker Lead</div>
+        <div class="detail-field-val">👷 ${leadName}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Permit Issuer</div>
+        <div class="detail-field-val">${issuerName}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Planned Start</div>
+        <div class="detail-field-val">${fmtDate(p.work_start_planned)}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Planned End</div>
+        <div class="detail-field-val">${fmtDate(p.work_end_planned)}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Issued At</div>
+        <div class="detail-field-val">${fmtDate(p.permit_issued_at)}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Expires At</div>
+        <div class="detail-field-val" style="color:${countdown(p.permit_expires_at)?.critical?'var(--danger)':'inherit'}">${fmtDate(p.permit_expires_at)}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Department</div>
+        <div class="detail-field-val">${p.department||'—'}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Field Verified</div>
+        <div class="detail-field-val">${p.issuer_verified_field
+          ? `<span style="color:var(--ok)">✓ ${fmtShort(p.issuer_field_verification_at)}</span>`
+          : '<span style="color:var(--muted)">Not verified</span>'}</div>
+      </div>
+      <div class="detail-field">
+        <div class="detail-field-label">Linked FLHA</div>
+        <div class="detail-field-val">${p.assessment_id?'<span style="color:var(--accent)">Linked</span>':'—'}</div>
+      </div>
+    </div>
+
+    ${p.issuer_field_verification_notes ? `
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title" style="margin-top:0">Field Verification Notes</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.6">"${p.issuer_field_verification_notes}"</div>
+    </div>` : ''}
+
+    ${p.description ? `
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title" style="margin-top:0">Work Description</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.6">${p.description}</div>
+    </div>` : ''}
+
+    ${ctrlHtml || simopsHtml || sigsHtml || crewHtml || revalHtml || closeoutHtml ? `
+    <div class="card">
+      ${ctrlHtml}${simopsHtml}${sigsHtml}${crewHtml}${revalHtml}${closeoutHtml}
+    </div>` : ''}
+  `;
+}
+
+// ── PERMIT ACTIONS ─────────────────────────────────────────────
+async function suspendPermit(id) {
+  const reason = prompt('Reason for suspension:');
+  if (!reason) return;
+  const res = await apiPost(`/api/permits/${id}/suspend`, {reason});
+  if (res.ok) {
+    toast('Permit suspended','warn');
+    viewPermit(id);
+    const [pData,aData] = await Promise.all([
+      apiGet('/api/permits?limit=100'), apiGet('/api/permits/dashboard')
+    ]);
+    permits=pData?.permits||[]; activePermits=aData?.active_permits||[];
+    renderKPIs(); renderPermitBoard(); buildAlertStrip();
+  } else {
+    toast(res.data?.error||'Suspend failed','danger');
+  }
+}
+
+async function closePermit(id) {
+  const notes = prompt('Closeout notes (describe site condition at close):');
+  if (notes === null) return;
+  const res = await apiPost(`/api/permits/${id}/close`, {closeout_notes:notes, deficiencies_found:false});
+  if (res.ok) {
+    toast('Permit closed','ok');
+    viewPermit(id);
+    const [pData,aData] = await Promise.all([
+      apiGet('/api/permits?limit=100'), apiGet('/api/permits/dashboard')
+    ]);
+    permits=pData?.permits||[]; activePermits=aData?.active_permits||[];
+    renderKPIs(); renderPermitBoard(); renderPermitsTable(); buildAlertStrip();
+  } else {
+    toast(res.data?.error||'Close failed','danger');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
