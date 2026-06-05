@@ -714,10 +714,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 <div id="toast"></div>
 
+<script src="vigil-auth.js"></script>
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
-const API = 'https://vigil-production-17ca.up.railway.app';
-const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+const API = window.VIGIL_API_BASE;
 const LOGGED_IN = {id:'1a549387-4fcd-40f5-838f-9dee721701d2', name:'James Marchetti'};
 
 // ── STATE ─────────────────────────────────────────────────────
@@ -820,7 +820,7 @@ function priorityChip(p) {
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  const ar = await fetch(API + '/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(AUTH)});
+  const ar = await fetch(API + '/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify(await getVigilCredentials())});
   if (!ar.ok) { toast('⚠️ Could not connect to Vigil API', 'danger'); return; }
   const ab = await ar.json();
   token = ab.token || ab.access_token || (ab.data && ab.data.token);

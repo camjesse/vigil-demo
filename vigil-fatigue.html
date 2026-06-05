@@ -405,6 +405,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 <div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
 
+<script src="vigil-auth.js"></script>
 <script>
 // ─── DATA ─────────────────────────────────────────────────────
 function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
@@ -429,13 +430,13 @@ let authToken = null;
 let overrides = [];
 
 // ─── API CONFIG ───────────────────────────────────────────────
-const API_BASE = 'https://vigil-production-17ca.up.railway.app';
+const API_BASE = window.VIGIL_API_BASE;
 
 async function apiLogin() {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({email:'j.marchetti@northernexpress.ca', password:'Test1234!'})
+    body: JSON.stringify(await getVigilCredentials())
   });
   if (!res.ok) throw new Error(`Login failed: ${res.status}`);
   const data = await res.json();

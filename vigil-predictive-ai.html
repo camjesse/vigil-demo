@@ -368,9 +368,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
+<script src="vigil-auth.js"></script>
 <script>
-const API  = 'https://vigil-production-17ca.up.railway.app';
-const AUTH = {email:'j.marchetti@northernexpress.ca', password:'Test1234!'};
+const API = window.VIGIL_API_BASE;
 
 let token        = null;
 let signals      = [];
@@ -549,7 +549,7 @@ function statusBadge(status) {
 // ── INIT ───────────────────────────────────────────────────────
 async function init() {
   const ar = await fetch(API+'/api/auth/login',{
-    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(AUTH)
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(await getVigilCredentials())
   });
   if (!ar.ok) { toast('Could not connect to Vigil API','danger'); return; }
   const ab = await ar.json();
