@@ -1,6 +1,8 @@
 (function () {
   const API_BASE = 'https://vigil-production-17ca.up.railway.app';
   const EMAIL_KEY = 'vigil_demo_email';
+  let pendingCredentials = null;
+  let lastCredentials = null;
 
   window.VIGIL_API_BASE = API_BASE;
 
@@ -24,7 +26,7 @@
     document.head.appendChild(style);
   }
 
-  window.getVigilCredentials = function getVigilCredentials() {
+  function openCredentialDialog() {
     injectStyles();
 
     return new Promise((resolve) => {
@@ -64,6 +66,7 @@
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         if (email) window.localStorage.setItem(EMAIL_KEY, email);
+        lastCredentials = { email, password };
         close({ email, password });
       });
 
@@ -75,5 +78,23 @@
       emailInput.focus();
       if (savedEmail) passwordInput.focus();
     });
+  }
+
+  window.getVigilCredentials = function getVigilCredentials() {
+    if (lastCredentials) {
+      return Promise.resolve(lastCredentials);
+    }
+
+    if (!pendingCredentials) {
+      pendingCredentials = openCredentialDialog().finally(() => {
+        pendingCredentials = null;
+      });
+    }
+
+    return pendingCredentials;
   };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    window.getVigilCredentials();
+  });
 }());
