@@ -31,9 +31,12 @@
 
     return new Promise((resolve) => {
       const savedEmail = window.localStorage.getItem(EMAIL_KEY) || '';
-      const backdrop = document.createElement('div');
+      const existingBackdrop = document.getElementById('vigil-auth-gate');
+      const backdrop = existingBackdrop || document.createElement('div');
       backdrop.className = 'vigil-auth-backdrop';
-      backdrop.innerHTML = `
+
+      if (!existingBackdrop) {
+        backdrop.innerHTML = `
         <form class="vigil-auth-card">
           <div class="vigil-auth-title">Sign in to Vigil</div>
           <div class="vigil-auth-copy">Enter a valid Vigil account to load live demo data. The password is never stored in this page.</div>
@@ -51,10 +54,15 @@
           </div>
         </form>
       `;
+      }
 
       const form = backdrop.querySelector('form');
       const emailInput = backdrop.querySelector('#vigil-auth-email');
       const passwordInput = backdrop.querySelector('#vigil-auth-password');
+
+      if (emailInput && !emailInput.value) {
+        emailInput.value = savedEmail;
+      }
 
       function close(credentials) {
         backdrop.remove();
@@ -74,7 +82,11 @@
         close({ email: '', password: '' });
       });
 
-      document.body.appendChild(backdrop);
+      if (!existingBackdrop) {
+        document.body.appendChild(backdrop);
+      }
+
+      backdrop.style.display = 'flex';
       emailInput.focus();
       if (savedEmail) passwordInput.focus();
     });
