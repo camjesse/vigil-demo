@@ -65,7 +65,10 @@
       }
 
       function close(credentials) {
-        backdrop.remove();
+        if (credentials.email && credentials.password) {
+          document.documentElement.classList.add('vigil-authenticated');
+          backdrop.remove();
+        }
         resolve(credentials);
       }
 
@@ -78,9 +81,12 @@
         close({ email, password });
       });
 
-      backdrop.querySelector('[data-cancel]').addEventListener('click', () => {
-        close({ email: '', password: '' });
-      });
+      const cancelButton = backdrop.querySelector('[data-cancel]');
+      if (cancelButton) {
+        cancelButton.addEventListener('click', () => {
+          emailInput.focus();
+        });
+      }
 
       if (!existingBackdrop) {
         document.body.appendChild(backdrop);

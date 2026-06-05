@@ -22,6 +22,7 @@ html.light-mode{
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
 .shell{display:flex;flex-direction:column;height:100vh}
+html:not(.vigil-authenticated) .shell{display:none}
 
 /* ── HEADER ─────────────────────────────────────────────── */
 .hdr{background:var(--s1);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:100;gap:10px}
@@ -241,7 +242,6 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
       <input id="vigil-auth-password" type="password" autocomplete="current-password" required style="height:38px;border-radius:6px;border:1px solid #263648;background:#07090F;color:#C8DCF0;padding:0 10px;font:inherit;font-size:13px">
     </div>
     <div class="vigil-auth-actions" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
-      <button class="vigil-auth-btn" type="button" data-cancel style="height:34px;border-radius:6px;border:1px solid #263648;background:#101520;color:#C8DCF0;padding:0 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Cancel</button>
       <button class="vigil-auth-btn primary" type="submit" style="height:34px;border-radius:6px;border:1px solid rgba(0,194,255,.4);background:#00C2FF;color:#061018;padding:0 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Sign in</button>
     </div>
   </form>
