@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+button,input,select{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-family:'Syne';font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}.stat-val{font-family:'Syne';font-size:23px;font-weight:800;margin-top:5px}.stat-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border)}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.search,.select{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}.search{width:min(260px,35vw)}.search:focus,.select:focus{border-color:var(--accent)}
+.table-wrap{overflow:auto}.tbl{width:100%;min-width:850px;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;background:rgba(255,255,255,.01);border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.identity{color:var(--text);font-weight:700}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.row-actions{display:flex;gap:5px}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(480px,100%);background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-family:'Syne';font-size:17px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select{height:38px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 10px;outline:none}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.page-hdr{flex-direction:column}.search{width:150px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Administration</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Administration</div>
+      <button class="nav-item active" data-view="accounts" onclick="showView('accounts')">Accounts</button>
+      <button class="nav-item" data-view="audit" onclick="showView('audit')">Security audit</button>
+    </nav>
+    <main class="content">
+      <section id="view-accounts">
+        <div class="page-hdr"><div><h1>User Accounts</h1><div class="page-sub">Manage access roles, worker identities, and active sessions.</div></div><div class="actions"><button class="btn primary" onclick="openCreate()">Create account</button></div></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Accounts</div><div class="stat-val" id="stat-users">-</div><div class="stat-sub">Company access</div></div>
+          <div class="stat"><div class="stat-label">Linked workers</div><div class="stat-val" id="stat-linked">-</div><div class="stat-sub">Verified identities</div></div>
+          <div class="stat"><div class="stat-label">Administrators</div><div class="stat-val" id="stat-admins">-</div><div class="stat-sub">Full access</div></div>
+          <div class="stat"><div class="stat-label">Unlinked</div><div class="stat-val" id="stat-unlinked">-</div><div class="stat-sub">Cannot perform writes</div></div>
+        </div>
+        <div class="panel"><div class="panel-hd"><div class="panel-title">Account directory</div><div class="spacer"></div><input class="search" id="user-search" placeholder="Search accounts..." oninput="renderUsers()"></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Account</th><th>Worker identity</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="user-rows"></tbody></table></div></div>
+      </section>
+      <section id="view-audit" class="hidden">
+        <div class="page-hdr"><div><h1>Security Audit</h1><div class="page-sub">Successful account and operational mutations recorded by the API.</div></div><div class="actions"><button class="btn" onclick="loadAudit()">Refresh</button></div></div>
+        <div class="panel"><div class="panel-hd"><div class="panel-title">Recent activity</div><div class="spacer"></div><select class="select" id="audit-method" onchange="loadAudit()"><option value="">All methods</option><option>POST</option><option>PATCH</option><option>PUT</option><option>DELETE</option></select><input class="search" id="audit-route" placeholder="Filter route..." onkeydown="if(event.key==='Enter')loadAudit()"></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Time</th><th>Actor</th><th>Role</th><th>Action</th><th>Route</th><th>Result</th></tr></thead><tbody id="audit-rows"></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260606-6"></script>
+<script>
+const API=window.VIGIL_API_BASE;let token=null,session=null,users=[],workers=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||`Request failed (${r.status})`);return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='audit')loadAudit()}
+async function init(){session=await getVigilSession();token=session.token;if(!['admin','superadmin'].includes(session.user.role)){document.querySelector('.content').innerHTML='<div class="empty">Administrator permission is required.</div>';return}await Promise.all([loadUsers(),loadWorkers()])}
+async function loadUsers(){users=(await api('/api/admin/users')).users;renderUsers()}
+async function loadWorkers(){workers=(await api('/api/workers?status=active')).workers}
+function renderUsers(){const q=document.getElementById('user-search').value.toLowerCase();const list=users.filter(u=>`${u.email} ${u.worker?.name||''} ${u.role}`.toLowerCase().includes(q));document.getElementById('stat-users').textContent=users.length;document.getElementById('stat-linked').textContent=users.filter(u=>u.worker).length;document.getElementById('stat-admins').textContent=users.filter(u=>['admin','superadmin'].includes(u.role)).length;document.getElementById('stat-unlinked').textContent=users.filter(u=>!u.worker).length;document.getElementById('user-rows').innerHTML=list.map(u=>`<tr><td><div class="identity">${esc(u.email)}</div><div class="meta">Created ${new Date(u.createdAt).toLocaleDateString()}</div></td><td>${u.worker?`<div class="identity">${esc(u.worker.name)}</div><div class="meta">${esc(u.worker.jobTitle||'No job title')}</div>`:'<span class="chip warn">Not linked</span>'}</td><td><span class="chip">${esc(u.role)}</span></td><td><span class="chip ${u.worker?.status==='active'?'ok':'warn'}">${u.worker?.status||'Restricted'}</span></td><td><div class="row-actions"><button class="btn small" onclick="openEdit('${u.id}')">Edit</button><button class="btn small danger" onclick="revoke('${u.id}')">Revoke sessions</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No matching accounts</td></tr>'}
+function workerOptions(selected){return `<option value="">No worker link</option>`+workers.map(w=>`<option value="${w.id}" ${w.id===selected?'selected':''}>${esc(w.first_name+' '+w.last_name)}${w.job_title?' - '+esc(w.job_title):''}</option>`).join('')}
+function roleOptions(selected){const roles=['worker','supervisor','manager','admin'];if(session?.user?.role==='superadmin'||selected==='superadmin')roles.push('superadmin');return roles.map(r=>`<option ${r===selected?'selected':''}>${r}</option>`).join('')}
+function modal(title,copy,fields,onSubmit){document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;document.querySelector('.modal form').onsubmit=async e=>{e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;try{await onSubmit(new FormData(e.target));closeModal();await loadUsers();toast('Account updated')}catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}}}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+function openCreate(){modal('Create account','Set a temporary password and link the account to a worker identity.',`<div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Temporary password</label><input name="password" type="password" minlength="12" required></div><div class="field"><label>Role</label><select name="role">${roleOptions('worker')}</select></div><div class="field"><label>Worker identity</label><select name="worker_id">${workerOptions('')}</select></div>`,f=>{const o=Object.fromEntries(f);o.worker_id=o.worker_id||null;return api('/api/admin/users',{method:'POST',body:JSON.stringify(o)})})}
+function openEdit(id){const u=users.find(x=>x.id===id);modal('Edit account','Role changes immediately revoke existing sessions.',`<div class="field"><label>Email</label><input name="email" type="email" value="${esc(u.email)}" required></div><div class="field"><label>Role</label><select name="role">${roleOptions(u.role)}</select></div><div class="field"><label>Worker identity</label><select name="worker_id">${workerOptions(u.workerId)}</select></div>`,f=>{const o=Object.fromEntries(f);o.worker_id=o.worker_id||null;return api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify(o)})})}
+async function revoke(id){if(!confirm('Revoke every active session for this account?'))return;await api('/api/admin/users/'+id+'/revoke-sessions',{method:'POST'});toast('Sessions revoked')}
+async function loadAudit(){const method=document.getElementById('audit-method').value,route=document.getElementById('audit-route').value;const q=new URLSearchParams({limit:'200'});if(method)q.set('method',method);if(route)q.set('route',route);const rows=(await api('/api/admin/audit-log?'+q)).auditLog;document.getElementById('audit-rows').innerHTML=rows.map(a=>`<tr><td>${new Date(a.created_at).toLocaleString()}</td><td><div class="identity">${esc((a.first_name&&a.last_name)?a.first_name+' '+a.last_name:a.email||'System')}</div><div class="meta">${esc(a.email||'')}</div></td><td><span class="chip">${esc(a.role||'-')}</span></td><td><span class="chip">${esc(a.method)}</span></td><td><span class="identity">${esc(a.route)}</span></td><td><span class="chip ok">${a.status_code}</span></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No audit events found</td></tr>'}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${esc(e.message)}</div>`);
+</script>
+</body>
+</html>

@@ -467,8 +467,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 
   <!-- FOOTER -->
   <div class="sb-footer">
-    <div class="sb-item" onclick="showSoon('settings')">
-      <span class="sb-icon">⚙️</span><span class="sb-label">Settings</span>
+    <div class="sb-item" id="sbi-admin" onclick="loadMod('admin')">
+      <span class="sb-icon">⚙️</span><span class="sb-label">Administration</span>
     </div>
     <div class="sb-item" onclick="showSoon('profile')">
       <span class="sb-icon">👤</span><span class="sb-label">Profile</span>
@@ -703,7 +703,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </div><!-- /body -->
 </div><!-- /shell -->
 
-<script src="vigil-auth.js?v=20260606-5"></script>
+<script src="vigil-auth.js?v=20260606-6"></script>
 <script>
 // ── MODULE CONFIG ─────────────────────────────────────────────
 const MODS = {
@@ -718,6 +718,7 @@ const MODS = {
   fatigue:      {src:'vigil-fatigue.html',             label:'Hours & Fatigue'},
   cor:          {src:'vigil-audit-readiness.html',     label:'COR Audit'},
   ai:           {src:'vigil-predictive-ai.html',       label:'Predictive AI'},
+  admin:        {src:'vigil-admin.html',               label:'Administration'},
 };
 
 const SOON = {
@@ -997,8 +998,10 @@ let dashToken = null;
 
 async function initDashboard() {
   try {
-    dashToken = await getVigilToken();
+    const session = await getVigilSession();
+    dashToken = session.token;
     if (!dashToken) return;
+    document.getElementById('sbi-admin')?.classList.toggle('hidden', !['admin','superadmin'].includes(session.user?.role));
 
     const hdr = {'Authorization':`Bearer ${dashToken}`,'Content-Type':'application/json'};
     const apiGet = url => fetch(`${DASH_API}${url}`,{headers:hdr}).then(r=>r.ok?r.json():null).catch(()=>null);
