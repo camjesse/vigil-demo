@@ -36,6 +36,8 @@
       .vigil-logout-btn:hover{color:var(--text,#D7E3EE);border-color:var(--b2,#2A394C)}
       .vigil-security-btn{height:27px;border-radius:6px;border:1px solid var(--border,#263648);background:transparent;color:var(--text2,#93A9BC);padding:0 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
       .vigil-security-btn:hover{color:var(--accent,#21B8E6);border-color:rgba(33,184,230,.35)}
+      .vigil-mobile-dashboard{display:none}
+      @media(max-width:900px){.vigil-mobile-dashboard{position:fixed;left:12px;bottom:12px;z-index:2147483000;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;border:1px solid rgba(33,184,230,.45);background:#0D121B;color:#D7E3EE;padding:0 13px;font:700 11px 'DM Sans',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45);cursor:pointer}}
       @media(max-width:700px){.vigil-session-user{display:none}.vigil-auth-card{padding:20px}}
     `;
     document.head.appendChild(style);
@@ -98,6 +100,19 @@
     control.querySelector('.vigil-security-btn').addEventListener('click', () => window.openVigilSecurity());
     control.querySelector('.vigil-logout-btn').addEventListener('click', () => window.logoutVigil());
     host.appendChild(control);
+  }
+
+  function renderMobileDashboardButton() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('mobile') || document.querySelector('.vigil-mobile-dashboard')) return;
+    const button = document.createElement('button');
+    button.className = 'vigil-mobile-dashboard';
+    button.type = 'button';
+    button.textContent = '← Dashboard';
+    button.addEventListener('click', () => {
+      window.location.href = 'vigil-demo.html';
+    });
+    document.body.appendChild(button);
   }
 
   function openSecurityDialog() {
@@ -313,6 +328,8 @@
   };
 
   window.addEventListener('DOMContentLoaded', () => {
+    injectStyles();
+    renderMobileDashboardButton();
     window.getVigilSession();
   });
 

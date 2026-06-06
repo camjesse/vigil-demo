@@ -287,6 +287,12 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media(max-width:900px){
+  html,body{height:auto;min-height:100%;overflow-y:auto;overscroll-behavior-y:auto}
+  .shell{height:auto;min-height:100dvh;overflow:visible}
+  .body{display:block;overflow:visible;min-height:0}
+  .ca{overflow:visible;min-height:0}
+  #panel-dash{position:relative;inset:auto;overflow:visible;min-height:calc(100dvh - 114px)}
+  .soon-outer{position:relative;inset:auto;min-height:calc(100dvh - 114px)}
   .sidebar:not(.mobile-open){display:none}
   .mobile-toggle{display:flex}
   .co-tag{display:none}
@@ -716,7 +722,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </div><!-- /body -->
 </div><!-- /shell -->
 
-<script src="vigil-auth.js?v=20260606-7"></script>
+<script src="vigil-auth.js?v=20260606-8"></script>
 <script>
 // ── MODULE CONFIG ─────────────────────────────────────────────
 const MODS = {
@@ -843,9 +849,15 @@ function goHome() {
 
 function loadMod(id) {
   if (cur === id) { closeMobileSidebar(); return; }
-  deact();
   const m = MODS[id];
   if (!m) return;
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    const url = new URL(m.src, window.location.href);
+    url.searchParams.set('mobile', '1');
+    window.location.href = url.href;
+    return;
+  }
+  deact();
   setActiveItem(id);
   document.getElementById('hdr-mod-tag').textContent = m.label;
   const f = document.getElementById('frm-' + id);
