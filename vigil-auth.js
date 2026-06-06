@@ -34,6 +34,8 @@
       .vigil-session-user{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--text2,#93A9BC)}
       .vigil-logout-btn{height:27px;border-radius:6px;border:1px solid var(--border,#263648);background:var(--s2,#111823);color:var(--text2,#93A9BC);padding:0 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
       .vigil-logout-btn:hover{color:var(--text,#D7E3EE);border-color:var(--b2,#2A394C)}
+      .vigil-security-btn{height:27px;border-radius:6px;border:1px solid var(--border,#263648);background:transparent;color:var(--text2,#93A9BC);padding:0 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
+      .vigil-security-btn:hover{color:var(--accent,#21B8E6);border-color:rgba(33,184,230,.35)}
       @media(max-width:700px){.vigil-session-user{display:none}.vigil-auth-card{padding:20px}}
     `;
     document.head.appendChild(style);
@@ -89,10 +91,99 @@
     const role = session.user?.role ? ` · ${session.user.role}` : '';
     control.innerHTML = `
       <span class="vigil-session-user" title="${email}${role}">${email}</span>
+      <button class="vigil-security-btn" type="button">Security</button>
       <button class="vigil-logout-btn" type="button">Log out</button>
     `;
-    control.querySelector('button').addEventListener('click', () => window.logoutVigil());
+    control.querySelector('.vigil-security-btn').addEventListener('click', () => window.openVigilSecurity());
+    control.querySelector('.vigil-logout-btn').addEventListener('click', () => window.logoutVigil());
     host.appendChild(control);
+  }
+
+  function openSecurityDialog() {
+    injectStyles();
+    if (document.querySelector('[data-vigil-security]')) return;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'vigil-auth-backdrop';
+    backdrop.dataset.vigilSecurity = 'true';
+    backdrop.innerHTML = `
+      <form class="vigil-auth-card">
+        <div class="vigil-auth-brand"><div class="vigil-auth-mark">V</div><div class="vigil-auth-brand-name">Account Security</div></div>
+        <div class="vigil-auth-title">Change password</div>
+        <div class="vigil-auth-copy">Changing your password immediately revokes all previously issued Vigil sessions.</div>
+        <div class="vigil-auth-error" role="alert"></div>
+        <div class="vigil-auth-field">
+          <label for="vigil-current-password">Current password</label>
+          <input id="vigil-current-password" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="vigil-auth-field">
+          <label for="vigil-new-password">New password</label>
+          <input id="vigil-new-password" type="password" autocomplete="new-password" minlength="12" required>
+        </div>
+        <div class="vigil-auth-field">
+          <label for="vigil-confirm-password">Confirm new password</label>
+          <input id="vigil-confirm-password" type="password" autocomplete="new-password" minlength="12" required>
+        </div>
+        <div class="vigil-auth-actions">
+          <button class="vigil-auth-btn" type="button" data-cancel>Cancel</button>
+          <button class="vigil-auth-btn primary" type="submit">Change password</button>
+        </div>
+      </form>
+    `;
+
+    const form = backdrop.querySelector('form');
+    const currentInput = backdrop.querySelector('#vigil-current-password');
+    const newInput = backdrop.querySelector('#vigil-new-password');
+    const confirmInput = backdrop.querySelector('#vigil-confirm-password');
+    const errorBox = backdrop.querySelector('.vigil-auth-error');
+    const submitButton = backdrop.querySelector('[type="submit"]');
+
+    backdrop.querySelector('[data-cancel]').addEventListener('click', () => backdrop.remove());
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorBox.classList.remove('show');
+
+      if (newInput.value !== confirmInput.value) {
+        errorBox.textContent = 'The new passwords do not match.';
+        errorBox.classList.add('show');
+        confirmInput.focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Changing...';
+      const response = await fetch(`${API_BASE}/api/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${currentSession.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: currentInput.value,
+          newPassword: newInput.value,
+        }),
+      }).catch(() => null);
+
+      const body = await response?.json().catch(() => ({}));
+      if (!response || !response.ok) {
+        errorBox.textContent = response?.status === 401
+          ? 'The current password is incorrect.'
+          : body?.details?.[0]?.message || body?.error || 'Password could not be changed. Please try again.';
+        errorBox.classList.add('show');
+        currentInput.value = '';
+        currentInput.focus();
+        submitButton.disabled = false;
+        submitButton.textContent = 'Change password';
+        return;
+      }
+
+      saveSession({ ...currentSession, ...body });
+      backdrop.remove();
+      window.alert('Your Vigil password has been changed. Previous sessions were revoked.');
+    });
+
+    document.body.appendChild(backdrop);
+    currentInput.focus();
   }
 
   function openLoginDialog(message) {
@@ -195,6 +286,10 @@
 
   window.getVigilUser = async function getVigilUser() {
     return (await window.getVigilSession()).user;
+  };
+
+  window.openVigilSecurity = function openVigilSecurity() {
+    openSecurityDialog();
   };
 
   window.logoutVigil = function logoutVigil() {
