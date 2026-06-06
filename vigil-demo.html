@@ -195,6 +195,78 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 .pm::before{content:'';display:block;height:2px;border-radius:2px;margin-bottom:7px}
 .pm.extreme::before{background:linear-gradient(90deg,var(--danger),var(--purple))}.pm.high::before{background:linear-gradient(90deg,var(--warn),var(--a2))}.pm.medium::before{background:linear-gradient(90deg,var(--accent),var(--a3))}
 
+/* ── CLEAN DASHBOARD ─────────────────────────────────────── */
+.dash-wrap{max-width:1440px;margin:0 auto;padding-bottom:28px}
+.dash-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;background:linear-gradient(180deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:14px}
+.dash-eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--accent);margin-bottom:5px}
+.dash-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1.1;color:var(--text);margin-bottom:6px}
+.dash-copy{font-size:12.5px;color:var(--text2);line-height:1.55;max-width:620px}
+.dash-pulse{display:flex;align-items:center;gap:8px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.22);border-radius:8px;padding:9px 11px;min-width:210px;color:var(--a3);font-size:11px;font-weight:700}
+.dash-pulse strong{font-family:'Syne',sans-serif;font-size:20px;color:var(--a3);line-height:1}
+.priority-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.priority-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:10px;align-items:flex-start;min-height:86px}
+.priority-card.danger{border-color:rgba(255,69,69,.28);background:linear-gradient(180deg,rgba(255,69,69,.08),var(--s1))}
+.priority-card.warn{border-color:rgba(255,184,0,.26);background:linear-gradient(180deg,rgba(255,184,0,.07),var(--s1))}
+.priority-card.ai{border-color:rgba(155,109,255,.3);background:linear-gradient(180deg,rgba(155,109,255,.08),var(--s1))}
+.priority-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--s3);flex-shrink:0;font-size:15px}
+.priority-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px}
+.priority-title{font-size:12px;font-weight:800;color:var(--text);line-height:1.35;margin-bottom:4px}
+.priority-meta{font-size:10.5px;color:var(--text2);line-height:1.4}
+.priority-link{border:none;background:transparent;color:var(--accent);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer;padding:0;margin-top:6px}
+.metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.metric-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;min-height:112px;position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:var(--metric-color,var(--accent));opacity:.95}
+.metric-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px}
+.metric-value{font-family:'Syne',sans-serif;font-size:27px;font-weight:800;line-height:1;color:var(--metric-color,var(--accent));margin-bottom:5px}
+.metric-note{font-size:10.5px;color:var(--text2);line-height:1.35;min-height:14px}
+.metric-note.good{color:var(--a3)}.metric-note.bad{color:var(--danger)}.metric-note.warn{color:var(--warn)}
+.metric-bars{display:flex;align-items:flex-end;gap:3px;height:24px;margin-top:9px}
+.metric-bars span{flex:1;border-radius:2px 2px 0 0;background:var(--metric-color,var(--accent));opacity:.82}
+.progress-row{margin-top:9px}
+.dash-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.dash-section-title h2{font-size:13px;font-weight:800;color:var(--text)}
+.dash-section-title button{border:none;background:transparent;color:var(--accent);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.operations-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.ops-panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:250px}
+.ops-panel.large{grid-row:span 2}
+.ops-panel.wide{grid-column:1/-1;min-height:auto}
+.ops-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--border);padding:12px 14px}
+.ops-title{font-size:12px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+.ops-action{border:none;background:transparent;color:var(--accent);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.ops-body{padding:12px 14px}
+.quiet-list{display:grid;gap:8px}
+.quiet-item{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--border);background:var(--s2);border-radius:7px;padding:9px}
+.quiet-item-title{font-size:11.5px;font-weight:800;color:var(--text);line-height:1.35}
+.quiet-item-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.compliance-stack{display:grid;gap:10px}
+.compliance-line{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.compliance-name{font-size:11px;font-weight:700;color:var(--text)}
+.compliance-value{font-size:11px;font-weight:800;color:var(--text)}
+.table-wrap{overflow-x:auto}
+.dash-table{width:100%;border-collapse:collapse;min-width:620px}
+.dash-table th{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:800}
+.dash-table td{padding:9px 10px;font-size:11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.dash-table tr:last-child td{border-bottom:none}
+.trend-panel{height:138px;display:flex;flex-direction:column;justify-content:flex-end}
+.trend-bars{display:flex;align-items:flex-end;gap:6px;height:84px}
+.trend-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.trend-bar{width:100%;border-radius:3px 3px 0 0;background:var(--accent);min-height:8px}
+.trend-label{font-size:8.5px;color:var(--muted)}
+.trend-legend{display:flex;justify-content:space-between;gap:8px;margin-top:11px;font-size:10px;color:var(--muted);flex-wrap:wrap}
+
+@media(max-width:1180px){
+  .metric-grid{grid-template-columns:repeat(3,1fr)}
+  .operations-grid{grid-template-columns:1fr 1fr}
+  .ops-panel.large{grid-row:auto}
+  .ops-panel.wide{grid-column:1/-1}
+}
+@media(max-width:760px){
+  #panel-dash{padding:12px}
+  .dash-hero{flex-direction:column}
+  .priority-grid,.metric-grid,.operations-grid{grid-template-columns:1fr}
+  .dash-pulse{width:100%}
+}
+
 /* ── SOON PANEL ──────────────────────────────────────────── */
 .soon-outer{position:absolute;inset:0;overflow-y:auto;display:none;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(155,109,255,.04),transparent),var(--bg)}
 .soon-inner{display:flex;flex-direction:column;align-items:center;padding:36px 32px;text-align:center;min-height:100%}
@@ -437,157 +509,196 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 
   <!-- DASHBOARD -->
   <div id="panel-dash">
-    <div class="alert pu">🧠 <strong>AI Alert:</strong> EXTREME risk prediction — Calgary Hub, tomorrow 06:00. 5 factors. <span style="color:var(--accent);cursor:pointer" onclick="loadMod('ai')">View →</span></div>
-    <div class="alert rd">🚨 2 open incidents unassigned · <span style="color:var(--accent);cursor:pointer" onclick="loadMod('incidents')">Assign now →</span> &nbsp;|&nbsp; 7 CAPA actions overdue · <span style="color:var(--accent);cursor:pointer" onclick="loadMod('incidents')">View register →</span></div>
-
-    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">📉 Lagging Indicators</div>
-    <div class="g6">
-      <div class="kpi bl"><div class="kpi-l">TRIF (YTD)</div><div class="kpi-v" id="kpi-trif">1.2</div><div class="kpi-n up" id="kpi-trif-sub">↓ 18% vs last year</div><div class="kt-wrap"><div class="kt" style="height:80%;background:var(--accent)"></div><div class="kt" style="height:90%;background:var(--accent)"></div><div class="kt" style="height:70%;background:var(--accent)"></div><div class="kt" style="height:55%;background:var(--a3)"></div><div class="kt" style="height:40%;background:var(--a3)"></div><div class="kt" style="height:30%;background:var(--a3)"></div></div></div>
-      <div class="kpi gr"><div class="kpi-l">LTIF (YTD)</div><div class="kpi-v" id="kpi-ltif">0.4</div><div class="kpi-n up" id="kpi-ltif-sub">↓ 31% vs last year</div><div class="kt-wrap"><div class="kt" style="height:90%;background:var(--accent)"></div><div class="kt" style="height:75%;background:var(--accent)"></div><div class="kt" style="height:60%;background:var(--a3)"></div><div class="kt" style="height:45%;background:var(--a3)"></div><div class="kt" style="height:30%;background:var(--a3)"></div><div class="kt" style="height:20%;background:var(--a3)"></div></div></div>
-      <div class="kpi gr"><div class="kpi-l">Days Since LTI</div><div class="kpi-v">47</div><div class="kpi-n up">↑ New record</div></div>
-      <div class="kpi rd"><div class="kpi-l">Lost Days YTD</div><div class="kpi-v" id="kpi-lost-days">12</div><div class="kpi-n" id="kpi-lost-days-sub">1 LTI incident</div></div>
-      <div class="kpi yw"><div class="kpi-l">Incident Cost YTD</div><div class="kpi-v">$47K</div><div class="kpi-n dn">↑ $18K from LTI</div></div>
-      <div class="kpi or"><div class="kpi-l">Severity Rate</div><div class="kpi-v">14.2</div><div class="kpi-n up">↓ 8% vs last year</div></div>
-    </div>
-
-    <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">📈 Leading Indicators</div>
-    <div class="g6" style="margin-bottom:14px">
-      <div class="kpi gr"><div class="kpi-l">Training Compliant</div><div class="kpi-v">91%</div><div class="kpi-n">218/239</div><div class="pw"><div class="pf" style="width:91%;background:var(--a3)"></div></div></div>
-      <div class="kpi yw"><div class="kpi-l">CAPA Closure Rate</div><div class="kpi-v" id="kpi-capa">62%</div><div class="kpi-n dn" id="kpi-capa-sub">7 overdue</div><div class="pw"><div class="pf" id="kpi-capa-bar" style="width:62%;background:var(--warn)"></div></div></div>
-      <div class="kpi bl"><div class="kpi-l">Inspection Completion</div><div class="kpi-v" id="kpi-inspection">94%</div><div class="kpi-n up" id="kpi-inspection-sub">↑ 6% this month</div><div class="pw"><div class="pf" id="kpi-inspection-bar" style="width:94%;background:var(--accent)"></div></div></div>
-      <div class="kpi gr"><div class="kpi-l">Near Miss Reports</div><div class="kpi-v" id="kpi-nearmiss">34</div><div class="kpi-n up">↑ Culture up</div><div class="kt-wrap"><div class="kt" style="height:30%;background:var(--a3)"></div><div class="kt" style="height:50%;background:var(--a3)"></div><div class="kt" style="height:70%;background:var(--a3)"></div><div class="kt" style="height:85%;background:var(--a3)"></div><div class="kt" style="height:95%;background:var(--a3)"></div><div class="kt" style="height:100%;background:var(--a3)"></div></div></div>
-      <div class="kpi bl"><div class="kpi-l">Active JHAs</div><div class="kpi-v" id="kpi-jha">27</div><div class="kpi-n">All tasks covered</div></div>
-      <div class="kpi gr"><div class="kpi-l">Toolbox Talks</div><div class="kpi-v" id="kpi-talks">18</div><div class="kpi-n">This month</div></div>
-    </div>
-
-    <div class="g3">
-      <div class="sc">
-        <div class="sch"><div class="sct">📊 Incident Trend — 12 Months</div><div class="sca" onclick="loadMod('incidents')">Details →</div></div>
-        <div class="scb">
-          <div class="bc">
-            <div class="bw"><div class="bar" style="height:60%;background:var(--accent)"></div><div class="bwl">Apr</div></div>
-            <div class="bw"><div class="bar" style="height:80%;background:var(--accent)"></div><div class="bwl">May</div></div>
-            <div class="bw"><div class="bar" style="height:50%;background:var(--accent)"></div><div class="bwl">Jun</div></div>
-            <div class="bw"><div class="bar" style="height:90%;background:var(--danger)"></div><div class="bwl">Jul</div></div>
-            <div class="bw"><div class="bar" style="height:40%;background:var(--accent)"></div><div class="bwl">Aug</div></div>
-            <div class="bw"><div class="bar" style="height:55%;background:var(--accent)"></div><div class="bwl">Sep</div></div>
-            <div class="bw"><div class="bar" style="height:35%;background:var(--a3)"></div><div class="bwl">Oct</div></div>
-            <div class="bw"><div class="bar" style="height:28%;background:var(--a3)"></div><div class="bwl">Nov</div></div>
-            <div class="bw"><div class="bar" style="height:22%;background:var(--a3)"></div><div class="bwl">Dec</div></div>
-            <div class="bw"><div class="bar" style="height:18%;background:var(--a3)"></div><div class="bwl">Jan</div></div>
-            <div class="bw"><div class="bar" style="height:14%;background:var(--a3)"></div><div class="bwl">Feb</div></div>
-            <div class="bw"><div class="bar" style="height:10%;background:var(--a3)"></div><div class="bwl">Mar</div></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--muted)">
-            <span>LTI: <b style="color:var(--danger)">1</b></span>
-            <span>Medical Aid: <b style="color:var(--warn)">2</b></span>
-            <span>First Aid: <b style="color:var(--accent)">2</b></span>
-            <span>Near Miss: <b style="color:var(--a3)">1</b></span>
-          </div>
+    <div class="dash-wrap">
+      <section class="dash-hero">
+        <div>
+          <div class="dash-eyebrow">Operations command center</div>
+          <div class="dash-title">Today's Safety Picture</div>
+          <p class="dash-copy">A cleaner view of the work that needs attention now: open incidents, overdue CAPA, risk signals, credentials, and site health across Northern Express Transport.</p>
         </div>
-      </div>
+        <div class="dash-pulse">
+          <span class="pd"></span>
+          <span>Live data</span>
+          <strong id="workers-count-dashboard">47</strong>
+          <span>workers</span>
+        </div>
+      </section>
 
-      <div class="sc" style="background:linear-gradient(160deg,var(--s1),#0C0818);border-color:rgba(155,109,255,.2)">
-        <div class="sch" style="border-color:rgba(155,109,255,.15)"><div class="sct" style="color:var(--purple)">🧠 AI Risk Predictions</div><div class="sca" style="color:var(--purple)" onclick="loadMod('ai')">View All →</div></div>
-        <div class="scb" id="card-predictions" style="padding:9px">
-          <div class="pm extreme" onclick="loadMod('ai')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div><div style="font-size:11px;font-weight:700">Vehicle Collision — Dock Ops</div><div style="font-size:10px;color:var(--muted)">Calgary Hub · Tomorrow 06:00</div></div>
-              <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--danger)">91%</div><div style="font-size:8.5px;color:var(--muted)">EXTREME</div></div>
+      <section class="priority-grid" aria-label="Today's priorities">
+        <article class="priority-card danger">
+          <div class="priority-icon">!</div>
+          <div>
+            <div class="priority-label">Needs assignment</div>
+            <div class="priority-title">2 open incidents are still unassigned</div>
+            <div class="priority-meta">Assign ownership before the next shift handoff.</div>
+            <button class="priority-link" onclick="loadMod('incidents')">Open incidents</button>
+          </div>
+        </article>
+        <article class="priority-card warn">
+          <div class="priority-icon">7</div>
+          <div>
+            <div class="priority-label">Overdue work</div>
+            <div class="priority-title">CAPA closure is behind target</div>
+            <div class="priority-meta"><span id="kpi-capa-sub">7 overdue</span> actions need follow-up.</div>
+            <button class="priority-link" onclick="loadMod('incidents')">Review CAPA register</button>
+          </div>
+        </article>
+        <article class="priority-card ai">
+          <div class="priority-icon">AI</div>
+          <div>
+            <div class="priority-label">Risk window</div>
+            <div class="priority-title">Calgary Hub risk predicted for 06:00</div>
+            <div class="priority-meta">Fatigue, weather, vehicle movement, and open actions are converging.</div>
+            <button class="priority-link" onclick="loadMod('ai')">View risk factors</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="metric-grid" aria-label="Key safety metrics">
+        <article class="metric-card" style="--metric-color:var(--accent)">
+          <div class="metric-label">TRIF YTD</div>
+          <div class="metric-value" id="kpi-trif">1.2</div>
+          <div class="metric-note good" id="kpi-trif-sub">Down 18% vs last year</div>
+          <div class="metric-bars"><span style="height:80%"></span><span style="height:72%"></span><span style="height:58%"></span><span style="height:42%;background:var(--a3)"></span><span style="height:30%;background:var(--a3)"></span></div>
+        </article>
+        <article class="metric-card" style="--metric-color:var(--a3)">
+          <div class="metric-label">LTIF YTD</div>
+          <div class="metric-value" id="kpi-ltif">0.4</div>
+          <div class="metric-note good" id="kpi-ltif-sub">Down 31% vs last year</div>
+          <div class="metric-bars"><span style="height:72%"></span><span style="height:60%"></span><span style="height:44%"></span><span style="height:34%"></span><span style="height:22%"></span></div>
+        </article>
+        <article class="metric-card" style="--metric-color:var(--danger)">
+          <div class="metric-label">Lost days YTD</div>
+          <div class="metric-value" id="kpi-lost-days">12</div>
+          <div class="metric-note bad" id="kpi-lost-days-sub">1 LTI incident</div>
+        </article>
+        <article class="metric-card" style="--metric-color:var(--a3)">
+          <div class="metric-label">Near miss reports</div>
+          <div class="metric-value" id="kpi-nearmiss">34</div>
+          <div class="metric-note good">Reporting culture is improving</div>
+          <div class="metric-bars"><span style="height:26%"></span><span style="height:42%"></span><span style="height:56%"></span><span style="height:74%"></span><span style="height:90%"></span></div>
+        </article>
+        <article class="metric-card" style="--metric-color:var(--accent)">
+          <div class="metric-label">Inspection completion</div>
+          <div class="metric-value" id="kpi-inspection">94%</div>
+          <div class="metric-note good" id="kpi-inspection-sub">14/15 done</div>
+          <div class="pw progress-row"><div class="pf" id="kpi-inspection-bar" style="width:94%;background:var(--accent)"></div></div>
+        </article>
+      </section>
+
+      <section class="operations-grid">
+        <article class="ops-panel large">
+          <div class="ops-head">
+            <div class="ops-title">Incident trend</div>
+            <button class="ops-action" onclick="loadMod('incidents')">Details</button>
+          </div>
+          <div class="ops-body">
+            <div class="trend-panel">
+              <div class="trend-bars">
+                <div class="trend-col"><div class="trend-bar" style="height:60%"></div><div class="trend-label">Apr</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:80%"></div><div class="trend-label">May</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:50%"></div><div class="trend-label">Jun</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:90%;background:var(--danger)"></div><div class="trend-label">Jul</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:40%"></div><div class="trend-label">Aug</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:55%"></div><div class="trend-label">Sep</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:35%;background:var(--a3)"></div><div class="trend-label">Oct</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:28%;background:var(--a3)"></div><div class="trend-label">Nov</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:22%;background:var(--a3)"></div><div class="trend-label">Dec</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:18%;background:var(--a3)"></div><div class="trend-label">Jan</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:14%;background:var(--a3)"></div><div class="trend-label">Feb</div></div>
+                <div class="trend-col"><div class="trend-bar" style="height:10%;background:var(--a3)"></div><div class="trend-label">Mar</div></div>
+              </div>
+              <div class="trend-legend">
+                <span>LTI <b style="color:var(--danger)">1</b></span>
+                <span>Medical aid <b style="color:var(--warn)">2</b></span>
+                <span>First aid <b style="color:var(--accent)">2</b></span>
+                <span>Near miss <b style="color:var(--a3)">1</b></span>
+              </div>
             </div>
-            <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap">
-              <span style="font-size:9.5px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.2);border-radius:3px;padding:1px 5px;color:var(--warn)">🌨️ Ice</span>
-              <span style="font-size:9.5px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);border-radius:3px;padding:1px 5px;color:var(--a2)">😴 3 fatigued</span>
+          </div>
+        </article>
+
+        <article class="ops-panel">
+          <div class="ops-head">
+            <div class="ops-title">AI risk predictions</div>
+            <button class="ops-action" onclick="loadMod('ai')">View all</button>
+          </div>
+          <div class="ops-body" id="card-predictions">
+            <div class="pm extreme" onclick="loadMod('ai')">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:11px;font-weight:700">Vehicle collision - Dock ops</div><div style="font-size:10px;color:var(--muted)">Calgary Hub - Tomorrow 06:00</div></div>
+                <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--danger)">91%</div><div style="font-size:8.5px;color:var(--muted)">EXTREME</div></div>
+              </div>
+            </div>
+            <div class="pm high" onclick="loadMod('ai')">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:11px;font-weight:700">Driver fatigue - Hwy 2</div><div style="font-size:10px;color:var(--muted)">Transport - This week</div></div>
+                <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--warn)">84%</div><div style="font-size:8.5px;color:var(--muted)">HIGH</div></div>
+              </div>
             </div>
           </div>
-          <div class="pm high" onclick="loadMod('ai')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div><div style="font-size:11px;font-weight:700">Driver Fatigue — Hwy 2</div><div style="font-size:10px;color:var(--muted)">Transport · This week</div></div>
-              <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--warn)">84%</div><div style="font-size:8.5px;color:var(--muted)">HIGH</div></div>
-            </div>
+        </article>
+
+        <article class="ops-panel">
+          <div class="ops-head">
+            <div class="ops-title">Action required</div>
+            <button class="ops-action" onclick="loadMod('incidents')">Open register</button>
           </div>
-          <div class="pm medium" onclick="loadMod('ai')">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div><div style="font-size:11px;font-weight:700">Manual Handling — Edmonton</div><div style="font-size:10px;color:var(--muted)">Hub · Next 2 weeks</div></div>
-              <div style="text-align:right"><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--accent)">77%</div><div style="font-size:8.5px;color:var(--muted)">MEDIUM</div></div>
-            </div>
+          <div class="ops-body quiet-list" id="card-capa">
+            <div class="quiet-item"><div><div class="quiet-item-title">Implement mandatory fatigue check-in</div><div class="quiet-item-meta">INC-2025-0005 - James Marchetti</div></div><span class="chip rd">Overdue</span></div>
+            <div class="quiet-item"><div><div class="quiet-item-title">Install hand guards on press equipment</div><div class="quiet-item-meta">INC-2025-0007 - Rob Hutchinson</div></div><span class="chip rd">Overdue</span></div>
+            <div class="quiet-item"><div><div class="quiet-item-title">Gas detector calibration</div><div class="quiet-item-meta">JHSC follow-up</div></div><span class="chip yw">Due soon</span></div>
           </div>
-        </div>
-      </div>
+        </article>
 
-      <div class="sc">
-        <div class="sch"><div class="sct">⚡ Action Required</div><div class="sca" onclick="loadMod('incidents')">All →</div></div>
-        <div class="scb" id="card-capa" style="padding:9px">
-          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10.5px"><div style="flex:1;line-height:1.4">Update confined space SOP<div style="font-size:9.5px;color:var(--muted)">INC-045</div></div><span class="chip rd">23d Late</span></div>
-          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10.5px"><div style="flex:1;line-height:1.4">Replace harness — Unit 14<div style="font-size:9.5px;color:var(--muted)">Inspection</div></div><span class="chip rd">16d Late</span></div>
-          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10.5px"><div style="flex:1;line-height:1.4">Gas detector calibration<div style="font-size:9.5px;color:var(--muted)">JHSC</div></div><span class="chip yw">9d Late</span></div>
-          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10.5px"><div style="flex:1;line-height:1.4">Ice clearing SOP — all sites<div style="font-size:9.5px;color:var(--muted)">AI+INC</div></div><span class="chip bl">In Progress</span></div>
-          <div style="display:flex;align-items:center;gap:7px;padding:5px 0;font-size:10.5px"><div style="flex:1;line-height:1.4">Ergonomic assessment Bay 3<div style="font-size:9.5px;color:var(--muted)">Observation</div></div><span class="chip gy">Pending</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="g3" style="margin-bottom:12px">
-      <div class="sc" style="background:linear-gradient(135deg,var(--s1),#050F0A)">
-        <div class="sch" style="border-color:rgba(0,229,160,.12)"><div class="sct" style="color:var(--a3)">💰 Safety ROI</div></div>
-        <div class="scb">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-            <div style="text-align:center"><div style="font-size:9px;color:var(--muted)">INVESTED</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--a2)">$89K</div></div>
-            <div style="font-size:16px;color:var(--muted)">→</div>
-            <div style="text-align:center"><div style="font-size:9px;color:var(--muted)">RETURNED</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--a3)">$284K</div></div>
-            <div style="font-size:16px;color:var(--muted)">=</div>
-            <div style="text-align:center"><div style="font-size:9px;color:var(--muted)">ROI</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--a3)">3.2×</div></div>
+        <article class="ops-panel">
+          <div class="ops-head">
+            <div class="ops-title">Compliance snapshot</div>
+            <button class="ops-action" onclick="loadMod('inspections')">Audit view</button>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:10.5px"><span style="color:var(--muted)">AI-attributed savings</span><span style="color:var(--a3);font-weight:600">$142K</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:10.5px"><span style="color:var(--muted)">Lost time avoided</span><span style="color:var(--a3);font-weight:600">$67.5K</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:10.5px"><span style="color:var(--muted)">WCB reduction</span><span style="color:var(--a3);font-weight:600">14%</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10.5px"><span style="color:var(--muted)">Incidents prevented</span><span style="color:var(--a3);font-weight:600">11</span></div>
-        </div>
-      </div>
+          <div class="ops-body compliance-stack">
+            <div class="compliance-line"><div><div class="compliance-name">CAPA closure</div><div class="pw"><div class="pf" id="kpi-capa-bar" style="width:62%;background:var(--warn)"></div></div></div><div class="compliance-value" id="kpi-capa">62%</div></div>
+            <div class="compliance-line"><div><div class="compliance-name">Training compliant</div><div class="pw"><div class="pf" style="width:91%;background:var(--a3)"></div></div></div><div class="compliance-value">91%</div></div>
+            <div class="compliance-line"><div><div class="compliance-name">Active JHAs</div><div class="metric-note">All critical tasks covered</div></div><div class="compliance-value" id="kpi-jha">27</div></div>
+            <div class="compliance-line"><div><div class="compliance-name">Toolbox talks</div><div class="metric-note">This month</div></div><div class="compliance-value" id="kpi-talks">18</div></div>
+          </div>
+        </article>
 
-      <div class="sc">
-        <div class="sch"><div class="sct">📋 Credential Health</div><div class="sca" onclick="loadMod('employees')">Manage →</div></div>
-        <div class="scb">
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>Driver's License</span><span style="color:var(--a3);font-weight:600">96%</span></div><div class="pw"><div class="pf" style="width:96%;background:var(--a3)"></div></div></div>
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>Medical Cert</span><span style="color:var(--a3);font-weight:600">88%</span></div><div class="pw"><div class="pf" style="width:88%;background:var(--a3)"></div></div></div>
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>H2S Alive</span><span style="color:var(--warn);font-weight:600">82%</span></div><div class="pw"><div class="pf" style="width:82%;background:var(--warn)"></div></div></div>
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>WHMIS 2015</span><span style="color:var(--a3);font-weight:600">91%</span></div><div class="pw"><div class="pf" style="width:91%;background:var(--a3)"></div></div></div>
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>First Aid</span><span style="color:var(--a3);font-weight:600">85%</span></div><div class="pw"><div class="pf" style="width:85%;background:var(--a3)"></div></div></div>
-          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px"><span>D&amp;A Testing</span><span style="color:var(--a3);font-weight:600">94%</span></div><div class="pw"><div class="pf" style="width:94%;background:var(--a3)"></div></div></div>
-        </div>
-      </div>
+        <article class="ops-panel">
+          <div class="ops-head">
+            <div class="ops-title">Expiring credentials</div>
+            <button class="ops-action" onclick="loadMod('employees')">Manage</button>
+          </div>
+          <div class="table-wrap">
+            <table class="dash-table" style="min-width:420px">
+              <thead><tr><th>Worker</th><th>Credential</th><th>Expires</th></tr></thead>
+              <tbody id="tbody-expiring">
+                <tr onclick="loadMod('employees')"><td style="font-weight:700">M. Dasilva</td><td>H2S Alive</td><td><span class="chip rd">Mar 26</span></td></tr>
+                <tr onclick="loadMod('employees')"><td style="font-weight:700">P. Whitehorse</td><td>Class 1 License</td><td><span class="chip rd">Mar 28</span></td></tr>
+                <tr onclick="loadMod('employees')"><td style="font-weight:700">S. Larsson</td><td>First Aid L2</td><td><span class="chip yw">Apr 3</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
 
-      <div class="sc">
-        <div class="sch"><div class="sct">⚠️ Expiring — 30 Days</div><div class="sca" onclick="loadMod('employees')">View All →</div></div>
-        <div class="scb" style="padding:0">
-          <table class="tbl">
-            <thead><tr><th>Worker</th><th>Credential</th><th>Expires</th></tr></thead>
-            <tbody id="tbody-expiring">
-              <tr onclick="loadMod('employees')"><td style="font-weight:600">M. Dasilva</td><td>H2S Alive</td><td><span class="chip rd">Mar 26</span></td></tr>
-              <tr onclick="loadMod('employees')"><td style="font-weight:600">P. Whitehorse</td><td>Class 1 License</td><td><span class="chip rd">Mar 28</span></td></tr>
-              <tr onclick="loadMod('employees')"><td style="font-weight:600">S. Larsson</td><td>First Aid L2</td><td><span class="chip yw">Apr 3</span></td></tr>
-              <tr onclick="loadMod('employees')"><td style="font-weight:600">B. Tremblay</td><td>D&A Test</td><td><span class="chip yw">Apr 9</span></td></tr>
-              <tr onclick="loadMod('employees')"><td style="font-weight:600">R. Nwosu</td><td>WHMIS 2015</td><td><span class="chip bl">Apr 14</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="sc">
-      <div class="sch"><div class="sct">🗺️ Site Safety Health — All Locations</div><div class="sca" onclick="loadMod('ai')">AI Heatmap →</div></div>
-      <div class="scb" style="padding:0">
-        <table class="tbl">
-          <thead><tr><th>Site</th><th>Workers</th><th>Training %</th><th>Open Incidents</th><th>Active JHAs</th><th>Last FLHA</th><th>AI Risk</th><th>Status</th></tr></thead>
-          <tbody id="tbody-sites">
-            <tr><td style="font-weight:600">Calgary Hub</td><td>84</td><td><span style="color:var(--a3)">93%</span></td><td><span class="chip rd">2</span></td><td>8</td><td>Today</td><td><span class="chip rd">EXTREME</span></td><td><span class="chip yw">Monitor</span></td></tr>
-            <tr><td style="font-weight:600">Edmonton Hub</td><td>67</td><td><span style="color:var(--a3)">91%</span></td><td><span class="chip gr">0</span></td><td>6</td><td>Today</td><td><span class="chip yw">HIGH</span></td><td><span class="chip gr">Good</span></td></tr>
-            <tr><td style="font-weight:600">Site B — Pipeline</td><td>42</td><td><span style="color:var(--warn)">84%</span></td><td><span class="chip yw">1</span></td><td>5</td><td>Yesterday</td><td><span class="chip yw">HIGH</span></td><td><span class="chip yw">Monitor</span></td></tr>
-            <tr><td style="font-weight:600">Red Deer</td><td>31</td><td><span style="color:var(--a3)">97%</span></td><td><span class="chip gr">0</span></td><td>3</td><td>Today</td><td><span class="chip bl">MEDIUM</span></td><td><span class="chip gr">Good</span></td></tr>
-            <tr><td style="font-weight:600">Transport — Hwy 2</td><td>23</td><td><span style="color:var(--a3)">89%</span></td><td><span class="chip gr">0</span></td><td>4</td><td>Today</td><td><span class="chip yw">HIGH</span></td><td><span class="chip yw">Monitor</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+        <article class="ops-panel wide">
+          <div class="ops-head">
+            <div class="ops-title">Site safety health</div>
+            <button class="ops-action" onclick="loadMod('ai')">Risk heatmap</button>
+          </div>
+          <div class="table-wrap">
+            <table class="dash-table">
+              <thead><tr><th>Site</th><th>Workers</th><th>Training %</th><th>Open incidents</th><th>Active JHAs</th><th>Last FLHA</th><th>AI risk</th><th>Status</th></tr></thead>
+              <tbody id="tbody-sites">
+                <tr><td style="font-weight:700">Calgary Hub</td><td>84</td><td><span style="color:var(--a3)">93%</span></td><td><span class="chip rd">2</span></td><td>8</td><td>Today</td><td><span class="chip rd">EXTREME</span></td><td><span class="chip yw">Monitor</span></td></tr>
+                <tr><td style="font-weight:700">Edmonton Hub</td><td>67</td><td><span style="color:var(--a3)">91%</span></td><td><span class="chip gr">0</span></td><td>6</td><td>Today</td><td><span class="chip yw">HIGH</span></td><td><span class="chip gr">Good</span></td></tr>
+                <tr><td style="font-weight:700">Site B - Pipeline</td><td>42</td><td><span style="color:var(--warn)">84%</span></td><td><span class="chip yw">1</span></td><td>5</td><td>Yesterday</td><td><span class="chip yw">HIGH</span></td><td><span class="chip yw">Monitor</span></td></tr>
+                <tr><td style="font-weight:700">Transport - Hwy 2</td><td>23</td><td><span style="color:var(--a3)">89%</span></td><td><span class="chip gr">0</span></td><td>4</td><td>Today</td><td><span class="chip yw">HIGH</span></td><td><span class="chip yw">Monitor</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
     </div>
   </div><!-- /panel-dash -->
 
@@ -928,7 +1039,10 @@ async function initDashboard() {
 
     const workerArr = workers && (workers.workers || workers.data || (Array.isArray(workers) ? workers : []));
     const workerCount = Array.isArray(workerArr) ? workerArr.length : 0;
-    if (workerCount > 0) setEl('workers-count', workerCount);
+    if (workerCount > 0) {
+      setEl('workers-count', workerCount);
+      setEl('workers-count-dashboard', workerCount);
+    }
 
     const inc   = (incidents && incidents.summary) || {};
     const rates = (incidents && incidents.rates)   || {};
