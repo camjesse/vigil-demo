@@ -204,7 +204,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
-<link rel="stylesheet" href="vigil-module.css?v=20260606-1">
+<link rel="stylesheet" href="vigil-module.css?v=20260606-2">
 </head>
 <body>
 <div class="app">
@@ -406,7 +406,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 <div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
 
-<script src="vigil-auth.js?v=20260606-1"></script>
+<script src="vigil-auth.js?v=20260606-2"></script>
 <script>
 // ─── DATA ─────────────────────────────────────────────────────
 function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
@@ -434,14 +434,7 @@ let overrides = [];
 const API_BASE = window.VIGIL_API_BASE;
 
 async function apiLogin() {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(await getVigilCredentials())
-  });
-  if (!res.ok) throw new Error(`Login failed: ${res.status}`);
-  const data = await res.json();
-  authToken = data.token || data.access_token || (data.data && data.data.token);
+  authToken = await getVigilToken();
   if (!authToken) throw new Error('No auth token in login response');
 }
 

@@ -199,7 +199,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 @keyframes spin{to{transform:rotate(360deg)}}
 .api-error-banner{background:rgba(255,69,69,.1);border-bottom:1px solid rgba(255,69,69,.25);padding:10px 24px;display:none;align-items:center;gap:12px;font-size:12px;color:#FF8888;flex-shrink:0}
 </style>
-<link rel="stylesheet" href="vigil-module.css?v=20260606-1">
+<link rel="stylesheet" href="vigil-module.css?v=20260606-2">
 </head>
 <body>
 <div id="loadingOverlay" class="loading-overlay">
@@ -418,20 +418,14 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 <!-- TOAST -->
 <div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
 
-<script src="vigil-auth.js?v=20260606-1"></script>
+<script src="vigil-auth.js?v=20260606-2"></script>
 <script>
 // ─── API ──────────────────────────────────────────────────────
 const API_BASE = window.VIGIL_API_BASE;
 let authToken = null;
 
 async function apiLogin() {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(await getVigilCredentials()),
-  });
-  if (!res.ok) throw new Error(`Login failed (${res.status})`);
-  authToken = (await res.json()).token;
+  authToken = await getVigilToken();
 }
 
 async function apiFetch(path, opts={}, _retry=true) {
@@ -439,7 +433,7 @@ async function apiFetch(path, opts={}, _retry=true) {
     ...opts,
     headers: {'Content-Type':'application/json', 'Authorization':`Bearer ${authToken}`, ...(opts.headers||{})},
   });
-  if (res.status === 401 && _retry) { await apiLogin(); return apiFetch(path, opts, false); }
+  if (res.status === 401 && _retry) { handleVigilUnauthorized(); throw new Error('Session expired'); }
   if (!res.ok) throw new Error(`API ${res.status} — ${path}`);
   return res.json();
 }

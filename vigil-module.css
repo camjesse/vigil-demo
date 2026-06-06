@@ -16,6 +16,7 @@
 
 html,body{background:var(--bg);letter-spacing:0}
 button,input,select,textarea{letter-spacing:0}
+html:not(.vigil-authenticated) .app{visibility:hidden}
 
 .topbar{
   min-height:58px;

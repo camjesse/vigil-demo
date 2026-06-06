@@ -205,7 +205,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   .sig-type-grid{grid-template-columns:1fr}
 }
 </style>
-<link rel="stylesheet" href="vigil-module.css?v=20260606-1">
+<link rel="stylesheet" href="vigil-module.css?v=20260606-2">
 </head>
 <body>
 <div class="app">
@@ -369,7 +369,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260606-1"></script>
+<script src="vigil-auth.js?v=20260606-2"></script>
 <script>
 const API = window.VIGIL_API_BASE;
 
@@ -549,14 +549,10 @@ function statusBadge(status) {
 
 // ── INIT ───────────────────────────────────────────────────────
 async function init() {
-  const ar = await fetch(API+'/api/auth/login',{
-    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(await getVigilCredentials())
-  });
-  if (!ar.ok) { toast('Could not connect to Vigil API','danger'); return; }
-  const ab = await ar.json();
-  token = ab.token || ab.access_token || (ab.data&&ab.data.token);
+  const session = await getVigilSession();
+  token = session.token;
   if (!token) { toast('Auth failed','danger'); return; }
-  document.getElementById('auth-pill').textContent = 'J. Marchetti · Admin';
+  document.getElementById('auth-pill').textContent = `${session.user.email} · ${session.user.role}`;
   document.getElementById('auth-pill').style.color = '';
 
   const [sigsRes, dashRes, predsRes] = await Promise.all([

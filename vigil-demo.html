@@ -301,23 +301,6 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </style>
 </head>
 <body>
-<div id="vigil-auth-gate" style="position:fixed;inset:0;background:rgba(2,6,12,.82);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px">
-  <form class="vigil-auth-card" style="width:min(380px,100%);background:#0C1018;border:1px solid #1E2D40;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:20px;color:#C8DCF0;font-family:'DM Sans',system-ui,sans-serif">
-    <div class="vigil-auth-title" style="font-family:'Syne',system-ui,sans-serif;font-size:19px;font-weight:800;margin-bottom:6px">Sign in to Vigil</div>
-    <div class="vigil-auth-copy" style="font-size:12px;line-height:1.5;color:#8AAAC4;margin-bottom:16px">Enter a valid Vigil account to load live demo data. The password is never stored in this page.</div>
-    <div class="vigil-auth-field" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-      <label for="vigil-auth-email" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8AAAC4;font-weight:700">Email</label>
-      <input id="vigil-auth-email" type="email" autocomplete="username" required style="height:38px;border-radius:6px;border:1px solid #263648;background:#07090F;color:#C8DCF0;padding:0 10px;font:inherit;font-size:13px">
-    </div>
-    <div class="vigil-auth-field" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-      <label for="vigil-auth-password" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8AAAC4;font-weight:700">Password</label>
-      <input id="vigil-auth-password" type="password" autocomplete="current-password" required style="height:38px;border-radius:6px;border:1px solid #263648;background:#07090F;color:#C8DCF0;padding:0 10px;font:inherit;font-size:13px">
-    </div>
-    <div class="vigil-auth-actions" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
-      <button class="vigil-auth-btn primary" type="submit" style="height:34px;border-radius:6px;border:1px solid rgba(0,194,255,.4);background:#00C2FF;color:#061018;padding:0 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Sign in</button>
-    </div>
-  </form>
-</div>
 <div class="shell">
 
 <!-- HEADER -->
@@ -720,7 +703,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </div><!-- /body -->
 </div><!-- /shell -->
 
-<script src="vigil-auth.js?v=20260606-1"></script>
+<script src="vigil-auth.js?v=20260606-2"></script>
 <script>
 // ── MODULE CONFIG ─────────────────────────────────────────────
 const MODS = {
@@ -1014,13 +997,7 @@ let dashToken = null;
 
 async function initDashboard() {
   try {
-    const authRes = await fetch(`${DASH_API}/api/auth/login`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(await getVigilCredentials())
-    });
-    if (!authRes.ok) return;
-    const authBody = await authRes.json();
-    dashToken = authBody.token || authBody.access_token || (authBody.data && authBody.data.token);
+    dashToken = await getVigilToken();
     if (!dashToken) return;
 
     const hdr = {'Authorization':`Bearer ${dashToken}`,'Content-Type':'application/json'};
