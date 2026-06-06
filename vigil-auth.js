@@ -12,14 +12,14 @@
     const style = document.createElement('style');
     style.id = 'vigil-auth-styles';
     style.textContent = `
-      .vigil-auth-backdrop{position:fixed;inset:0;background:rgba(2,6,12,.72);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px}
-      .vigil-auth-card{width:min(380px,100%);background:#0C1018;border:1px solid #1E2D40;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:20px;color:#C8DCF0;font-family:'DM Sans',system-ui,sans-serif}
+      .vigil-auth-backdrop{position:fixed;inset:0;background:rgba(2,6,12,.72);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:auto}
+      .vigil-auth-card{box-sizing:border-box;width:min(380px,100%);max-width:100%;max-height:calc(100vh - 40px);overflow:auto;background:#0C1018;border:1px solid #1E2D40;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:20px;color:#C8DCF0;font-family:'DM Sans',system-ui,sans-serif}
       .vigil-auth-title{font-family:'Syne',system-ui,sans-serif;font-size:19px;font-weight:800;margin-bottom:6px}
       .vigil-auth-copy{font-size:12px;line-height:1.5;color:#8AAAC4;margin-bottom:16px}
       .vigil-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
       .vigil-auth-field label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8AAAC4;font-weight:700}
-      .vigil-auth-field input{height:38px;border-radius:6px;border:1px solid #263648;background:#07090F;color:#C8DCF0;padding:0 10px;font:inherit;font-size:13px}
-      .vigil-auth-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+      .vigil-auth-field input{box-sizing:border-box;width:100%;min-width:0;height:38px;border-radius:6px;border:1px solid #263648;background:#07090F;color:#C8DCF0;padding:0 10px;font:inherit;font-size:13px}
+      .vigil-auth-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
       .vigil-auth-btn{height:34px;border-radius:6px;border:1px solid #263648;background:#101520;color:#C8DCF0;padding:0 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
       .vigil-auth-btn.primary{border-color:rgba(0,194,255,.4);background:#00C2FF;color:#061018}
     `;

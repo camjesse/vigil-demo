@@ -1,0 +1,235 @@
+/* Shared Vigil module interface cleanup */
+:root{
+  --bg:#080B12;
+  --s1:#0D121B;
+  --s2:#111823;
+  --s3:#17202D;
+  --s4:#1D2938;
+  --border:#202C3B;
+  --b2:#2A394C;
+  --b3:#35475C;
+  --text:#D7E3EE;
+  --text2:#93A9BC;
+  --muted:#617A90;
+  --accent:#21B8E6;
+}
+
+html,body{background:var(--bg);letter-spacing:0}
+button,input,select,textarea{letter-spacing:0}
+
+.topbar{
+  min-height:58px;
+  height:58px;
+  padding:0 20px;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  box-shadow:none;
+}
+.logo-mark,.logo-shield{
+  border-radius:7px;
+  background:linear-gradient(135deg,#21B8E6,#19C995);
+}
+.logo-title,.logo-name,.topbar-logo{
+  letter-spacing:0;
+}
+.logo-sub,.logo-module,.topbar-module{
+  letter-spacing:.4px;
+}
+.topbar-module{
+  border:1px solid var(--border);
+  background:var(--s2);
+  border-radius:5px;
+}
+.topbar-pill,.company-badge,.co-tag,.lpill{
+  border-radius:6px;
+  background:var(--s2);
+  border-color:var(--border);
+}
+
+.alert-banner,.alert-strip,.astrip{
+  min-height:34px;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+}
+.alert-strip-label{
+  border-right-color:var(--border);
+}
+
+.main-area,.main,.panels{background:var(--bg)}
+.content,.panel-pad,.panel{scrollbar-gutter:stable}
+.content{padding:22px}
+.panel-pad{padding:20px}
+
+.sidenav{
+  width:218px;
+  background:var(--s1);
+  border-right:1px solid var(--border);
+  padding:12px 8px;
+}
+.nav-section{padding:0;margin-bottom:10px}
+.nav-label{
+  padding:8px 9px 5px;
+  color:var(--muted);
+  letter-spacing:1px;
+}
+.nav-item{
+  min-height:34px;
+  margin-bottom:2px;
+  padding:8px 10px;
+  border:1px solid transparent;
+  border-radius:6px;
+  color:var(--text2);
+}
+.nav-item:hover{background:var(--s2);border-color:var(--border)}
+.nav-item.active{
+  background:rgba(33,184,230,.09);
+  border-color:rgba(33,184,230,.2);
+  color:var(--accent);
+}
+
+.page-hdr,.form-header,.detail-hdr{
+  margin-bottom:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.page-title,.form-title,.detail-title{
+  letter-spacing:0;
+  color:var(--text);
+}
+.page-sub,.form-sub{color:var(--text2);line-height:1.55}
+
+.stats,.kpi-strip{gap:10px;margin-bottom:16px}
+.stat,.kpi-card{
+  min-height:104px;
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:13px 14px;
+  box-shadow:none;
+}
+.stat::after,.kpi-card::before{height:2px;opacity:.9}
+.stat-label,.kpi-label{font-weight:700;letter-spacing:.65px;color:var(--muted)}
+.stat-val,.kpi-val{letter-spacing:0}
+
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:none;
+}
+.card-hdr{
+  min-height:44px;
+  padding:11px 14px;
+  background:rgba(255,255,255,.008);
+  border-bottom:1px solid var(--border);
+}
+.card-title{letter-spacing:0;color:var(--text)}
+.card-body{padding:14px}
+
+.row2,.row3{gap:12px;margin-bottom:12px}
+.detail-field,.detail-fact,.review-section,.action-card,.capa-item,.cred-card,.trust-item,.urgency-box,.anon-box{
+  background:var(--s2);
+  border-color:var(--border);
+  border-radius:7px;
+}
+
+.tbl-wrap,.table-wrap{overflow-x:auto}
+.tbl{min-width:680px}
+.tbl th{
+  padding:9px 11px;
+  color:var(--muted);
+  background:rgba(255,255,255,.01);
+  font-weight:700;
+  letter-spacing:.55px;
+}
+.tbl td{padding:10px 11px;color:var(--text);border-bottom-color:var(--border)}
+.tbl tr:hover td,.tbl tr.clickable:hover td{background:var(--s2)}
+
+.chip{border-radius:5px;letter-spacing:0;text-transform:none}
+.btn{
+  min-height:32px;
+  border-radius:6px;
+  letter-spacing:0;
+  box-shadow:none;
+  transform:none!important;
+}
+.btn-primary{background:var(--accent);color:#061018}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-ghost{background:var(--s2);border-color:var(--border);color:var(--text2)}
+.btn-ghost:hover{background:var(--s3);border-color:var(--b2);color:var(--text)}
+
+.tabs{
+  gap:2px;
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+.tab{
+  min-height:37px;
+  padding:9px 13px;
+  border:1px solid transparent;
+  border-bottom:2px solid transparent;
+  border-radius:6px 6px 0 0;
+  white-space:nowrap;
+}
+.tab:hover{background:var(--s2)}
+.tab.active{background:rgba(33,184,230,.06);border-bottom-color:var(--accent)}
+
+.filter-row,.filter-bar{gap:7px}
+.filter-chip{
+  border-radius:6px;
+  background:var(--s1);
+  border-color:var(--border);
+}
+.filter-chip.active{background:rgba(33,184,230,.08)}
+.search-bar,.form-input,.form-select,.form-textarea,.filter-bar select,.filter-bar input{
+  background:var(--s2);
+  border-color:var(--border);
+  border-radius:6px;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus,.filter-bar select:focus,.filter-bar input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(33,184,230,.08);
+}
+.type-card,.type-btn,.upload-zone,.photo-drop{
+  border-radius:7px;
+  background:var(--s2);
+}
+.type-card:hover,.type-btn:hover{background:var(--s3)}
+
+.drawer,.modal,.modal-overlay .modal{
+  background:var(--s1);
+  border-color:var(--border);
+  border-radius:8px;
+}
+.drawer-hdr,.drawer-footer{border-color:var(--border)}
+.toast,#toast{border-radius:7px}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+
+@media(max-width:900px){
+  .topbar{padding:0 12px}
+  .topbar-center{display:none}
+  .company-badge,.co-tag{display:none}
+  .content,.panel-pad{padding:14px}
+  .sidenav{width:190px}
+}
+
+@media(max-width:700px){
+  .topbar{min-height:54px;height:auto;padding:9px 10px;flex-wrap:wrap}
+  .topbar-right{margin-left:auto}
+  .sidenav{display:none}
+  .content,.panel-pad{padding:11px}
+  .page-hdr{gap:12px;flex-direction:column}
+  .page-actions{width:100%;flex-wrap:wrap}
+  .stats,.kpi-strip{grid-template-columns:1fr 1fr}
+  .form-grid,.form-grid.cols3,.form-row,.detail-grid{grid-template-columns:1fr}
+  .tbl{min-width:620px}
+}
+
+@media(max-width:480px){
+  .stats,.kpi-strip{grid-template-columns:1fr}
+  .topbar-pill:not(:last-child){display:none}
+}
