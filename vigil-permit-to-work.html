@@ -524,7 +524,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         </div>
         <div class="form-group">
           <label class="form-label">Issuer Name</label>
-          <input type="text" class="form-input" id="f-issuer-name" value="James Marchetti" disabled>
+          <input type="text" class="form-input" id="f-issuer-name" value="Signed-in user" disabled>
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
@@ -578,7 +578,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260606-4"></script>
+<script src="vigil-auth.js?v=20260606-5"></script>
 <script>
 const API = window.VIGIL_API_BASE;
 let token = null;
@@ -699,10 +699,15 @@ function needsCloseout(p) {
 
 // ── INIT ───────────────────────────────────────────────────────
 async function init() {
-  token = await getVigilToken();
+  const session = await getVigilSession();
+  token = session.token;
   if (!token) { toast('Auth failed','danger'); return; }
-
-  LOGGED_IN = {id: parseJwt(token)?.userId || '', name:'James Marchetti'};
+  if (!session.worker) {
+    toast('Your account is not linked to a worker profile. Contact an administrator.', 'danger');
+    return;
+  }
+  LOGGED_IN = {id:session.worker.id, name:session.worker.name};
+  document.getElementById('f-issuer-name').value = LOGGED_IN.name;
 
   const [pData, aData, wData, haData] = await Promise.all([
     apiGet('/api/permits?limit=100'),
@@ -728,10 +733,6 @@ async function init() {
   populateAssessmentDropdown();
   renderTypeGrid();
   showPanel('dash');
-}
-
-function parseJwt(t) {
-  try { return JSON.parse(atob(t.split('.')[1])); } catch{ return {}; }
 }
 
 // ── KPIs ───────────────────────────────────────────────────────

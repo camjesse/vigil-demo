@@ -362,7 +362,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   </div>
   <div class="topbar-right">
     <div class="company-badge">🚛 Northern Express Transport Ltd.</div>
-    <div class="user-dot" title="James Marchetti — HSE Manager">J</div>
+    <div class="user-dot" id="signed-in-user-dot" title="Signed-in user">?</div>
   </div>
 </div>
 
@@ -697,7 +697,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="init()">↺ Retry</button>
 </div>
 
-<script src="vigil-auth.js?v=20260606-4"></script>
+<script src="vigil-auth.js?v=20260606-5"></script>
 <script>
 // ============================================================
 // API CONFIG & AUTH
@@ -839,7 +839,12 @@ async function init() {
   hideApiError();
   try {
     setLoadingMsg('Authenticating…');
-    await apiLogin();
+    const session = await getVigilSession();
+    authToken = session.token;
+    const userDot = document.getElementById('signed-in-user-dot');
+    const displayName = session.worker?.name || session.user?.email || 'Signed-in user';
+    userDot.textContent = displayName.charAt(0).toUpperCase();
+    userDot.title = session.worker?.jobTitle ? `${displayName} — ${session.worker.jobTitle}` : displayName;
     await loadData();
     showLoading(false);
     renderAll();

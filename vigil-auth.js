@@ -88,9 +88,10 @@
     const control = document.createElement('div');
     control.className = 'vigil-session-control';
     const email = session.user?.email || 'Signed in';
+    const displayName = session.worker?.name || email;
     const role = session.user?.role ? ` · ${session.user.role}` : '';
     control.innerHTML = `
-      <span class="vigil-session-user" title="${email}${role}">${email}</span>
+      <span class="vigil-session-user" title="${email}${role}">${displayName}</span>
       <button class="vigil-security-btn" type="button">Security</button>
       <button class="vigil-logout-btn" type="button">Log out</button>
     `;
@@ -247,8 +248,13 @@
 
         const body = await response.json();
         window.localStorage.setItem(EMAIL_KEY, email);
+        const session = await validateSession({
+          token: body.token,
+          user: body.user,
+          companyId: body.companyId,
+        });
         backdrop.remove();
-        resolve({
+        resolve(session || {
           token: body.token,
           user: body.user,
           companyId: body.companyId,
@@ -286,6 +292,10 @@
 
   window.getVigilUser = async function getVigilUser() {
     return (await window.getVigilSession()).user;
+  };
+
+  window.getVigilWorker = async function getVigilWorker() {
+    return (await window.getVigilSession()).worker || null;
   };
 
   window.openVigilSecurity = function openVigilSecurity() {
