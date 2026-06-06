@@ -20,8 +20,8 @@ html.light-mode{
   --text:#0F172A;--text2:#475569;--muted:#64748B;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
-.shell{display:flex;flex-direction:column;height:100vh}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;overscroll-behavior:none}
+.shell{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0}
 html:not(.vigil-authenticated) .shell{display:none}
 
 /* ── HEADER ─────────────────────────────────────────────── */
@@ -68,7 +68,7 @@ html:not(.vigil-authenticated) .shell{display:none}
 .btn-pu{background:linear-gradient(135deg,#9B6DFF,#6030C0);color:#fff}
 
 /* ── BODY LAYOUT ─────────────────────────────────────────── */
-.body{display:flex;flex:1;overflow:hidden}
+.body{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* ── SIDEBAR ─────────────────────────────────────────────── */
 .sidebar{
@@ -96,7 +96,7 @@ html:not(.vigil-authenticated) .shell{display:none}
 .sidebar.collapsed .sb-logo-text-wrap{opacity:0;width:0;overflow:hidden}
 
 /* Scroll area */
-.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 4px}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 4px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .sb-scroll::-webkit-scrollbar{width:3px}
 .sb-scroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
@@ -141,8 +141,8 @@ html:not(.vigil-authenticated) .shell{display:none}
 .sidebar.mobile-open{position:fixed;left:0;top:0;bottom:0;z-index:300;width:260px !important;box-shadow:8px 0 32px rgba(0,0,0,.5)}
 
 /* ── CONTENT AREA ────────────────────────────────────────── */
-.ca{flex:1;overflow:hidden;position:relative;background:var(--bg)}
-.mframe{position:absolute;inset:0;border:none;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .18s}
+.ca{flex:1;min-height:0;overflow:hidden;position:relative;background:var(--bg)}
+.mframe{position:absolute;inset:0;border:none;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .18s;touch-action:pan-y}
 .mframe.active{opacity:1;pointer-events:all}
 .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);z-index:20;transition:opacity .3s}
 .loading.gone{opacity:0;pointer-events:none}
@@ -155,7 +155,7 @@ html:not(.vigil-authenticated) .shell{display:none}
 @keyframes lf{from{width:0}to{width:100%}}
 
 /* ── DASHBOARD ───────────────────────────────────────────── */
-#panel-dash{position:absolute;inset:0;overflow-y:auto;padding:18px;display:none}
+#panel-dash{position:absolute;inset:0;overflow-y:auto;padding:18px;display:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 #panel-dash.active{display:block}
 .g6{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:14px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
@@ -269,7 +269,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 }
 
 /* ── SOON PANEL ──────────────────────────────────────────── */
-.soon-outer{position:absolute;inset:0;overflow-y:auto;display:none;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(155,109,255,.04),transparent),var(--bg)}
+.soon-outer{position:absolute;inset:0;overflow-y:auto;display:none;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(155,109,255,.04),transparent),var(--bg);touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .soon-inner{display:flex;flex-direction:column;align-items:center;padding:36px 32px;text-align:center;min-height:100%}
 .s-icon{font-size:44px;margin-bottom:12px;opacity:.8}
 .s-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
@@ -897,7 +897,15 @@ function injectS(f) {
   try {
     const d = f.contentDocument || f.contentWindow.document;
     const s = d.createElement('style');
-    s.textContent = '.topbar,.hdr{display:none!important}.app,.shell,html,body{height:100%!important}.main-area,.layout,.body{height:100%!important}';
+    s.textContent = `
+      .topbar,.hdr{display:none!important}
+      html,body{height:100%!important;min-height:0!important;overscroll-behavior-y:contain!important}
+      .app,.shell,.main-area,.layout,.body{height:100%!important;min-height:0!important}
+      .content,.panel,.panels,.main,.main-content,.drawer-body,.table-wrap{
+        touch-action:pan-y!important;
+        -webkit-overflow-scrolling:touch!important;
+      }
+    `;
     d.head.appendChild(s);
     if (document.documentElement.classList.contains('light-mode')) {
       d.documentElement.classList.add('light-mode');
