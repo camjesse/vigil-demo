@@ -41,7 +41,9 @@
 
   function readStoredSession() {
     try {
-      return JSON.parse(window.sessionStorage.getItem(SESSION_KEY) || 'null');
+      const shared = window.localStorage.getItem(SESSION_KEY);
+      const legacy = window.sessionStorage.getItem(SESSION_KEY);
+      return JSON.parse(shared || legacy || 'null');
     } catch {
       return null;
     }
@@ -49,7 +51,8 @@
 
   function saveSession(session) {
     currentSession = session;
-    window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    window.sessionStorage.removeItem(SESSION_KEY);
     document.documentElement.classList.add('vigil-authenticated');
     renderSessionControl(session);
     return session;
@@ -57,6 +60,7 @@
 
   function clearSession() {
     currentSession = null;
+    window.localStorage.removeItem(SESSION_KEY);
     window.sessionStorage.removeItem(SESSION_KEY);
     document.documentElement.classList.remove('vigil-authenticated');
     document.querySelector('.vigil-session-control')?.remove();
@@ -205,5 +209,12 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     window.getVigilSession();
+  });
+
+  window.addEventListener('storage', (event) => {
+    if (event.key === SESSION_KEY && !event.newValue) {
+      currentSession = null;
+      window.top.location.href = 'index.html';
+    }
   });
 }());
