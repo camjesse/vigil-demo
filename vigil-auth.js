@@ -2,10 +2,14 @@
   const API_BASE = 'https://vigil-production-17ca.up.railway.app';
   const SESSION_KEY = 'vigil_session';
   const EMAIL_KEY = 'vigil_demo_email';
+  const THEME_KEY = 'vigil_theme';
   let pendingSession = null;
   let currentSession = null;
 
   window.VIGIL_API_BASE = API_BASE;
+  try {
+    document.documentElement.classList.toggle('light-mode', window.localStorage.getItem(THEME_KEY) === 'light');
+  } catch {}
 
   function injectStyles() {
     if (document.getElementById('vigil-auth-styles')) return;
@@ -37,6 +41,11 @@
       .vigil-security-btn{height:27px;border-radius:6px;border:1px solid var(--border,#263648);background:transparent;color:var(--text2,#93A9BC);padding:0 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
       .vigil-security-btn:hover{color:var(--accent,#21B8E6);border-color:rgba(33,184,230,.35)}
       .vigil-mobile-dashboard{display:none}
+      html.light-mode{--bg:#F4F7FA!important;--s1:#FFFFFF!important;--s2:#EDF2F7!important;--s3:#E2E8F0!important;--s4:#D8E1EB!important;--border:#CBD5E1!important;--border2:#B8C5D3!important;--b2:#B8C5D3!important;--b3:#A7B6C7!important;--text:#102033!important;--text2:#42566B!important;--muted:#64788D!important}
+      html.light-mode body,html.light-mode .app,html.light-mode .shell,html.light-mode .main,html.light-mode .main-area,html.light-mode .content,html.light-mode .panel,html.light-mode .panels{color:var(--text)!important}
+      html.light-mode .topbar,html.light-mode .hdr{background:var(--s1)!important}
+      html.light-mode input,html.light-mode select,html.light-mode textarea{color:var(--text)!important;background:var(--s1)!important}
+      html.light-mode .vigil-mobile-dashboard{background:#FFFFFF;color:#102033}
       @media(max-width:900px){.vigil-mobile-dashboard{position:fixed;left:12px;bottom:12px;z-index:2147483000;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;border:1px solid rgba(33,184,230,.45);background:#0D121B;color:#D7E3EE;padding:0 13px;font:700 11px 'DM Sans',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45);cursor:pointer}}
       @media(max-width:700px){.vigil-session-user{display:none}.vigil-auth-card{padding:20px}}
     `;
@@ -337,6 +346,9 @@
     if (event.key === SESSION_KEY && !event.newValue) {
       currentSession = null;
       window.top.location.href = 'index.html';
+    }
+    if (event.key === THEME_KEY) {
+      document.documentElement.classList.toggle('light-mode', event.newValue === 'light');
     }
   });
 }());
