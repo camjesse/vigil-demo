@@ -747,6 +747,9 @@ function fmt(str) {
   if (!str) return '—';
   return str.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 }
+function escHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function fmtDate(s) {
   if (!s) return '—';
   const d = new Date(s);
@@ -1070,15 +1073,19 @@ function cancelForm() {
 }
 
 // ── INCIDENT DETAIL ───────────────────────────────────────────
-function showDetail(id) {
+async function showDetail(id) {
   const inc = incidents.find(i => i.id === id);
   if (!inc) return;
   showPanel('detail');
-  renderDetail(inc);
+  document.getElementById('detail-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div><span>Loading response details…</span></div>';
+  const detail = await apiGet('/api/incidents/' + id);
+  renderDetail(inc, detail || {});
 }
 
-function renderDetail(inc) {
+function renderDetail(inc, detail = {}) {
   const incCapas = capas.filter(c => c.incident_id === inc.id);
+  const acknowledgements = detail.acknowledgements || [];
+  const acknowledgedByMe = Boolean(detail.acknowledged_by_current_user);
   const WORKFLOW = [
     {key:'reported',         label:'Reported'},
     {key:'under_investigation',label:'Investigation'},
@@ -1134,6 +1141,9 @@ function renderDetail(inc) {
           <div class="capa-status">${c.status === 'completed' ? `<span class="chip ok">Closed</span>` : c.is_overdue ? `<span class="chip danger">Overdue</span>` : `<span class="chip warn">Open</span>`}</div>
         </div>`;
       }).join('');
+  const acknowledgementsHtml = acknowledgements.length
+    ? acknowledgements.map(a => `<div class="capa-item"><div class="capa-dot" style="background:var(--ok)"></div><div class="capa-info"><div class="capa-title">${escHtml(a.first_name)} ${escHtml(a.last_name)}</div><div class="capa-meta">${escHtml(a.job_title || 'Responder')} · ${new Date(a.acknowledged_at).toLocaleString()}</div>${a.response_notes ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px">${escHtml(a.response_notes)}</div>` : ''}</div><span class="chip ok">Acknowledged</span></div>`).join('')
+    : '<div class="desc-box">No responder has acknowledged this incident yet.</div>';
 
   document.getElementById('detail-content').innerHTML = `
     <div class="detail-hdr">
@@ -1160,6 +1170,12 @@ function renderDetail(inc) {
 
     <div class="section-title">Key Facts</div>
     <div class="detail-grid">${factsHtml}</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px;gap:10px">
+      <div class="section-title" style="margin:0">Response & Acknowledgement</div>
+      <button class="btn ${acknowledgedByMe ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="acknowledgeIncident('${inc.id}')" ${acknowledgedByMe ? 'disabled' : ''}>${acknowledgedByMe ? 'You acknowledged' : 'Acknowledge incident'}</button>
+    </div>
+    ${acknowledgementsHtml}
 
     ${inc.description ? `<div class="section-title">Description</div><div class="desc-box">${inc.description}</div>` : ''}
     ${inc.immediate_actions ? `<div class="section-title">Immediate Actions</div><div class="desc-box">${inc.immediate_actions}</div>` : ''}
@@ -1220,6 +1236,15 @@ function renderDetail(inc) {
       </div>
     </div>
   `;
+}
+
+async function acknowledgeIncident(id) {
+  const notes = prompt('Optional response note (for example: Response team dispatched)');
+  if (notes === null) return;
+  const result = await apiPost(`/api/incidents/${id}/acknowledgements`, {response_notes: notes || null});
+  if (!result.ok) return toast(result.data?.error || 'Could not acknowledge incident', 'danger');
+  toast('Incident acknowledged', 'ok');
+  showDetail(id);
 }
 
 function toggleAddCapaForm(incId) {
