@@ -1137,8 +1137,9 @@ function renderDetail(inc, detail = {}) {
             <div class="capa-title">${c.title}</div>
             <div class="capa-meta">${priorityChip(c.priority)} &nbsp;→ ${assignee} &nbsp;${dueLabel}</div>
             ${c.description ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px;line-height:1.5">${c.description}</div>` : ''}
+            ${c.completion_notes ? `<div style="font-size:10.5px;color:var(--ok);margin-top:5px;line-height:1.5">Completion: ${escHtml(c.completion_notes)} · ${(c.completion_evidence_urls || []).length} evidence link(s)</div>` : ''}
           </div>
-          <div class="capa-status">${c.status === 'completed' ? `<span class="chip ok">Closed</span>` : c.is_overdue ? `<span class="chip danger">Overdue</span>` : `<span class="chip warn">Open</span>`}</div>
+          <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<span class="chip ok">Awaiting verification</span>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${c.id}','${inc.id}')">Submit completion</button>`}</div>
         </div>`;
       }).join('');
   const acknowledgementsHtml = acknowledgements.length
@@ -1226,7 +1227,7 @@ function renderDetail(inc, detail = {}) {
           <select class="form-select" id="capa-action-type">
             <option value="corrective">Corrective</option>
             <option value="preventive">Preventive</option>
-            <option value="improvement">Improvement</option>
+            <option value="immediate">Immediate</option>
           </select>
         </div>
       </div>
@@ -1247,6 +1248,19 @@ async function acknowledgeIncident(id) {
   showDetail(id);
 }
 
+async function completeCapa(id, incidentId) {
+  const notes = prompt('Describe what was completed. This note is required for verification.');
+  if (!notes) return;
+  const evidence = prompt('Optional evidence links, separated by commas (photos, documents, records)') || '';
+  const completion_evidence_urls = evidence.split(',').map(x => x.trim()).filter(Boolean);
+  const result = await apiPost(`/api/corrective-actions/${id}/complete`, {completion_notes: notes, completion_evidence_urls});
+  if (!result.ok) return toast(result.data?.error || 'Could not submit completion', 'danger');
+  toast('Completion submitted for verification', 'ok');
+  const fresh = await apiGet('/api/corrective-actions?limit=100');
+  capas = (fresh && fresh.corrective_actions) || capas;
+  showDetail(incidentId);
+}
+
 function toggleAddCapaForm(incId) {
   const f = document.getElementById('add-capa-form');
   if (f) f.classList.toggle('open');
@@ -1262,7 +1276,7 @@ async function submitCapa(incId) {
   if (!title) { toast('Title is required', 'danger'); return; }
 
   const body = {title, description:desc, incident_id:incId, assigned_to:assign||LOGGED_IN.id, due_date:due||null, priority:prio, action_type:atype, assigned_by:LOGGED_IN.id};
-  const res = await apiPost('/api/corrective-actions', body);
+  const res = await apiPost(`/api/incidents/${incId}/corrective-actions`, body);
   if (res.ok) {
     toast('✅ CAPA added', 'ok');
     // Reload capas and re-render
@@ -1574,8 +1588,7 @@ async function submitIncident() {
     was_lost_time: formData.was_lost_time || false,
     lost_time_days: formData.lost_time_days || null,
     was_recordable: formData.was_recordable || false,
-    is_regulatory_reportable: formData.is_regulatory_reportable || false,
-    body_map: formData.body_regions?.length > 0 ? formData.body_regions : null,
+    body_map: formData.body_regions?.length > 0 ? {regions: formData.body_regions} : null,
   };
 
   const res = await apiPost('/api/incidents', payload);

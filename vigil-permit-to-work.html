@@ -612,6 +612,15 @@ async function apiPost(path, body) {
     return {ok:r.ok, status:r.status, data:await r.json()};
   } catch(e) { return {ok:false, status:0, data:{}} }
 }
+async function apiPut(path, body) {
+  try {
+    const r = await fetch(API + path, {
+      method:'PUT', headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    return {ok:r.ok, status:r.status, data:await r.json()};
+  } catch(e) { return {ok:false, status:0, data:{}} }
+}
 
 // ── TOAST ──────────────────────────────────────────────────────
 function toast(msg, type='ok', ms=4000) {
@@ -1302,7 +1311,6 @@ async function submitAndIssuePermit() {
     work_end_planned:   formData.end   ? new Date(formData.end).toISOString()   : undefined,
     worker_lead:        selectedLeadId || undefined,
     assessment_id:      formData.assessment || undefined,
-    permit_type_controls: formControls,
   };
 
   const createRes = await apiPost('/api/permits', payload);
@@ -1315,8 +1323,17 @@ async function submitAndIssuePermit() {
   const pid = createRes.data.permit.id;
   const pnum = createRes.data.permit.permit_number;
 
+  btn.textContent = 'Saving controls…';
+  const controlsRes = await apiPut(`/api/permits/${pid}/controls`, {controls:formControls});
+  if (!controlsRes.ok) {
+    const err = controlsRes.data?.error || `HTTP ${controlsRes.status}`;
+    toast(`Control verification failed to save: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    return;
+  }
+
   btn.textContent = 'Submitting…';
-  const submitRes = await apiPost(`/api/permits/${pid}/submit`, {worker_lead: selectedLeadId});
+  const submitRes = await apiPost(`/api/permits/${pid}/submit`, {});
   if (!submitRes.ok) {
     const err = submitRes.data?.error || `HTTP ${submitRes.status}`;
     toast(`Submit failed: ${err}`, 'danger');
@@ -1626,7 +1643,7 @@ async function viewPermit(id) {
 async function suspendPermit(id) {
   const reason = prompt('Reason for suspension:');
   if (!reason) return;
-  const res = await apiPost(`/api/permits/${id}/suspend`, {reason});
+  const res = await apiPost(`/api/permits/${id}/suspend`, {suspension_reason:reason});
   if (res.ok) {
     toast('Permit suspended','warn');
     viewPermit(id);

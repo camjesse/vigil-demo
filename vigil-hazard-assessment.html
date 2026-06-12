@@ -692,6 +692,10 @@ async function apiPost(path, body) {
   const r = await fetch(API + path, {method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
   return {ok:r.ok, status:r.status, data:await r.json().catch(()=>null)};
 }
+async function apiPut(path, body) {
+  const r = await fetch(API + path, {method:'PUT',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return {ok:r.ok, status:r.status, data:await r.json().catch(()=>null)};
+}
 function fmt(s) {
   if (!s) return '—';
   return s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -1450,9 +1454,58 @@ async function submitFlha() {
   const created = createRes.data.assessment;
   lastSubmittedId = created.id;
 
+  const syncResults = [];
+  syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}`, {
+    what_changed_today: formData.whatChanged || null,
+    reflection_response: formData.reflection || null,
+  }));
+
+  const detail = await apiGet(`/api/hazard/assessments/${created.id}`);
+  const createdDetail = detail && detail.assessment;
+  if (createdDetail) {
+    for (const confirmation of createdDetail.hazard_confirmations || []) {
+      syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}/hazards/${confirmation.id}`, {
+        confirmation_status: formHazardResponses[confirmation.template_hazard_id] || 'unsure',
+        worker_notes: formHazardNotes[confirmation.template_hazard_id] || null,
+      }));
+    }
+    for (const confirmation of createdDetail.control_confirmations || []) {
+      syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}/controls/${confirmation.id}`, {
+        confirmed: Boolean(formControlResponses[confirmation.template_control_id]),
+        notes: null,
+      }));
+    }
+  }
+  for (const hazard of formSiteHazards.filter(h => h.description && h.description.trim())) {
+    syncResults.push(await apiPost(`/api/hazard/assessments/${created.id}/site-hazards`, {
+      hazard_description: hazard.description.trim(),
+      hazard_category: hazard.category || 'other',
+      severity_potential: hazard.severity_potential || 'minor',
+    }));
+  }
+  for (const workerId of formCrewIds) {
+    syncResults.push(await apiPost(`/api/hazard/assessments/${created.id}/crew`, {
+      worker_id: workerId,
+      understood_hazards: true,
+    }));
+  }
+  const failedSync = syncResults.find(r => !r.ok);
+  if (failedSync) {
+    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    const errDetail = failedSync.data?.message || failedSync.data?.error || `HTTP ${failedSync.status}`;
+    toast(`⚠️ FLHA details failed to save: ${errDetail}`, 'danger');
+    return;
+  }
+
   // Submit for quality scoring
-  const submitRes = await apiPost(`/api/hazard/assessments/${created.id}/submit`, {});
-  const final = (submitRes.ok && submitRes.data?.assessment) ? submitRes.data.assessment : created;
+  const submitRes = await apiPost(`/api/hazard/assessments/${created.id}/submit`, {time_to_complete_seconds:300});
+  if (!submitRes.ok || !submitRes.data?.assessment) {
+    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    const errDetail = submitRes.data?.message || submitRes.data?.error || `HTTP ${submitRes.status}`;
+    toast(`⚠️ FLHA submit failed: ${errDetail}`, 'danger');
+    return;
+  }
+  const final = submitRes.data.assessment;
 
   btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
 

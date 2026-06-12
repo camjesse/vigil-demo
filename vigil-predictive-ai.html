@@ -963,7 +963,7 @@ async function confirmAction() {
   const btn = document.querySelector('#action-modal .btn-ok');
   btn.disabled = true; btn.textContent = 'Saving…';
 
-  const res = await apiPost(`/api/risk/signals/${pendingActionId}/action`, {notes});
+  const res = await apiPost(`/api/risk/signals/${pendingActionId}/action`, {action_notes:notes});
   if (res.ok) {
     const updated = res.data.signal;
     const idx = signals.findIndex(s=>s.id===pendingActionId);
