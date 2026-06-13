@@ -357,11 +357,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
             </select>
             <select class="form-select" id="filter-type" style="width:auto;padding:3px 8px;font-size:10.5px" onchange="filterIncidents()">
               <option value="">All Types</option>
-              <option value="injury">Injury</option>
+              <option value="injury_illness">Injury / Illness</option>
               <option value="near_miss">Near Miss</option>
-              <option value="vehicle">Vehicle</option>
+              <option value="motor_vehicle_collision">Motor Vehicle Collision</option>
+              <option value="property_equipment_damage">Property / Equipment Damage</option>
               <option value="environmental">Environmental</option>
-              <option value="property_damage">Property Damage</option>
+              <option value="fire_explosion">Fire / Explosion</option>
+              <option value="security">Security</option>
+              <option value="process_safety">Process Safety</option>
+              <option value="public_third_party">Public / Third Party</option>
+              <option value="regulatory_non_compliance">Regulatory Non-Compliance</option>
+              <option value="other">Other</option>
             </select>
           </div>
         </div>
@@ -420,14 +426,17 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
       <div class="form-section active" id="step-1">
         <div class="form-label" style="margin-bottom:12px;font-size:13px;color:var(--text)">Select Incident Type <span class="req">*</span></div>
         <div class="type-grid" id="type-grid">
-          <div class="type-card" data-type="injury" onclick="selectType(this,'injury')"><div class="type-icon">🤕</div><div class="type-label">Injury</div></div>
+          <div class="type-card" data-type="injury_illness" onclick="selectType(this,'injury_illness')"><div class="type-icon">🤕</div><div class="type-label">Injury / Illness</div></div>
           <div class="type-card" data-type="near_miss" onclick="selectType(this,'near_miss')"><div class="type-icon">⚠️</div><div class="type-label">Near Miss</div></div>
-          <div class="type-card" data-type="vehicle" onclick="selectType(this,'vehicle')"><div class="type-icon">🚛</div><div class="type-label">Vehicle</div></div>
-          <div class="type-card" data-type="property_damage" onclick="selectType(this,'property_damage')"><div class="type-icon">🏗️</div><div class="type-label">Property</div></div>
+          <div class="type-card" data-type="motor_vehicle_collision" onclick="selectType(this,'motor_vehicle_collision')"><div class="type-icon">🚛</div><div class="type-label">Motor Vehicle Collision</div></div>
+          <div class="type-card" data-type="property_equipment_damage" onclick="selectType(this,'property_equipment_damage')"><div class="type-icon">🏗️</div><div class="type-label">Property / Equipment</div></div>
           <div class="type-card" data-type="environmental" onclick="selectType(this,'environmental')"><div class="type-icon">🌿</div><div class="type-label">Environmental</div></div>
-          <div class="type-card" data-type="fire" onclick="selectType(this,'fire')"><div class="type-icon">🔥</div><div class="type-label">Fire</div></div>
-          <div class="type-card" data-type="spill" onclick="selectType(this,'spill')"><div class="type-icon">🛢️</div><div class="type-label">Spill</div></div>
+          <div class="type-card" data-type="fire_explosion" onclick="selectType(this,'fire_explosion')"><div class="type-icon">🔥</div><div class="type-label">Fire / Explosion</div></div>
           <div class="type-card" data-type="security" onclick="selectType(this,'security')"><div class="type-icon">🔒</div><div class="type-label">Security</div></div>
+          <div class="type-card" data-type="process_safety" onclick="selectType(this,'process_safety')"><div class="type-icon">⚙️</div><div class="type-label">Process Safety</div></div>
+          <div class="type-card" data-type="public_third_party" onclick="selectType(this,'public_third_party')"><div class="type-icon">👥</div><div class="type-label">Public / Third Party</div></div>
+          <div class="type-card" data-type="regulatory_non_compliance" onclick="selectType(this,'regulatory_non_compliance')"><div class="type-icon">📜</div><div class="type-label">Regulatory Non-Compliance</div></div>
+          <div class="type-card" data-type="other" onclick="selectType(this,'other')"><div class="type-icon">📌</div><div class="type-label">Other</div></div>
         </div>
 
         <div id="severity-suggestion" style="display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--warn);margin-bottom:14px">
@@ -792,14 +801,22 @@ function sevChip(s) {
 }
 function typeChip(t) {
   const map = {
+    injury_illness:  ['danger','🤕 Injury / Illness'],
     injury:          ['danger','🤕 Injury'],
     near_miss:       ['ok','⚠️ Near Miss'],
+    motor_vehicle_collision:['warn','🚛 Motor Vehicle Collision'],
     vehicle:         ['warn','🚛 Vehicle'],
     environmental:   ['cyan','🌿 Environmental'],
+    property_equipment_damage:['accent','🏗️ Property / Equipment'],
     property_damage: ['accent','🏗️ Property'],
+    fire_explosion:  ['orange','🔥 Fire / Explosion'],
     fire:            ['orange','🔥 Fire'],
     spill:           ['orange','🛢️ Spill'],
     security:        ['muted','🔒 Security'],
+    process_safety:  ['purple','⚙️ Process Safety'],
+    public_third_party:['accent','👥 Public / Third Party'],
+    regulatory_non_compliance:['warn','📜 Regulatory Non-Compliance'],
+    other:           ['muted','📌 Other'],
   };
   const [cls, lbl] = map[t] || ['muted', fmt(t)];
   return `<span class="chip ${cls}">${lbl}</span>`;
@@ -1342,7 +1359,7 @@ function goStep(n, silent) {
 
   // Step 3 — show/hide injury fields
   if (n === 3) {
-    const isInjury = formData.incident_type === 'injury';
+    const isInjury = ['injury','injury_illness'].includes(formData.incident_type);
     document.getElementById('step3-injury-fields').style.display = isInjury ? 'block' : 'none';
     document.getElementById('step3-noinjury').style.display = isInjury ? 'none' : 'block';
   }
@@ -1393,12 +1410,14 @@ function selectType(el, type) {
   formData.incident_type = type;
   // Severity suggestion
   const hints = {
-    injury: 'Severity will be determined based on treatment type and lost time status.',
+    injury_illness: 'Severity will be determined based on treatment type, exposure, and lost time status.',
     near_miss: 'Near miss incidents should be recorded even if no injury occurred — they are leading indicators.',
-    vehicle: 'Vehicle incidents may require DOT/TC regulatory reporting if involving commercial vehicles.',
+    motor_vehicle_collision: 'Motor vehicle collisions may require DOT/TC regulatory reporting if involving commercial vehicles.',
     environmental: 'Environmental incidents may trigger AEP or EPA reporting requirements.',
-    fire: 'Fire incidents should be reported to the fire authority and may require regulatory notification.',
-    spill: 'Spills may require immediate regulatory notification depending on volume and substance.',
+    fire_explosion: 'Fire or explosion incidents should be reported to the fire authority and may require regulatory notification.',
+    process_safety: 'Process safety events include loss of containment, pressure release, and uncontrolled energy.',
+    public_third_party: 'Record impacts or credible risk involving members of the public, clients, or third parties.',
+    regulatory_non_compliance: 'Capture the requirement, regulator, and immediate containment or notification actions.',
   };
   const hint = hints[type];
   if (hint) {
@@ -1525,7 +1544,7 @@ function renderReview() {
       ['Department', formData.department || '—'],
       ['Job Title', formData.job_title || '—'],
     ]},
-    ...(formData.incident_type === 'injury' ? [{title:'Injury Details', rows:[
+    ...(['injury','injury_illness'].includes(formData.incident_type) ? [{title:'Injury Details', rows:[
       ['Injury Type', fmt(formData.injury_type)],
       ['Treatment', fmt(formData.treatment_type)],
       ['Lost Time', formData.was_lost_time ? `Yes — ${formData.lost_time_days || 0} days` : 'No'],
