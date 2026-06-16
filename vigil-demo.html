@@ -411,7 +411,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   <span class="asep">·</span>
   <div class="ai-item" style="color:var(--warn)" onclick="loadMod('employees')"><div class="ad" style="background:var(--warn)"></div>11 credentials expiring 30d</div>
   <div class="aact">
-    <button class="btn btn-rd" onclick="loadMod('incidents')">🚨 Report Incident</button>
+    <button class="btn btn-rd" onclick="reportIncidentWorkflow()">🚨 Report Incident</button>
     <button class="btn btn-g" onclick="document.getElementById('astrip').classList.add('off')">✕</button>
   </div>
 </div>
@@ -965,13 +965,14 @@ function goHome() {
   closeMobileSidebar();
 }
 
-function loadMod(id) {
-  if (cur === id) { closeMobileSidebar(); return; }
+function loadMod(id, action) {
+  if (cur === id) { if (action) sendModuleAction(id, action); closeMobileSidebar(); return; }
   const m = MODS[id];
   if (!m) return;
   if (window.matchMedia('(max-width: 900px)').matches) {
     const url = new URL(m.src, window.location.href);
     url.searchParams.set('mobile', '1');
+    if (action) url.searchParams.set('action', action);
     window.location.href = url.href;
     return;
   }
@@ -983,13 +984,34 @@ function loadMod(id) {
   if (!loaded[id]) {
     showL(m.label);
     f.src = m.src;
-    f.onload = () => { loaded[id] = true; hideL(); f.classList.add('active'); injectS(f); };
+    f.onload = () => { loaded[id] = true; hideL(); f.classList.add('active'); injectS(f); if (action) sendModuleAction(id, action); };
     f.onerror = () => { hideL(); showErr(m.src); };
   } else {
     f.classList.add('active');
+    if (action) sendModuleAction(id, action);
   }
   cur = id;
   closeMobileSidebar();
+}
+
+function sendModuleAction(id, action) {
+  const f = document.getElementById('frm-' + id);
+  if (!f || !f.contentWindow) return;
+  setTimeout(() => {
+    try { f.contentWindow.postMessage({type:'VIGIL_ACTION', action}, '*'); } catch(e) {}
+    try {
+      if (action === 'report_incident' && typeof f.contentWindow.openReportIncident === 'function') {
+        f.contentWindow.openReportIncident();
+      }
+      if (action === 'report_incident' && f.contentDocument?.getElementById('panel-form') && typeof f.contentWindow.showPanel === 'function') {
+        f.contentWindow.showPanel('form');
+      }
+    } catch(e) {}
+  }, 350);
+}
+
+function reportIncidentWorkflow() {
+  loadMod('investigations', 'report_incident');
 }
 
 function showSoon(id) {

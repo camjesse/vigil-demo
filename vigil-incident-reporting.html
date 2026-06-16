@@ -879,7 +879,17 @@ async function init() {
   renderIncidentsTable();
   renderCapaList();
   buildAlertStrip();
+  handleStartupAction();
 }
+
+function handleStartupAction() {
+  const action = new URLSearchParams(window.location.search).get('action');
+  if (action === 'report_incident') showPanel('form');
+}
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION' && e.data.action === 'report_incident') showPanel('form');
+});
 
 // ── KPIs ──────────────────────────────────────────────────────
 function renderKPIs() {
