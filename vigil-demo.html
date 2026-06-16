@@ -40,7 +40,7 @@ html:not(.vigil-authenticated) .shell{display:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .co-tag{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:10px;color:var(--text2);white-space:nowrap}
 .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;cursor:pointer;flex-shrink:0}
-.notif-wrap{position:relative}.notif-btn{position:relative;width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text2);cursor:pointer}.notif-btn:hover{background:var(--s3);color:var(--text)}.notif-count{position:absolute;right:-5px;top:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--danger);color:#fff;font-size:8px;font-weight:800;display:none;align-items:center;justify-content:center}.notif-count.visible{display:flex}.notif-panel{display:none;position:absolute;right:0;top:38px;width:min(380px,calc(100vw - 24px));max-height:460px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;box-shadow:0 18px 55px rgba(0,0,0,.45);overflow:hidden;z-index:500}.notif-panel.open{display:block}.notif-head{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700}.notif-head-actions{margin-left:auto;display:flex;gap:10px}.notif-head button{border:0;background:none;color:var(--accent);font-size:10px;cursor:pointer}.notif-list{max-height:400px;overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}.notif-item{padding:11px 12px;border-bottom:1px solid var(--border);cursor:pointer}.notif-item:hover{background:var(--s2)}.notif-item.unread{background:rgba(0,194,255,.04);border-left:2px solid var(--accent)}.notif-title{font-size:11px;font-weight:700;color:var(--text)}.notif-msg{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.4}.notif-time{font-size:9px;color:var(--muted);margin-top:5px}.notif-empty{padding:28px;text-align:center;color:var(--muted);font-size:11px}.pref-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:16px;z-index:1200}.pref-dialog{width:min(480px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.pref-title{font-family:'Syne';font-size:17px;font-weight:800}.pref-copy{font-size:11px;color:var(--text2);line-height:1.45;margin:5px 0 14px}.pref-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}.pref-row-copy{flex:1}.pref-row-title{font-size:11px;font-weight:700}.pref-row-desc{font-size:9.5px;color:var(--muted);margin-top:3px}.pref-row input{width:18px;height:18px;accent-color:var(--accent)}.pref-lock{font-size:9px;color:var(--warn);font-weight:700}.pref-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:15px}.pref-actions button{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 12px;font-size:10px;font-weight:700;cursor:pointer}.pref-actions .primary{background:var(--accent);border-color:var(--accent);color:#061018}
+.notif-wrap{position:relative}.notif-btn{position:relative;width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text2);cursor:pointer}.notif-btn:hover{background:var(--s3);color:var(--text)}.notif-count{position:absolute;right:-5px;top:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--danger);color:#fff;font-size:8px;font-weight:800;display:none;align-items:center;justify-content:center}.notif-count.visible{display:flex}.notif-panel{display:none;position:absolute;right:0;top:38px;width:min(430px,calc(100vw - 24px));max-height:560px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;box-shadow:0 18px 55px rgba(0,0,0,.45);overflow:hidden;z-index:500}.notif-panel.open{display:block}.notif-head{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700}.notif-head-actions{margin-left:auto;display:flex;gap:10px}.notif-head button{border:0;background:none;color:var(--accent);font-size:10px;cursor:pointer}.notif-list{max-height:470px;overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}.notif-item{padding:11px 12px;border-bottom:1px solid var(--border);cursor:pointer}.notif-item:hover{background:var(--s2)}.notif-item.unread{background:rgba(0,194,255,.04);border-left:2px solid var(--accent)}.notif-title{font-size:11px;font-weight:700;color:var(--text)}.notif-msg{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.4}.notif-time{font-size:9px;color:var(--muted);margin-top:5px}.notif-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.notif-chip{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;border-radius:999px;padding:2px 6px;background:var(--s3);color:var(--text2)}.notif-chip.escalation,.notif-chip.failed{background:rgba(255,69,69,.16);color:var(--danger)}.notif-chip.assignment,.notif-chip.sent{background:rgba(0,229,160,.14);color:var(--a3)}.notif-chip.incident,.notif-chip.pending{background:rgba(255,184,0,.15);color:var(--warn)}.notif-chip.skipped{background:rgba(90,110,130,.18);color:var(--muted)}.notif-empty{padding:28px;text-align:center;color:var(--muted);font-size:11px}.pref-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:16px;z-index:1200}.pref-dialog{width:min(480px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.pref-title{font-family:'Syne';font-size:17px;font-weight:800}.pref-copy{font-size:11px;color:var(--text2);line-height:1.45;margin:5px 0 14px}.pref-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}.pref-row-copy{flex:1}.pref-row-title{font-size:11px;font-weight:700}.pref-row-desc{font-size:9.5px;color:var(--muted);margin-top:3px}.pref-row input{width:18px;height:18px;accent-color:var(--accent)}.pref-lock{font-size:9px;color:var(--warn);font-weight:700}.pref-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:15px}.pref-actions button{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 12px;font-size:10px;font-weight:700;cursor:pointer}.pref-actions .primary{background:var(--accent);border-color:var(--accent);color:#061018}
 .jur-toggle{display:flex;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:2px;flex-shrink:0}
 .jt-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:16px;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--muted);border:none;background:transparent;font-family:'DM Sans',sans-serif;white-space:nowrap}
 .jt-btn.active{background:var(--s3);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
@@ -144,6 +144,43 @@ html:not(.vigil-authenticated) .shell{display:none}
 .ca{flex:1;min-height:0;overflow:hidden;position:relative;background:var(--bg)}
 .mframe{position:absolute;inset:0;border:none;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .18s;touch-action:pan-y}
 .mframe.active{opacity:1;pointer-events:all}
+.workflow-panel{position:absolute;inset:0;overflow:auto;background:var(--bg);opacity:0;pointer-events:none;transition:opacity .18s;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.workflow-panel.active{opacity:1;pointer-events:all}
+.workflow-wrap{padding:18px;max-width:1320px;margin:0 auto}
+.workflow-hero{background:linear-gradient(135deg,rgba(0,194,255,.08),rgba(155,109,255,.08));border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;display:flex;align-items:flex-start;gap:16px;justify-content:space-between}
+.workflow-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.5px}
+.workflow-copy{font-size:12px;color:var(--text2);line-height:1.55;margin-top:5px;max-width:760px}
+.workflow-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.workflow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.workflow-stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}
+.workflow-stat-label{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700}
+.workflow-stat-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-top:4px}
+.workflow-stat-sub{font-size:10px;color:var(--text2);margin-top:2px}
+.workflow-body{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+.workflow-card{background:var(--s1);border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.workflow-card-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.workflow-card-title{font-size:12px;font-weight:800}
+.workflow-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.workflow-tab{border:1px solid var(--border);background:var(--s2);color:var(--text2);border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;cursor:pointer}
+.workflow-tab.active{background:rgba(0,194,255,.12);border-color:rgba(0,194,255,.35);color:var(--accent)}
+.workflow-list{max-height:calc(100dvh - 292px);overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.workflow-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border);align-items:start}
+.workflow-row.unread{background:rgba(0,194,255,.035);border-left:3px solid var(--accent)}
+.workflow-row.escalation{background:rgba(255,69,69,.035)}
+.workflow-row-title{font-size:12px;font-weight:800;color:var(--text)}
+.workflow-row-msg{font-size:11px;color:var(--text2);line-height:1.45;margin-top:4px}
+.workflow-row-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.workflow-row-actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+.workflow-side{display:flex;flex-direction:column;gap:12px}
+.workflow-side-block{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:13px}
+.workflow-side-title{font-size:12px;font-weight:800;margin-bottom:8px}
+.workflow-side-copy{font-size:11px;color:var(--text2);line-height:1.5}
+.workflow-route{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:11px}
+.workflow-route:first-of-type{border-top:0}
+.mini-btn{height:27px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:10px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif}
+.mini-btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}
+.mini-btn.danger{background:rgba(255,69,69,.14);border-color:rgba(255,69,69,.32);color:var(--danger)}
+.mini-btn:hover{filter:brightness(1.08)}
 .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);z-index:20;transition:opacity .3s}
 .loading.gone{opacity:0;pointer-events:none}
 .spin{animation:spin 1.8s linear infinite;font-size:36px;margin-bottom:12px}
@@ -260,12 +297,22 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   .operations-grid{grid-template-columns:1fr 1fr}
   .ops-panel.large{grid-row:auto}
   .ops-panel.wide{grid-column:1/-1}
+  .workflow-grid{grid-template-columns:repeat(2,1fr)}
+  .workflow-body{grid-template-columns:1fr}
+  .workflow-list{max-height:none}
 }
 @media(max-width:760px){
   #panel-dash{padding:12px}
   .dash-hero{flex-direction:column}
   .priority-grid,.metric-grid,.operations-grid{grid-template-columns:1fr}
   .dash-pulse{width:100%}
+  .workflow-wrap{padding:12px}
+  .workflow-hero{flex-direction:column}
+  .workflow-actions{justify-content:flex-start}
+  .workflow-card-head{align-items:flex-start;flex-direction:column}
+  .workflow-tabs{margin-left:0}
+  .workflow-row{grid-template-columns:1fr}
+  .workflow-row-actions{justify-content:flex-start}
 }
 
 /* ── SOON PANEL ──────────────────────────────────────────── */
@@ -292,6 +339,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   .body{display:block;overflow:visible;min-height:0}
   .ca{overflow:visible;min-height:0}
   #panel-dash{position:relative;inset:auto;overflow:visible;min-height:calc(100dvh - 114px)}
+  .workflow-panel{position:relative;inset:auto;overflow:visible;min-height:calc(100dvh - 114px)}
   .soon-outer{position:relative;inset:auto;min-height:calc(100dvh - 114px)}
   .sidebar:not(.mobile-open){display:none}
   .mobile-toggle{display:flex}
@@ -304,6 +352,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 }
 @media(max-width:600px){
   .g6{grid-template-columns:1fr 1fr}
+  .workflow-grid{grid-template-columns:1fr}
   .s-feats{grid-template-columns:1fr}
   .lpill{display:none}
   .jt-btn:not(.active){display:none}
@@ -341,7 +390,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
     <div class="notif-wrap">
       <button class="notif-btn" title="Notifications" onclick="toggleNotifications(event)">🔔<span class="notif-count" id="notif-count">0</span></button>
       <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
-        <div class="notif-head">Notifications<div class="notif-head-actions"><button onclick="openNotificationPreferences()">Preferences</button><button onclick="markAllNotificationsRead()">Mark all read</button></div></div>
+        <div class="notif-head">Notifications<div class="notif-head-actions"><button onclick="openNotificationWorkflow()">Workflow</button><button onclick="openNotificationPreferences()">Preferences</button><button onclick="markAllNotificationsRead()">Mark all read</button></div></div>
         <div class="notif-list" id="notif-list"><div class="notif-empty">Loading notifications...</div></div>
       </div>
     </div>
@@ -489,6 +538,9 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   <div class="sb-footer">
     <div class="sb-item" id="sbi-admin" onclick="loadMod('admin')">
       <span class="sb-icon">⚙️</span><span class="sb-label">Administration</span>
+    </div>
+    <div class="sb-item" id="sbi-notifications" onclick="openNotificationWorkflow()">
+      <span class="sb-icon">📬</span><span class="sb-label">Email Workflow</span>
     </div>
     <div class="sb-item" onclick="openNotificationPreferences()">
       <span class="sb-icon">🔔</span><span class="sb-label">Notification Settings</span>
@@ -705,6 +757,70 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
     </div>
   </div><!-- /panel-dash -->
 
+  <!-- EMAIL / NOTIFICATION WORKFLOW -->
+  <div id="panel-notifications" class="workflow-panel">
+    <div class="workflow-wrap">
+      <section class="workflow-hero">
+        <div>
+          <div class="dash-eyebrow">Notification command center</div>
+          <div class="workflow-title">Email Workflow</div>
+          <p class="workflow-copy">Every email Vigil sends is paired with an in-app workflow item here. Triage the alert, open the related module, mark it handled, or tune email preferences without hunting through your inbox.</p>
+        </div>
+        <div class="workflow-actions">
+          <button class="mini-btn primary" onclick="loadNotifications()">↻ Refresh</button>
+          <button class="mini-btn" onclick="openNotificationPreferences()">Preferences</button>
+          <button class="mini-btn" onclick="loadMod('admin')">Admin delivery</button>
+        </div>
+      </section>
+
+      <section class="workflow-grid">
+        <article class="workflow-stat"><div class="workflow-stat-label">Needs Action</div><div class="workflow-stat-value" id="wf-needs">0</div><div class="workflow-stat-sub">Unread or escalated</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Unread</div><div class="workflow-stat-value" id="wf-unread">0</div><div class="workflow-stat-sub">Not opened yet</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Escalations</div><div class="workflow-stat-value" id="wf-escalations">0</div><div class="workflow-stat-sub">Mandatory response path</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Email Issues</div><div class="workflow-stat-value" id="wf-email-issues">0</div><div class="workflow-stat-sub">Failed or skipped delivery</div></article>
+      </section>
+
+      <section class="workflow-body">
+        <article class="workflow-card">
+          <div class="workflow-card-head">
+            <div class="workflow-card-title">Triage queue</div>
+            <div class="workflow-tabs">
+              <button class="workflow-tab active" id="wf-tab-needs" onclick="setNotificationWorkflowFilter('needs')">Needs action</button>
+              <button class="workflow-tab" id="wf-tab-unread" onclick="setNotificationWorkflowFilter('unread')">Unread</button>
+              <button class="workflow-tab" id="wf-tab-email" onclick="setNotificationWorkflowFilter('email')">Email issues</button>
+              <button class="workflow-tab" id="wf-tab-all" onclick="setNotificationWorkflowFilter('all')">All</button>
+            </div>
+          </div>
+          <div class="workflow-list" id="workflow-list">
+            <div class="notif-empty">Loading workflow...</div>
+          </div>
+        </article>
+
+        <aside class="workflow-side">
+          <div class="workflow-side-block">
+            <div class="workflow-side-title">How to process emails</div>
+            <div class="workflow-side-copy">Use the queue as the operational source of truth. Email gets your attention; the workflow item records what needs to happen next.</div>
+          </div>
+          <div class="workflow-side-block">
+            <div class="workflow-side-title">Fast routes</div>
+            <div class="workflow-route"><span>Incident escalations</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
+            <div class="workflow-route"><span>Corrective actions</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
+            <div class="workflow-route"><span>Investigations</span><button class="mini-btn" onclick="loadMod('investigations')">Open</button></div>
+            <div class="workflow-route"><span>Email delivery audit</span><button class="mini-btn" onclick="loadMod('admin')">Open</button></div>
+          </div>
+          <div class="workflow-side-block">
+            <div class="workflow-side-title">Controls</div>
+            <div class="workflow-side-copy">Routine assignment, incident, and system emails can be tuned in preferences. Critical incident escalation stays mandatory so serious events cannot disappear silently.</div>
+            <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+              <button class="mini-btn primary" onclick="openNotificationPreferences()">Preferences</button>
+              <button class="mini-btn" onclick="markAllNotificationsRead()">Mark all read</button>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </div><!-- /panel-notifications -->
+
   <!-- IFRAMES -->
   <iframe class="mframe" id="frm-employees"     src="about:blank"></iframe>
   <iframe class="mframe" id="frm-incidents"     src="about:blank"></iframe>
@@ -902,6 +1018,7 @@ function showSoon(id) {
 
 function deact() {
   document.getElementById('panel-dash').classList.remove('active');
+  document.getElementById('panel-notifications')?.classList.remove('active');
   document.getElementById('soon-outer').style.display = 'none';
   document.querySelectorAll('.mframe').forEach(f => f.classList.remove('active'));
 }
@@ -1031,6 +1148,7 @@ updateAlertStrip('ca');
 const DASH_API = window.VIGIL_API_BASE;
 let dashToken = null;
 let dashboardNotifications = [];
+let notificationWorkflowFilter = 'needs';
 
 async function initDashboard() {
   try {
@@ -1142,13 +1260,30 @@ function renderNotifications() {
   const list = document.getElementById('notif-list');
   if (!dashboardNotifications.length) {
     list.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+    renderNotificationWorkflow();
     return;
   }
-  list.innerHTML = dashboardNotifications.map(n=>`<div class="notif-item ${n.read_at?'':'unread'}" onclick="openNotification('${n.id}','${n.entity_type||''}')"><div class="notif-title">${escapeDashboardText(n.title)}</div><div class="notif-msg">${escapeDashboardText(n.message||'')}</div><div class="notif-time">${new Date(n.created_at).toLocaleString()} · Email ${escapeDashboardText(n.email_status)}</div></div>`).join('');
+  list.innerHTML = dashboardNotifications.slice(0,8).map(n=>`<div class="notif-item ${n.read_at?'':'unread'}" onclick="openNotification('${n.id}')">
+    <div class="notif-title">${escapeDashboardText(n.title)}</div>
+    <div class="notif-msg">${escapeDashboardText(n.message||'')}</div>
+    <div class="notif-time">${formatDashboardDate(n.created_at)}</div>
+    <div class="notif-meta">${notifChip(n.category)}${notifChip(n.email_status)}${n.read_at?'':'<span class="notif-chip pending">unread</span>'}</div>
+  </div>`).join('') + `<div class="notif-item" onclick="openNotificationWorkflow()" style="text-align:center;color:var(--accent);font-weight:800">Open full email workflow →</div>`;
+  renderNotificationWorkflow();
 }
 
 function escapeDashboardText(value) {
   return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatDashboardDate(value) {
+  if (!value) return 'Unknown time';
+  try { return new Date(value).toLocaleString(); } catch(e) { return 'Unknown time'; }
+}
+
+function notifChip(value) {
+  const v = String(value || 'unknown').toLowerCase();
+  return `<span class="notif-chip ${escapeDashboardText(v)}">${escapeDashboardText(v.replaceAll('_',' '))}</span>`;
 }
 
 function toggleNotifications(event) {
@@ -1157,11 +1292,120 @@ function toggleNotifications(event) {
   loadNotifications();
 }
 
-async function openNotification(id, entityType) {
-  await fetch(`${DASH_API}/api/notifications/${id}/read`, {method:'PATCH',headers:{Authorization:`Bearer ${dashToken}`}});
-  document.getElementById('notif-panel').classList.remove('open');
-  if (entityType === 'incident' || entityType === 'corrective_action') loadMod('incidents');
+function openNotificationWorkflow() {
+  document.getElementById('notif-panel')?.classList.remove('open');
+  deact();
+  cur = 'notifications';
+  setActiveItem('notifications');
+  document.getElementById('hdr-mod-tag').textContent = 'Email Workflow';
+  document.getElementById('panel-notifications')?.classList.add('active');
+  closeMobileSidebar();
+  renderNotificationWorkflow();
   loadNotifications();
+}
+
+function setNotificationWorkflowFilter(filter) {
+  notificationWorkflowFilter = filter;
+  document.querySelectorAll('.workflow-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('wf-tab-' + filter)?.classList.add('active');
+  renderNotificationWorkflow();
+}
+
+function routeForNotification(n) {
+  const type = String(n?.entity_type || '').toLowerCase();
+  const title = String(n?.title || '').toLowerCase();
+  const msg = String(n?.message || '').toLowerCase();
+  const text = `${type} ${title} ${msg}`;
+  if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
+  if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
+  if (type.includes('observation')) return 'observations';
+  if (type.includes('hazard') || type.includes('flha')) return 'hazards';
+  if (type.includes('permit')) return 'permits';
+  if (type.includes('audit') || type.includes('finding')) return 'cor';
+  if (type.includes('fleet') || type.includes('equipment') || text.includes('vehicle')) return 'fleet';
+  if (type.includes('fatigue') || text.includes('fatigue')) return 'fatigue';
+  if (type.includes('risk') || type.includes('signal')) return 'ai';
+  return 'admin';
+}
+
+function routeLabel(route) {
+  return route === 'admin' ? 'Admin delivery' : (MODS[route]?.label || 'Related module');
+}
+
+async function markNotificationRead(id, refreshOnly=false) {
+  if (!dashToken || !id) return;
+  await fetch(`${DASH_API}/api/notifications/${id}/read`, {method:'PATCH',headers:{Authorization:`Bearer ${dashToken}`}});
+  if (refreshOnly) await loadNotifications();
+}
+
+async function openNotification(id) {
+  const n = dashboardNotifications.find(item=>item.id===id);
+  await markNotificationRead(id, false);
+  document.getElementById('notif-panel')?.classList.remove('open');
+  if (n) loadMod(routeForNotification(n));
+  loadNotifications();
+}
+
+async function openNotificationRoute(id) {
+  const n = dashboardNotifications.find(item=>item.id===id);
+  if (!n) return;
+  await markNotificationRead(id, false);
+  loadMod(routeForNotification(n));
+  loadNotifications();
+}
+
+function notificationNeedsAction(n) {
+  return !n.read_at || n.category === 'escalation' || ['failed','pending'].includes(String(n.email_status || '').toLowerCase());
+}
+
+function renderNotificationWorkflow() {
+  const panel = document.getElementById('panel-notifications');
+  const list = document.getElementById('workflow-list');
+  if (!panel || !list) return;
+  const all = dashboardNotifications || [];
+  const unread = all.filter(n=>!n.read_at);
+  const escalations = all.filter(n=>n.category === 'escalation');
+  const emailIssues = all.filter(n=>['failed','skipped','pending'].includes(String(n.email_status || '').toLowerCase()));
+  const needs = all.filter(notificationNeedsAction);
+  setEl('wf-needs', needs.length);
+  setEl('wf-unread', unread.length);
+  setEl('wf-escalations', escalations.length);
+  setEl('wf-email-issues', emailIssues.length);
+
+  let rows = all;
+  if (notificationWorkflowFilter === 'needs') rows = needs;
+  if (notificationWorkflowFilter === 'unread') rows = unread;
+  if (notificationWorkflowFilter === 'email') rows = emailIssues;
+
+  if (!rows.length) {
+    const label = notificationWorkflowFilter === 'all' ? 'No notifications found' : 'No workflow items in this filter';
+    list.innerHTML = `<div class="notif-empty">${label}</div>`;
+    return;
+  }
+  list.innerHTML = rows.map(n=>{
+    const route = routeForNotification(n);
+    const isEsc = n.category === 'escalation';
+    const delivery = String(n.email_status || 'pending').toLowerCase();
+    const detail = n.email_error || n.email_skip_reason || '';
+    return `<div class="workflow-row ${n.read_at?'':'unread'} ${isEsc?'escalation':''}">
+      <div>
+        <div class="workflow-row-title">${escapeDashboardText(n.title)}</div>
+        <div class="workflow-row-msg">${escapeDashboardText(n.message || '')}</div>
+        <div class="workflow-row-meta">
+          ${notifChip(n.category)}
+          ${notifChip(delivery)}
+          ${n.read_at ? `<span class="notif-chip">read</span>` : `<span class="notif-chip pending">unread</span>`}
+          <span class="notif-chip">${escapeDashboardText(routeLabel(route))}</span>
+        </div>
+        <div class="notif-time">${formatDashboardDate(n.created_at)}${detail ? ' · ' + escapeDashboardText(detail) : ''}</div>
+      </div>
+      <div class="workflow-row-actions">
+        <button class="mini-btn primary" onclick="openNotificationRoute('${n.id}')">Open ${escapeDashboardText(routeLabel(route))}</button>
+        ${n.read_at ? '' : `<button class="mini-btn" onclick="markNotificationRead('${n.id}', true)">Mark read</button>`}
+        ${isEsc ? `<button class="mini-btn danger" onclick="loadMod('admin')">Escalation policy</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function markAllNotificationsRead() {
