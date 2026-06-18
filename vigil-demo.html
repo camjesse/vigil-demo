@@ -965,14 +965,25 @@ function goHome() {
   closeMobileSidebar();
 }
 
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  if (typeof action === 'string') return { action };
+  return action;
+}
+
 function loadMod(id, action) {
-  if (cur === id) { if (action) sendModuleAction(id, action); closeMobileSidebar(); return; }
+  const actionPayload = normalizeModuleAction(action);
+  if (cur === id) { if (actionPayload) sendModuleAction(id, actionPayload); closeMobileSidebar(); return; }
   const m = MODS[id];
   if (!m) return;
   if (window.matchMedia('(max-width: 900px)').matches) {
     const url = new URL(m.src, window.location.href);
     url.searchParams.set('mobile', '1');
-    if (action) url.searchParams.set('action', action);
+    if (actionPayload) {
+      Object.entries(actionPayload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value);
+      });
+    }
     window.location.href = url.href;
     return;
   }
@@ -984,30 +995,46 @@ function loadMod(id, action) {
   if (!loaded[id]) {
     showL(m.label);
     f.src = m.src;
-    f.onload = () => { loaded[id] = true; hideL(); f.classList.add('active'); injectS(f); if (action) sendModuleAction(id, action); };
+    f.onload = () => { loaded[id] = true; hideL(); f.classList.add('active'); injectS(f); if (actionPayload) sendModuleAction(id, actionPayload); };
     f.onerror = () => { hideL(); showErr(m.src); };
   } else {
     f.classList.add('active');
-    if (action) sendModuleAction(id, action);
+    if (actionPayload) sendModuleAction(id, actionPayload);
   }
   cur = id;
   closeMobileSidebar();
 }
 
 function sendModuleAction(id, action) {
+  const actionPayload = normalizeModuleAction(action);
   const f = document.getElementById('frm-' + id);
   if (!f || !f.contentWindow) return;
   setTimeout(() => {
-    try { f.contentWindow.postMessage({type:'VIGIL_ACTION', action}, '*'); } catch(e) {}
+    try { f.contentWindow.postMessage({type:'VIGIL_ACTION', ...actionPayload}, '*'); } catch(e) {}
     try {
-      if (action === 'report_incident' && typeof f.contentWindow.openReportIncident === 'function') {
+      if (actionPayload?.action === 'report_incident' && typeof f.contentWindow.openReportIncident === 'function') {
         f.contentWindow.openReportIncident();
       }
-      if (action === 'report_incident' && f.contentDocument?.getElementById('panel-form') && typeof f.contentWindow.showPanel === 'function') {
+      if (actionPayload?.action === 'report_incident' && f.contentDocument?.getElementById('panel-form') && typeof f.contentWindow.showPanel === 'function') {
         f.contentWindow.showPanel('form');
       }
     } catch(e) {}
   }, 350);
+}
+
+function startupWorkflowAction() {
+  const q = new URLSearchParams(window.location.search);
+  const module = q.get('module');
+  if (!module) return false;
+  if (module === 'dashboard') { goHome(); return true; }
+  if (module === 'notifications') { openNotificationWorkflow(); return true; }
+  const payload = {
+    action: q.get('action') || 'open',
+    entity: q.get('entity') || '',
+    id: q.get('id') || '',
+  };
+  loadMod(module, payload);
+  return true;
 }
 
 function reportIncidentWorkflow() {
@@ -1108,7 +1135,9 @@ window.addEventListener('load', () => {
   loadSidebarState();
   setTimeout(() => {
     document.getElementById('loader').classList.add('gone');
-    setTimeout(() => { document.getElementById('panel-dash').classList.add('active'); }, 300);
+    setTimeout(() => {
+      if (!startupWorkflowAction()) document.getElementById('panel-dash').classList.add('active');
+    }, 300);
     initDashboard();
   }, 1100);
 });
@@ -1354,6 +1383,21 @@ function routeLabel(route) {
   return route === 'admin' ? 'Admin delivery' : (MODS[route]?.label || 'Related module');
 }
 
+function actionForNotification(n) {
+  const type = String(n?.entity_type || '').toLowerCase();
+  const title = String(n?.title || '').toLowerCase();
+  const msg = String(n?.message || '').toLowerCase();
+  const entityId = n?.entity_id || '';
+  if (type.includes('corrective')) {
+    return { action: title.includes('verification') || msg.includes('verification') ? 'verify' : 'complete', entity: 'corrective_action', id: entityId };
+  }
+  if (type.includes('incident')) {
+    const action = title.includes('response overdue') || msg.includes('acknowledgement') || msg.includes('no recorded responder') ? 'acknowledge' : 'follow_up';
+    return { action, entity: 'incident', id: entityId };
+  }
+  return { action: 'open', entity: type, id: entityId };
+}
+
 async function markNotificationRead(id, refreshOnly=false) {
   if (!dashToken || !id) return;
   await fetch(`${DASH_API}/api/notifications/${id}/read`, {method:'PATCH',headers:{Authorization:`Bearer ${dashToken}`}});
@@ -1364,7 +1408,7 @@ async function openNotification(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   await markNotificationRead(id, false);
   document.getElementById('notif-panel')?.classList.remove('open');
-  if (n) loadMod(routeForNotification(n));
+  if (n) loadMod(routeForNotification(n), actionForNotification(n));
   loadNotifications();
 }
 
@@ -1372,7 +1416,7 @@ async function openNotificationRoute(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   if (!n) return;
   await markNotificationRead(id, false);
-  loadMod(routeForNotification(n));
+  loadMod(routeForNotification(n), actionForNotification(n));
   loadNotifications();
 }
 

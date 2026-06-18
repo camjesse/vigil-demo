@@ -101,6 +101,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* OVERDUE */
 .overdue-days{color:var(--danger);font-weight:600;font-size:10.5px}
+.workflow-focus{border-color:rgba(59,130,246,.75)!important;box-shadow:0 0 0 2px rgba(59,130,246,.18),0 10px 30px rgba(59,130,246,.08)}
 
 /* FORM PANEL */
 .form-wrap{max-width:680px;margin:0 auto;padding:24px 18px}
@@ -741,6 +742,8 @@ let newIncidentId = null;
 let bodySelected = new Set();
 let formStep = 1;
 let formData = {};
+let pendingWorkflowAction = null;
+let focusedCapaId = null;
 
 // ── HELPERS ───────────────────────────────────────────────────
 async function apiGet(path) {
@@ -883,13 +886,53 @@ async function init() {
 }
 
 function handleStartupAction() {
-  const action = new URLSearchParams(window.location.search).get('action');
+  const q = new URLSearchParams(window.location.search);
+  const action = q.get('action');
+  const payload = { action, entity:q.get('entity') || '', id:q.get('id') || '' };
   if (action === 'report_incident') showPanel('form');
+  else if (action || payload.entity || payload.id) handleWorkflowAction(payload);
 }
 
 window.addEventListener('message', e => {
-  if (e.data && e.data.type === 'VIGIL_ACTION' && e.data.action === 'report_incident') showPanel('form');
+  if (!e.data || e.data.type !== 'VIGIL_ACTION') return;
+  if (e.data.action === 'report_incident') showPanel('form');
+  else handleWorkflowAction(e.data);
 });
+
+async function handleWorkflowAction(payload = {}) {
+  if (!incidents.length && !capas.length) {
+    pendingWorkflowAction = payload;
+    return;
+  }
+  const entity = String(payload.entity || '').toLowerCase();
+  const action = String(payload.action || 'open').toLowerCase();
+  const id = payload.id || payload.entityId || '';
+  if (!id && action !== 'report_incident') return;
+
+  if (entity.includes('corrective')) {
+    const capa = capas.find(c => c.id === id);
+    if (!capa) return toast('Corrective action not found in current register', 'danger');
+    focusedCapaId = id;
+    await showDetail(capa.incident_id);
+    setTimeout(() => {
+      const el = document.getElementById('capa-' + id);
+      if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+      toast(action === 'verify' ? 'Opened CAPA awaiting verification' : 'Opened CAPA completion workflow', 'ok');
+    }, 120);
+    return;
+  }
+
+  if (entity.includes('incident') || action === 'acknowledge' || action === 'follow_up' || action === 'open') {
+    const inc = incidents.find(i => i.id === id);
+    if (!inc) return toast('Incident not found in current register', 'danger');
+    focusedCapaId = null;
+    await showDetail(id);
+    setTimeout(() => {
+      document.getElementById('incident-response-section')?.scrollIntoView({behavior:'smooth', block:'center'});
+      if (action === 'acknowledge') toast('Opened incident response acknowledgement workflow', 'ok');
+    }, 120);
+  }
+}
 
 // ── KPIs ──────────────────────────────────────────────────────
 function renderKPIs() {
@@ -1158,7 +1201,7 @@ function renderDetail(inc, detail = {}) {
         const dot = c.status === 'completed' ? 'var(--ok)' : c.is_overdue ? 'var(--danger)' : 'var(--warn)';
         const assignee = c.assignee_first_name ? `${c.assignee_first_name} ${c.assignee_last_name}` : '—';
         const dueLabel = c.is_overdue ? `<span class="overdue-days">${c.days_overdue}d overdue</span>` : `Due ${fmtShortDate(c.due_date)}`;
-        return `<div class="capa-item">
+        return `<div class="capa-item ${focusedCapaId === c.id ? 'workflow-focus' : ''}" id="capa-${c.id}">
           <div class="capa-dot" style="background:${dot}"></div>
           <div class="capa-info">
             <div class="capa-title">${c.title}</div>
@@ -1199,7 +1242,7 @@ function renderDetail(inc, detail = {}) {
     <div class="section-title">Key Facts</div>
     <div class="detail-grid">${factsHtml}</div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px;gap:10px">
+    <div id="incident-response-section" style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px;gap:10px">
       <div class="section-title" style="margin:0">Response & Acknowledgement</div>
       <button class="btn ${acknowledgedByMe ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="acknowledgeIncident('${inc.id}')" ${acknowledgedByMe ? 'disabled' : ''}>${acknowledgedByMe ? 'You acknowledged' : 'Acknowledge incident'}</button>
     </div>
