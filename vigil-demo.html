@@ -992,16 +992,23 @@ function loadMod(id, action) {
   document.getElementById('hdr-mod-tag').textContent = m.label;
   const f = document.getElementById('frm-' + id);
   if (!f) return;
+  cur = id;
   if (!loaded[id]) {
     showL(m.label);
     f.src = m.src;
-    f.onload = () => { loaded[id] = true; hideL(); f.classList.add('active'); injectS(f); if (actionPayload) sendModuleAction(id, actionPayload); };
+    f.onload = () => {
+      loaded[id] = true;
+      injectS(f);
+      if (cur !== id) return;
+      hideL();
+      f.classList.add('active');
+      if (actionPayload) sendModuleAction(id, actionPayload);
+    };
     f.onerror = () => { hideL(); showErr(m.src); };
   } else {
     f.classList.add('active');
     if (actionPayload) sendModuleAction(id, actionPayload);
   }
-  cur = id;
   closeMobileSidebar();
 }
 
