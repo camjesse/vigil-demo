@@ -31,6 +31,8 @@
       .vigil-auth-error{display:none;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(239,68,68,.3);border-radius:6px;background:rgba(239,68,68,.08);color:#FCA5A5;font-size:11.5px;line-height:1.45}
       .vigil-auth-error.show{display:block}
       .vigil-auth-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px;flex-wrap:wrap}
+      .vigil-auth-link{border:0;background:transparent;color:#21B8E6;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;padding:0}
+      .vigil-auth-link:hover{text-decoration:underline}
       .vigil-auth-btn{height:36px;border-radius:6px;border:1px solid #2A394C;background:#111823;color:#D7E3EE;padding:0 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
       .vigil-auth-btn.primary{border-color:rgba(33,184,230,.45);background:#21B8E6;color:#061018}
       .vigil-auth-btn:disabled{opacity:.55;cursor:wait}
@@ -68,6 +70,12 @@
     window.sessionStorage.removeItem(SESSION_KEY);
     document.documentElement.classList.add('vigil-authenticated');
     renderSessionControl(session);
+    if (session.requiresPasswordChange && !document.querySelector('[data-vigil-security]')) {
+      window.setTimeout(() => openSecurityDialog(
+        'Set your password',
+        'This account is using a temporary password. Set a new password before continuing.'
+      ), 100);
+    }
     return session;
   }
 
@@ -124,7 +132,7 @@
     document.body.appendChild(button);
   }
 
-  function openSecurityDialog() {
+  function openSecurityDialog(title = 'Change password', copy = 'Changing your password immediately revokes all previously issued Vigil sessions.') {
     injectStyles();
     if (document.querySelector('[data-vigil-security]')) return;
 
@@ -134,8 +142,8 @@
     backdrop.innerHTML = `
       <form class="vigil-auth-card">
         <div class="vigil-auth-brand"><div class="vigil-auth-mark">V</div><div class="vigil-auth-brand-name">Account Security</div></div>
-        <div class="vigil-auth-title">Change password</div>
-        <div class="vigil-auth-copy">Changing your password immediately revokes all previously issued Vigil sessions.</div>
+        <div class="vigil-auth-title">${title}</div>
+        <div class="vigil-auth-copy">${copy}</div>
         <div class="vigil-auth-error" role="alert"></div>
         <div class="vigil-auth-field">
           <label for="vigil-current-password">Current password</label>
@@ -232,6 +240,7 @@
             <label for="vigil-auth-password">Password</label>
             <input id="vigil-auth-password" type="password" autocomplete="current-password" required>
           </div>
+          <button class="vigil-auth-link" type="button" data-forgot>Forgot password?</button>
           <div class="vigil-auth-actions">
             <button class="vigil-auth-btn primary" type="submit">Sign in</button>
           </div>
@@ -243,6 +252,30 @@
       const passwordInput = backdrop.querySelector('#vigil-auth-password');
       const errorBox = backdrop.querySelector('.vigil-auth-error');
       const submitButton = backdrop.querySelector('[type="submit"]');
+      const forgotButton = backdrop.querySelector('[data-forgot]');
+
+      forgotButton.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        if (!email) {
+          errorBox.textContent = 'Enter your email address first, then choose Forgot password.';
+          errorBox.classList.add('show');
+          emailInput.focus();
+          return;
+        }
+
+        forgotButton.disabled = true;
+        forgotButton.textContent = 'Sending reset...';
+        const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        }).catch(() => null);
+        const body = await response?.json().catch(() => ({}));
+        errorBox.textContent = body?.message || 'If that email exists in Vigil, a password reset link has been sent.';
+        errorBox.classList.add('show');
+        forgotButton.disabled = false;
+        forgotButton.textContent = 'Forgot password?';
+      });
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
