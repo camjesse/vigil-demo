@@ -867,7 +867,7 @@ const SOON = {
   profile:      {icon:'👤',title:'Profile',desc:'Manage your user profile, preferences, security settings, and notification preferences.',feats:[]},
 };
 
-let cur = null, loaded = {};
+let cur = null, loaded = {}, loadingMod = null;
 
 // ── SIDEBAR ───────────────────────────────────────────────────
 function toggleSidebar() {
@@ -994,18 +994,32 @@ function loadMod(id, action) {
   if (!f) return;
   cur = id;
   if (!loaded[id]) {
+    loadingMod = id;
     showL(m.label);
     f.src = m.src;
     f.onload = () => {
       loaded[id] = true;
       injectS(f);
+      if (loadingMod === id) {
+        hideL();
+        loadingMod = null;
+      }
       if (cur !== id) return;
-      hideL();
       f.classList.add('active');
       if (actionPayload) sendModuleAction(id, actionPayload);
     };
-    f.onerror = () => { hideL(); showErr(m.src); };
+    f.onerror = () => {
+      if (loadingMod === id) {
+        hideL();
+        loadingMod = null;
+      }
+      if (cur === id) showErr(m.src);
+    };
   } else {
+    if (loadingMod && lDiv) {
+      hideL();
+      loadingMod = null;
+    }
     f.classList.add('active');
     if (actionPayload) sendModuleAction(id, actionPayload);
   }
