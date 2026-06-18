@@ -21,7 +21,7 @@
   </header>
   <main class="main">
     <section class="panel" id="panel-dashboard"><div class="panel-pad">
-      <div class="page-hdr"><div><div class="page-title">Investigation Command Center</div><div class="page-sub">Report the event, investigate what failed, validate root causes, and turn findings into accountable actions.</div></div><div class="actions"><button class="btn" onclick="loadAll()">↻ Refresh</button><button class="btn btn-danger" onclick="openReportIncident()">🚨 Report Incident</button><button class="btn btn-primary" onclick="openStart()">＋ Start Investigation</button></div></div>
+      <div class="page-hdr"><div><div class="page-title">Investigation Command Center</div><div class="page-sub">Report the event, investigate what failed, validate root causes, and turn findings into accountable actions.</div></div><div class="actions"><button class="btn" onclick="loadAll()">↻ Refresh</button><button class="btn btn-danger" id="m-open-investigation" onclick="openReportIncident()">🚨 Report Incident</button><button class="btn btn-primary" onclick="openStart()">＋ Start Investigation</button></div></div>
       <div class="kpis">
         <div class="kpi" style="--tone:var(--accent)"><div class="kpi-label">Open Investigations</div><div class="kpi-value" id="kpi-open">—</div><div class="kpi-sub">Active workflow</div></div>
         <div class="kpi" style="--tone:var(--danger)"><div class="kpi-label">Overdue</div><div class="kpi-value" id="kpi-overdue">—</div><div class="kpi-sub">Past target completion</div></div>
