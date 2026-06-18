@@ -883,6 +883,11 @@ async function init() {
   renderCapaList();
   buildAlertStrip();
   handleStartupAction();
+  if (pendingWorkflowAction) {
+    const action = pendingWorkflowAction;
+    pendingWorkflowAction = null;
+    handleWorkflowAction(action);
+  }
 }
 
 function handleStartupAction() {
