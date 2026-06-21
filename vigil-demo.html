@@ -540,7 +540,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
       <span class="sb-icon">⚙️</span><span class="sb-label">Administration</span>
     </div>
     <div class="sb-item" id="sbi-notifications" onclick="openNotificationWorkflow()">
-      <span class="sb-icon">📬</span><span class="sb-label">Email Workflow</span>
+      <span class="sb-icon">✅</span><span class="sb-label">Action Center</span>
     </div>
     <div class="sb-item" onclick="openNotificationPreferences()">
       <span class="sb-icon">🔔</span><span class="sb-label">Notification Settings</span>
@@ -757,60 +757,62 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
     </div>
   </div><!-- /panel-dash -->
 
-  <!-- EMAIL / NOTIFICATION WORKFLOW -->
+  <!-- ACTION CENTER / NOTIFICATION WORKFLOW -->
   <div id="panel-notifications" class="workflow-panel">
     <div class="workflow-wrap">
       <section class="workflow-hero">
         <div>
-          <div class="dash-eyebrow">Notification command center</div>
-          <div class="workflow-title">Email Workflow</div>
-          <p class="workflow-copy">Every email Vigil sends is paired with an in-app workflow item here. Triage the alert, open the related module, mark it handled, or tune email preferences without hunting through your inbox.</p>
+          <div class="dash-eyebrow">Cross-module workflow</div>
+          <div class="workflow-title">Action Center</div>
+          <p class="workflow-copy">Emails get your attention. This is where the work gets finished: CAPAs, observation actions, inspection findings, meeting actions, overdue responses, and verification follow-up in one operational queue.</p>
         </div>
         <div class="workflow-actions">
-          <button class="mini-btn primary" onclick="loadNotifications()">↻ Refresh</button>
+          <button class="mini-btn primary" onclick="loadActionCenter()">↻ Refresh</button>
           <button class="mini-btn" onclick="openNotificationPreferences()">Preferences</button>
           <button class="mini-btn" onclick="loadMod('admin')">Admin delivery</button>
         </div>
       </section>
 
       <section class="workflow-grid">
-        <article class="workflow-stat"><div class="workflow-stat-label">Needs Action</div><div class="workflow-stat-value" id="wf-needs">0</div><div class="workflow-stat-sub">Unread or escalated</div></article>
-        <article class="workflow-stat"><div class="workflow-stat-label">Unread</div><div class="workflow-stat-value" id="wf-unread">0</div><div class="workflow-stat-sub">Not opened yet</div></article>
-        <article class="workflow-stat"><div class="workflow-stat-label">Escalations</div><div class="workflow-stat-value" id="wf-escalations">0</div><div class="workflow-stat-sub">Mandatory response path</div></article>
-        <article class="workflow-stat"><div class="workflow-stat-label">Email Issues</div><div class="workflow-stat-value" id="wf-email-issues">0</div><div class="workflow-stat-sub">Failed or skipped delivery</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Open Actions</div><div class="workflow-stat-value" id="wf-open">0</div><div class="workflow-stat-sub">Assigned work items</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Overdue</div><div class="workflow-stat-value" id="wf-overdue">0</div><div class="workflow-stat-sub">Past due date</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Awaiting Verify</div><div class="workflow-stat-value" id="wf-verify">0</div><div class="workflow-stat-sub">Completed, needs review</div></article>
+        <article class="workflow-stat"><div class="workflow-stat-label">Unread Emails</div><div class="workflow-stat-value" id="wf-unread">0</div><div class="workflow-stat-sub">Notification follow-up</div></article>
       </section>
 
       <section class="workflow-body">
         <article class="workflow-card">
           <div class="workflow-card-head">
-            <div class="workflow-card-title">Triage queue</div>
+            <div class="workflow-card-title">Unified action queue</div>
             <div class="workflow-tabs">
-              <button class="workflow-tab active" id="wf-tab-needs" onclick="setNotificationWorkflowFilter('needs')">Needs action</button>
-              <button class="workflow-tab" id="wf-tab-unread" onclick="setNotificationWorkflowFilter('unread')">Unread</button>
-              <button class="workflow-tab" id="wf-tab-email" onclick="setNotificationWorkflowFilter('email')">Email issues</button>
+              <button class="workflow-tab active" id="wf-tab-open" onclick="setNotificationWorkflowFilter('open')">Open</button>
+              <button class="workflow-tab" id="wf-tab-overdue" onclick="setNotificationWorkflowFilter('overdue')">Overdue</button>
+              <button class="workflow-tab" id="wf-tab-verify" onclick="setNotificationWorkflowFilter('verify')">Verify</button>
+              <button class="workflow-tab" id="wf-tab-emails" onclick="setNotificationWorkflowFilter('emails')">Emails</button>
               <button class="workflow-tab" id="wf-tab-all" onclick="setNotificationWorkflowFilter('all')">All</button>
             </div>
           </div>
           <div class="workflow-list" id="workflow-list">
-            <div class="notif-empty">Loading workflow...</div>
+            <div class="notif-empty">Loading action center...</div>
           </div>
         </article>
 
         <aside class="workflow-side">
           <div class="workflow-side-block">
-            <div class="workflow-side-title">How to process emails</div>
-            <div class="workflow-side-copy">Use the queue as the operational source of truth. Email gets your attention; the workflow item records what needs to happen next.</div>
+            <div class="workflow-side-title">What this solves</div>
+            <div class="workflow-side-copy">Notifications no longer strand people in an inbox. Assignment, overdue, completion, and verification work appears here even when the source module is different.</div>
           </div>
           <div class="workflow-side-block">
             <div class="workflow-side-title">Fast routes</div>
-            <div class="workflow-route"><span>Incident escalations</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
-            <div class="workflow-route"><span>Corrective actions</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
-            <div class="workflow-route"><span>Investigations</span><button class="mini-btn" onclick="loadMod('investigations')">Open</button></div>
+            <div class="workflow-route"><span>Incident CAPAs</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
+            <div class="workflow-route"><span>Observation actions</span><button class="mini-btn" onclick="loadMod('observations')">Open</button></div>
+            <div class="workflow-route"><span>Inspection actions</span><button class="mini-btn" onclick="loadMod('inspections')">Open</button></div>
+            <div class="workflow-route"><span>Meeting/JHSC actions</span><button class="mini-btn" onclick="showSoon('jhsc')">Open</button></div>
             <div class="workflow-route"><span>Email delivery audit</span><button class="mini-btn" onclick="loadMod('admin')">Open</button></div>
           </div>
           <div class="workflow-side-block">
-            <div class="workflow-side-title">Controls</div>
-            <div class="workflow-side-copy">Routine assignment, incident, and system emails can be tuned in preferences. Critical incident escalation stays mandatory so serious events cannot disappear silently.</div>
+            <div class="workflow-side-title">Notification controls</div>
+            <div class="workflow-side-copy">Routine assignment, incident, and system emails can still be tuned in preferences. Critical incident escalation stays mandatory so serious events cannot disappear silently.</div>
             <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
               <button class="mini-btn primary" onclick="openNotificationPreferences()">Preferences</button>
               <button class="mini-btn" onclick="markAllNotificationsRead()">Mark all read</button>
@@ -1220,7 +1222,9 @@ updateAlertStrip('ca');
 const DASH_API = window.VIGIL_API_BASE;
 let dashToken = null;
 let dashboardNotifications = [];
-let notificationWorkflowFilter = 'needs';
+let actionCenterItems = [];
+let actionCenterSummary = {open:0, overdue:0, awaiting_verification:0, mine:0};
+let notificationWorkflowFilter = 'open';
 
 async function initDashboard() {
   try {
@@ -1229,6 +1233,7 @@ async function initDashboard() {
     if (!dashToken) return;
     document.getElementById('sbi-admin')?.classList.toggle('hidden', !['admin','superadmin'].includes(session.user?.role));
     loadNotifications();
+    loadActionCenter();
 
     const hdr = {'Authorization':`Bearer ${dashToken}`,'Content-Type':'application/json'};
     const apiGet = url => fetch(`${DASH_API}${url}`,{headers:hdr}).then(r=>r.ok?r.json():null).catch(()=>null);
@@ -1340,7 +1345,7 @@ function renderNotifications() {
     <div class="notif-msg">${escapeDashboardText(n.message||'')}</div>
     <div class="notif-time">${formatDashboardDate(n.created_at)}</div>
     <div class="notif-meta">${notifChip(n.category)}${notifChip(n.email_status)}${n.read_at?'':'<span class="notif-chip pending">unread</span>'}</div>
-  </div>`).join('') + `<div class="notif-item" onclick="openNotificationWorkflow()" style="text-align:center;color:var(--accent);font-weight:800">Open full email workflow →</div>`;
+  </div>`).join('') + `<div class="notif-item" onclick="openNotificationWorkflow()" style="text-align:center;color:var(--accent);font-weight:800">Open Action Center →</div>`;
   renderNotificationWorkflow();
 }
 
@@ -1364,16 +1369,32 @@ function toggleNotifications(event) {
   loadNotifications();
 }
 
+async function loadActionCenter() {
+  if (!dashToken) return;
+  try {
+    const response = await fetch(`${DASH_API}/api/actions?limit=150`, {headers:{Authorization:`Bearer ${dashToken}`}});
+    const data = await response.json().catch(()=>({}));
+    if (!response.ok) throw new Error(data.error || 'Unable to load action center');
+    actionCenterItems = data.actions || [];
+    actionCenterSummary = data.summary || {open:0, overdue:0, awaiting_verification:0, mine:0};
+    renderNotificationWorkflow();
+  } catch(e) {
+    console.warn('[Vigil] Action Center failed:', e.message);
+    renderNotificationWorkflow();
+  }
+}
+
 function openNotificationWorkflow() {
   document.getElementById('notif-panel')?.classList.remove('open');
   deact();
   cur = 'notifications';
   setActiveItem('notifications');
-  document.getElementById('hdr-mod-tag').textContent = 'Email Workflow';
+  document.getElementById('hdr-mod-tag').textContent = 'Action Center';
   document.getElementById('panel-notifications')?.classList.add('active');
   closeMobileSidebar();
   renderNotificationWorkflow();
   loadNotifications();
+  loadActionCenter();
 }
 
 function setNotificationWorkflowFilter(filter) {
@@ -1445,51 +1466,164 @@ function notificationNeedsAction(n) {
   return !n.read_at || n.category === 'escalation' || ['failed','pending'].includes(String(n.email_status || '').toLowerCase());
 }
 
+function sourceChip(type) {
+  const map = {
+    corrective_action: ['failed','CAPA'],
+    observation_action: ['sent','Observation'],
+    inspection_action: ['pending','Inspection'],
+    meeting_action: ['assignment','Meeting'],
+  };
+  const [cls, label] = map[type] || ['unknown', type || 'Action'];
+  return `<span class="notif-chip ${cls}">${escapeDashboardText(label)}</span>`;
+}
+
+function statusChip(status, overdue) {
+  if (overdue) return '<span class="notif-chip failed">overdue</span>';
+  const s = String(status || 'open').toLowerCase();
+  const cls = s === 'verified' ? 'delivered' : s === 'completed' ? 'pending' : s === 'in_progress' ? 'sent' : 'unknown';
+  return `<span class="notif-chip ${cls}">${escapeDashboardText(s.replaceAll('_',' '))}</span>`;
+}
+
+function priorityChip(priority) {
+  if (!priority) return '';
+  const p = String(priority).toLowerCase();
+  const cls = ['critical','high'].includes(p) ? 'failed' : p === 'medium' ? 'pending' : 'delivered';
+  return `<span class="notif-chip ${cls}">${escapeDashboardText(p)}</span>`;
+}
+
+function actionAssignee(a) {
+  return [a.assignee_first_name, a.assignee_last_name].filter(Boolean).join(' ') || 'Unassigned';
+}
+
+function actionRoutePayload(a) {
+  const entity = a.source_type || 'action';
+  const action = a.status === 'completed' ? 'verify' : 'complete';
+  return { action, entity, id: a.id, parent_id: a.parent_id || '' };
+}
+
+function openActionRoute(id) {
+  const a = actionCenterItems.find(item=>item.id===id);
+  if (!a) return;
+  if (a.route_module === 'meetings') return showSoon('jhsc');
+  const route = a.route_module || 'admin';
+  loadMod(route, actionRoutePayload(a));
+}
+
+async function completeActionCenterItem(id) {
+  const a = actionCenterItems.find(item=>item.id===id);
+  if (!a || !dashToken) return;
+  let body = {};
+  if (a.source_type === 'corrective_action') {
+    const notes = window.prompt('Completion notes for this CAPA:');
+    if (!notes || !notes.trim()) return;
+    body = {completion_notes: notes.trim(), completion_evidence_urls: []};
+  }
+  const response = await fetch(`${DASH_API}/api/actions/${a.source_type}/${a.id}/complete`, {
+    method:'POST',
+    headers:{Authorization:`Bearer ${dashToken}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body),
+  });
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) return toast(data.error || 'Unable to complete action');
+  toast('Action marked complete');
+  await loadActionCenter();
+}
+
+async function verifyActionCenterItem(id) {
+  const a = actionCenterItems.find(item=>item.id===id);
+  if (!a || !dashToken) return;
+  const body = a.source_type === 'corrective_action' ? {verification_notes:'Verified from Action Center'} : {};
+  const response = await fetch(`${DASH_API}/api/actions/${a.source_type}/${a.id}/verify`, {
+    method:'POST',
+    headers:{Authorization:`Bearer ${dashToken}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body),
+  });
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) return toast(data.error || 'Unable to verify action');
+  toast('Action verified');
+  await loadActionCenter();
+}
+
 function renderNotificationWorkflow() {
   const panel = document.getElementById('panel-notifications');
   const list = document.getElementById('workflow-list');
   if (!panel || !list) return;
-  const all = dashboardNotifications || [];
-  const unread = all.filter(n=>!n.read_at);
-  const escalations = all.filter(n=>n.category === 'escalation');
-  const emailIssues = all.filter(n=>['failed','skipped','pending'].includes(String(n.email_status || '').toLowerCase()));
-  const needs = all.filter(notificationNeedsAction);
-  setEl('wf-needs', needs.length);
+  const emails = dashboardNotifications || [];
+  const unread = emails.filter(n=>!n.read_at);
+  const actions = actionCenterItems || [];
+  const open = actions.filter(a=>['open','in_progress'].includes(a.status));
+  const overdue = actions.filter(a=>a.is_overdue);
+  const verify = actions.filter(a=>a.status === 'completed');
+  setEl('wf-open', actionCenterSummary.open ?? open.length);
+  setEl('wf-overdue', actionCenterSummary.overdue ?? overdue.length);
+  setEl('wf-verify', actionCenterSummary.awaiting_verification ?? verify.length);
   setEl('wf-unread', unread.length);
-  setEl('wf-escalations', escalations.length);
-  setEl('wf-email-issues', emailIssues.length);
 
-  let rows = all;
-  if (notificationWorkflowFilter === 'needs') rows = needs;
-  if (notificationWorkflowFilter === 'unread') rows = unread;
-  if (notificationWorkflowFilter === 'email') rows = emailIssues;
+  if (notificationWorkflowFilter === 'emails') {
+    const rows = emails.filter(notificationNeedsAction);
+    if (!rows.length) {
+      list.innerHTML = '<div class="notif-empty">No notification follow-up items</div>';
+      return;
+    }
+    list.innerHTML = rows.map(n=>{
+      const route = routeForNotification(n);
+      const isEsc = n.category === 'escalation';
+      const delivery = String(n.email_status || 'pending').toLowerCase();
+      const detail = n.email_error || n.email_skip_reason || '';
+      return `<div class="workflow-row ${n.read_at?'':'unread'} ${isEsc?'escalation':''}">
+        <div>
+          <div class="workflow-row-title">${escapeDashboardText(n.title)}</div>
+          <div class="workflow-row-msg">${escapeDashboardText(n.message || '')}</div>
+          <div class="workflow-row-meta">
+            ${notifChip(n.category)}
+            ${notifChip(delivery)}
+            ${n.read_at ? `<span class="notif-chip">read</span>` : `<span class="notif-chip pending">unread</span>`}
+            <span class="notif-chip">${escapeDashboardText(routeLabel(route))}</span>
+          </div>
+          <div class="notif-time">${formatDashboardDate(n.created_at)}${detail ? ' · ' + escapeDashboardText(detail) : ''}</div>
+        </div>
+        <div class="workflow-row-actions">
+          <button class="mini-btn primary" onclick="openNotificationRoute('${n.id}')">Open ${escapeDashboardText(routeLabel(route))}</button>
+          ${n.read_at ? '' : `<button class="mini-btn" onclick="markNotificationRead('${n.id}', true)">Mark read</button>`}
+          ${isEsc ? `<button class="mini-btn danger" onclick="loadMod('admin')">Escalation policy</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  let rows = actions;
+  if (notificationWorkflowFilter === 'open') rows = open;
+  if (notificationWorkflowFilter === 'overdue') rows = overdue;
+  if (notificationWorkflowFilter === 'verify') rows = verify;
 
   if (!rows.length) {
-    const label = notificationWorkflowFilter === 'all' ? 'No notifications found' : 'No workflow items in this filter';
+    const label = notificationWorkflowFilter === 'all' ? 'No action items found' : 'No action items in this filter';
     list.innerHTML = `<div class="notif-empty">${label}</div>`;
     return;
   }
-  list.innerHTML = rows.map(n=>{
-    const route = routeForNotification(n);
-    const isEsc = n.category === 'escalation';
-    const delivery = String(n.email_status || 'pending').toLowerCase();
-    const detail = n.email_error || n.email_skip_reason || '';
-    return `<div class="workflow-row ${n.read_at?'':'unread'} ${isEsc?'escalation':''}">
+  list.innerHTML = rows.map(a=>{
+    const route = a.route_module === 'meetings' ? 'jhsc' : (a.route_module || 'admin');
+    const parent = [a.parent_number, a.parent_title].filter(Boolean).join(' · ');
+    const due = a.due_date ? `Due ${new Date(a.due_date).toLocaleDateString()}` : 'No due date';
+    const overdueText = a.is_overdue ? ` · ${Math.abs(a.days_overdue || 0)} day${Math.abs(a.days_overdue || 0) === 1 ? '' : 's'} overdue` : '';
+    return `<div class="workflow-row ${a.is_overdue?'escalation':''}">
       <div>
-        <div class="workflow-row-title">${escapeDashboardText(n.title)}</div>
-        <div class="workflow-row-msg">${escapeDashboardText(n.message || '')}</div>
+        <div class="workflow-row-title">${escapeDashboardText(a.title)}</div>
+        <div class="workflow-row-msg">${escapeDashboardText(a.description || parent || a.source_label || '')}</div>
         <div class="workflow-row-meta">
-          ${notifChip(n.category)}
-          ${notifChip(delivery)}
-          ${n.read_at ? `<span class="notif-chip">read</span>` : `<span class="notif-chip pending">unread</span>`}
-          <span class="notif-chip">${escapeDashboardText(routeLabel(route))}</span>
+          ${sourceChip(a.source_type)}
+          ${statusChip(a.status, a.is_overdue)}
+          ${priorityChip(a.priority)}
+          <span class="notif-chip">${escapeDashboardText(actionAssignee(a))}</span>
+          <span class="notif-chip">${escapeDashboardText(route === 'jhsc' ? 'JHSC / Meetings' : routeLabel(route))}</span>
         </div>
-        <div class="notif-time">${formatDashboardDate(n.created_at)}${detail ? ' · ' + escapeDashboardText(detail) : ''}</div>
+        <div class="notif-time">${escapeDashboardText(due + overdueText)}${a.site ? ' · ' + escapeDashboardText(a.site) : ''}</div>
       </div>
       <div class="workflow-row-actions">
-        <button class="mini-btn primary" onclick="openNotificationRoute('${n.id}')">Open ${escapeDashboardText(routeLabel(route))}</button>
-        ${n.read_at ? '' : `<button class="mini-btn" onclick="markNotificationRead('${n.id}', true)">Mark read</button>`}
-        ${isEsc ? `<button class="mini-btn danger" onclick="loadMod('admin')">Escalation policy</button>` : ''}
+        <button class="mini-btn primary" onclick="openActionRoute('${a.id}')">Open</button>
+        ${['open','in_progress'].includes(a.status) ? `<button class="mini-btn" onclick="completeActionCenterItem('${a.id}')">Complete</button>` : ''}
+        ${a.status === 'completed' ? `<button class="mini-btn" onclick="verifyActionCenterItem('${a.id}')">Verify</button>` : ''}
       </div>
     </div>`;
   }).join('');
