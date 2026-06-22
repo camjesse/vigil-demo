@@ -1409,8 +1409,8 @@ function routeForNotification(n) {
   const title = String(n?.title || '').toLowerCase();
   const msg = String(n?.message || '').toLowerCase();
   const text = `${type} ${title} ${msg}`;
-  if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
+  if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
   if (type.includes('observation')) return 'observations';
   if (type.includes('hazard') || type.includes('flha')) return 'hazards';
   if (type.includes('permit')) return 'permits';
