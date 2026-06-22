@@ -167,6 +167,7 @@ html:not(.vigil-authenticated) .shell{display:none}
 .workflow-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border);align-items:start}
 .workflow-row.unread{background:rgba(0,194,255,.035);border-left:3px solid var(--accent)}
 .workflow-row.escalation{background:rgba(255,69,69,.035)}
+.workflow-row.focused-action{background:rgba(59,130,246,.07);box-shadow:inset 3px 0 0 var(--accent)}
 .workflow-row-title{font-size:12px;font-weight:800;color:var(--text)}
 .workflow-row-msg{font-size:11px;color:var(--text2);line-height:1.45;margin-top:4px}
 .workflow-row-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
@@ -1050,7 +1051,7 @@ function startupWorkflowAction() {
   const module = q.get('module');
   if (!module) return false;
   if (module === 'dashboard') { goHome(); return true; }
-  if (module === 'notifications') { openNotificationWorkflow(); return true; }
+  if (module === 'notifications') { openNotificationWorkflow(q.get('id') || null); return true; }
   const payload = {
     action: q.get('action') || 'open',
     entity: q.get('entity') || '',
@@ -1225,6 +1226,7 @@ let dashboardNotifications = [];
 let actionCenterItems = [];
 let actionCenterSummary = {open:0, overdue:0, awaiting_verification:0, mine:0};
 let notificationWorkflowFilter = 'open';
+let actionCenterFocusId = null;
 
 async function initDashboard() {
   try {
@@ -1377,14 +1379,17 @@ async function loadActionCenter() {
     if (!response.ok) throw new Error(data.error || 'Unable to load action center');
     actionCenterItems = data.actions || [];
     actionCenterSummary = data.summary || {open:0, overdue:0, awaiting_verification:0, mine:0};
+    if (actionCenterFocusId && actionCenterItems.some(a=>a.id===actionCenterFocusId)) notificationWorkflowFilter = 'all';
     renderNotificationWorkflow();
+    if (actionCenterFocusId) setTimeout(()=>document.getElementById('wf-action-'+actionCenterFocusId)?.scrollIntoView({behavior:'smooth',block:'center'}),100);
   } catch(e) {
     console.warn('[Vigil] Action Center failed:', e.message);
     renderNotificationWorkflow();
   }
 }
 
-function openNotificationWorkflow() {
+function openNotificationWorkflow(focusId=null) {
+  if (focusId) actionCenterFocusId = focusId;
   document.getElementById('notif-panel')?.classList.remove('open');
   deact();
   cur = 'notifications';
@@ -1409,6 +1414,7 @@ function routeForNotification(n) {
   const title = String(n?.title || '').toLowerCase();
   const msg = String(n?.message || '').toLowerCase();
   const text = `${type} ${title} ${msg}`;
+  if (['inspection_action','meeting_action'].includes(type)) return 'notifications';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
   if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
   if (type.includes('observation')) return 'observations';
@@ -1450,7 +1456,11 @@ async function openNotification(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   await markNotificationRead(id, false);
   document.getElementById('notif-panel')?.classList.remove('open');
-  if (n) loadMod(routeForNotification(n), actionForNotification(n));
+  if (n) {
+    const route = routeForNotification(n);
+    if (route === 'notifications') openNotificationWorkflow(n.entity_id || null);
+    else loadMod(route, actionForNotification(n));
+  }
   loadNotifications();
 }
 
@@ -1458,7 +1468,9 @@ async function openNotificationRoute(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   if (!n) return;
   await markNotificationRead(id, false);
-  loadMod(routeForNotification(n), actionForNotification(n));
+  const route = routeForNotification(n);
+  if (route === 'notifications') openNotificationWorkflow(n.entity_id || null);
+  else loadMod(route, actionForNotification(n));
   loadNotifications();
 }
 
@@ -1607,7 +1619,7 @@ function renderNotificationWorkflow() {
     const parent = [a.parent_number, a.parent_title].filter(Boolean).join(' · ');
     const due = a.due_date ? `Due ${new Date(a.due_date).toLocaleDateString()}` : 'No due date';
     const overdueText = a.is_overdue ? ` · ${Math.abs(a.days_overdue || 0)} day${Math.abs(a.days_overdue || 0) === 1 ? '' : 's'} overdue` : '';
-    return `<div class="workflow-row ${a.is_overdue?'escalation':''}">
+    return `<div class="workflow-row ${a.is_overdue?'escalation':''} ${actionCenterFocusId===a.id?'focused-action':''}" id="wf-action-${a.id}">
       <div>
         <div class="workflow-row-title">${escapeDashboardText(a.title)}</div>
         <div class="workflow-row-msg">${escapeDashboardText(a.description || parent || a.source_label || '')}</div>
