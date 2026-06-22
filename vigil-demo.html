@@ -495,9 +495,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           <span class="sb-icon">🤝</span><span class="sb-label">Contractors</span>
           <span class="sb-soon">Soon</span>
         </div>
-        <div class="sb-item" id="sbi-jhsc" onclick="showSoon('jhsc')">
+        <div class="sb-item" id="sbi-jhsc" onclick="loadMod('jhsc')">
           <span class="sb-icon">👥</span><span class="sb-label">JHSC</span>
-          <span class="sb-soon">Soon</span>
         </div>
       </div>
     </div>
@@ -808,7 +807,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
             <div class="workflow-route"><span>Incident CAPAs</span><button class="mini-btn" onclick="loadMod('incidents')">Open</button></div>
             <div class="workflow-route"><span>Observation actions</span><button class="mini-btn" onclick="loadMod('observations')">Open</button></div>
             <div class="workflow-route"><span>Inspection actions</span><button class="mini-btn" onclick="loadMod('inspections')">Open</button></div>
-            <div class="workflow-route"><span>Meeting/JHSC actions</span><button class="mini-btn" onclick="showSoon('jhsc')">Open</button></div>
+            <div class="workflow-route"><span>Meeting/JHSC actions</span><button class="mini-btn" onclick="loadMod('jhsc')">Open</button></div>
             <div class="workflow-route"><span>Email delivery audit</span><button class="mini-btn" onclick="loadMod('admin')">Open</button></div>
           </div>
           <div class="workflow-side-block">
@@ -834,6 +833,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   <iframe class="mframe" id="frm-permits"       src="about:blank"></iframe>
   <iframe class="mframe" id="frm-fleet"         src="about:blank"></iframe>
   <iframe class="mframe" id="frm-fatigue"       src="about:blank"></iframe>
+  <iframe class="mframe" id="frm-jhsc"          src="about:blank"></iframe>
   <iframe class="mframe" id="frm-cor"           src="about:blank"></iframe>
   <iframe class="mframe" id="frm-ai"            src="about:blank"></iframe>
   <iframe class="mframe" id="frm-admin"         src="about:blank"></iframe>
@@ -856,6 +856,7 @@ const MODS = {
   permits:      {src:'vigil-permit-to-work.html',      label:'Permits'},
   fleet:        {src:'vigil-fleet.html',               label:'Fleet & Equipment'},
   fatigue:      {src:'vigil-fatigue.html',             label:'Hours & Fatigue'},
+  jhsc:         {src:'vigil-jhsc-meetings.html',       label:'JHSC & Safety Meetings'},
   cor:          {src:'vigil-audit-readiness.html',     label:'COR Audit'},
   ai:           {src:'vigil-predictive-ai.html',       label:'Predictive AI'},
   admin:        {src:'vigil-admin.html',               label:'Administration'},
@@ -1414,7 +1415,8 @@ function routeForNotification(n) {
   const title = String(n?.title || '').toLowerCase();
   const msg = String(n?.message || '').toLowerCase();
   const text = `${type} ${title} ${msg}`;
-  if (['inspection_action','meeting_action'].includes(type)) return 'notifications';
+  if (type === 'meeting_action') return 'jhsc';
+  if (type === 'inspection_action') return 'notifications';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
   if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
   if (type.includes('observation')) return 'observations';
@@ -1516,7 +1518,7 @@ function actionRoutePayload(a) {
 function openActionRoute(id) {
   const a = actionCenterItems.find(item=>item.id===id);
   if (!a) return;
-  if (a.route_module === 'meetings') return showSoon('jhsc');
+  if (a.route_module === 'meetings') return loadMod('jhsc', actionRoutePayload(a));
   const route = a.route_module || 'admin';
   loadMod(route, actionRoutePayload(a));
 }
