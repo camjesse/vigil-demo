@@ -173,6 +173,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 /* ACTION CARD */
 .action-card{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:6px}
 .action-card.done{border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03)}
+.action-card.focus{border-color:rgba(59,130,246,.7);box-shadow:0 0 0 1px rgba(59,130,246,.35),0 0 18px rgba(59,130,246,.16)}
+.action-card.overdue{border-color:rgba(239,68,68,.38);background:rgba(239,68,68,.035)}
+.action-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -645,6 +648,9 @@ let workers = [];
 let selectedObsType = null;
 let isAnon = false;
 let activeDetailId = null;
+let activeActionFocusId = null;
+let moduleReady = false;
+let pendingModuleAction = null;
 
 // ── API ────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -749,6 +755,48 @@ function today() {
   return new Date().toISOString().slice(0,10);
 }
 
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  if (typeof action === 'string') return {action};
+  return action;
+}
+
+async function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  const entity = String(payload.entity || '').toLowerCase();
+  if (payload.action === 'report_observation' || payload.action === 'report') {
+    showPanel('form');
+    return;
+  }
+  if ((entity === 'observation' || entity === 'observations') && payload.id) {
+    viewObservation(payload.id);
+    return;
+  }
+  if (entity === 'observation_action' && payload.id) {
+    openObservationAction(payload.id, payload.parent_id || null);
+  }
+}
+
+async function openObservationAction(actionId, parentId=null) {
+  if (parentId) {
+    viewObservation(parentId, actionId);
+    return;
+  }
+  const res = await apiGet('/api/actions?type=observation_action&status=open,in_progress,completed,verified&limit=250');
+  const action = (res?.actions || []).find(a => a.id === actionId);
+  if (!action?.parent_id) {
+    toast('Observation action not found or already unavailable', 'warn');
+    showPanel('dash');
+    return;
+  }
+  viewObservation(action.parent_id, actionId);
+}
+
 // ── INIT ───────────────────────────────────────────────────────
 async function init() {
   token = await getVigilToken();
@@ -782,7 +830,25 @@ async function init() {
   renderSilenceAlert();
   buildAlertStrip();
   renderTypeGrid();
-  showPanel('dash');
+  moduleReady = true;
+  if (pendingModuleAction) {
+    const action = pendingModuleAction;
+    pendingModuleAction = null;
+    handleModuleAction(action);
+    return;
+  }
+  if (!startupAction()) showPanel('dash');
+}
+
+function startupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const action = q.get('action');
+  const entity = q.get('entity');
+  const id = q.get('id');
+  const parentId = q.get('parent_id');
+  if (!action && !entity && !id) return false;
+  handleModuleAction({action: action || 'open', entity, id, parent_id: parentId});
+  return true;
 }
 
 // ── KPIs ───────────────────────────────────────────────────────
@@ -1143,8 +1209,9 @@ function resetForm() {
 }
 
 // ── OBSERVATION DETAIL ─────────────────────────────────────────
-async function viewObservation(id) {
+async function viewObservation(id, focusActionId=null) {
   activeDetailId = id;
+  activeActionFocusId = focusActionId;
   showPanel('detail');
   const el = document.getElementById('detail-content');
   el.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading…</span></div>`;
@@ -1174,8 +1241,12 @@ async function viewObservation(id) {
     ? `${o.assignee_first_name} ${o.assignee_last_name}` : null;
 
   // Actions HTML
-  const actionsHtml = actions.length ? actions.map(a => `
-    <div class="action-card${a.status==='completed'||a.status==='verified'?' done':''}">
+  const actionsHtml = actions.length ? actions.map(a => {
+    const isDone = a.status === 'completed' || a.status === 'verified';
+    const isFocus = activeActionFocusId && a.id === activeActionFocusId;
+    const isOverdue = a.due_date && new Date(a.due_date) < new Date(today()) && ['open','in_progress'].includes(a.status);
+    return `
+    <div class="action-card${isDone?' done':''}${isFocus?' focus':''}${isOverdue?' overdue':''}" id="obs-action-${a.id}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div style="flex:1">
           <div style="font-size:12.5px;font-weight:600;margin-bottom:2px">${a.title}</div>
@@ -1183,11 +1254,17 @@ async function viewObservation(id) {
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span class="chip muted" style="font-size:9px">${fmt(a.status||'open')}</span>
             ${a.due_date?`<span style="font-size:10px;color:var(--muted)">Due ${fmtDate(a.due_date)}</span>`:''}
+            ${isOverdue?`<span class="chip danger" style="font-size:9px">Overdue</span>`:''}
           </div>
         </div>
-        ${a.status==='completed'||a.status==='verified'?'<span style="font-size:16px;color:var(--ok)">✓</span>':''}
+        <div class="action-tools">
+          ${['open','in_progress'].includes(a.status) ? `<button class="btn btn-ok btn-sm" onclick="completeObservationAction('${a.id}')">Complete</button>` : ''}
+          ${a.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyObservationAction('${a.id}')">Verify</button>` : ''}
+          ${a.status === 'verified' ? '<span style="font-size:16px;color:var(--ok)">✓</span>' : ''}
+        </div>
       </div>
-    </div>`).join('') : `<div style="font-size:11.5px;color:var(--muted);padding:8px 0">No actions assigned yet</div>`;
+    </div>`;
+  }).join('') : `<div style="font-size:11.5px;color:var(--muted);padding:8px 0">No actions assigned yet</div>`;
 
   // Comments HTML
   const commentsHtml = [...updates, ...comments].sort((a,b)=>
@@ -1319,6 +1396,13 @@ async function viewObservation(id) {
       ${feedbackHtml||`<div style="font-size:11.5px;color:var(--muted)">No feedback sent yet. Feedback closes the loop with the reporter — this is critical for trust.</div>`}
     </div>`:``}
   `;
+
+  if (activeActionFocusId) {
+    setTimeout(() => {
+      const target = document.getElementById('obs-action-' + activeActionFocusId);
+      if (target) target.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 80);
+  }
 }
 
 // ── MODALS ─────────────────────────────────────────────────────
@@ -1407,6 +1491,32 @@ async function submitAction() {
   }
 }
 
+async function completeObservationAction(actionId) {
+  const res = await apiPost(`/api/actions/observation_action/${actionId}/complete`, {});
+  if (res.ok) {
+    toast('Observation action marked complete','ok');
+    viewObservation(activeDetailId, actionId);
+    const fresh = await apiGet('/api/observations?limit=100');
+    if (fresh) observations = fresh.observations||[];
+    renderKPIs(); renderTable();
+  } else {
+    toast(res.data?.error||'Failed to complete action','danger');
+  }
+}
+
+async function verifyObservationAction(actionId) {
+  const res = await apiPost(`/api/actions/observation_action/${actionId}/verify`, {});
+  if (res.ok) {
+    toast('Observation action verified','ok');
+    viewObservation(activeDetailId, actionId);
+    const fresh = await apiGet('/api/observations?limit=100');
+    if (fresh) observations = fresh.observations||[];
+    renderKPIs(); renderTable();
+  } else {
+    toast(res.data?.error||'Failed to verify action','danger');
+  }
+}
+
 async function submitClose() {
   const notes = document.getElementById('modal-close-notes').value.trim();
   if (!notes) { toast('Enter close notes — the reporter deserves to know what was done','danger'); return; }
@@ -1433,6 +1543,11 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => {
     if (e.target === overlay) closeModal(overlay.id);
   });
+});
+
+window.addEventListener('message', event => {
+  if (!event.data || event.data.type !== 'VIGIL_ACTION') return;
+  handleModuleAction(event.data);
 });
 
 init();
