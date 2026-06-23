@@ -852,7 +852,7 @@ const MODS = {
   investigations:{src:'vigil-investigation-workflow.html', label:'Investigations'},
   hazards:      {src:'vigil-hazard-assessment.html',   label:'Hazard Assessment'},
   observations: {src:'vigil-observations.html',        label:'Observations'},
-  inspections:  {src:'vigil-audit-readiness.html',     label:'Inspections & Audits'},
+  inspections:  {src:'vigil-inspections.html',          label:'Inspections'},
   permits:      {src:'vigil-permit-to-work.html',      label:'Permits'},
   fleet:        {src:'vigil-fleet.html',               label:'Fleet & Equipment'},
   fatigue:      {src:'vigil-fatigue.html',             label:'Hours & Fatigue'},
@@ -1416,7 +1416,7 @@ function routeForNotification(n) {
   const msg = String(n?.message || '').toLowerCase();
   const text = `${type} ${title} ${msg}`;
   if (type === 'meeting_action') return 'jhsc';
-  if (type === 'inspection_action') return 'notifications';
+  if (type === 'inspection_action') return 'inspections';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
   if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
   if (type.includes('observation')) return 'observations';
