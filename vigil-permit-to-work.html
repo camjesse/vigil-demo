@@ -580,7 +580,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
-const API = window.VIGIL_API_BASE;
+const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token = null;
 let LOGGED_IN = {};
 
@@ -595,6 +595,8 @@ let formControls = {};
 let fieldVerified = false;
 let selectedLeadId = null;
 let lastIssuedId = null;
+let moduleReady = false;
+let pendingModuleAction = null;
 
 // ── API ────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -741,8 +743,49 @@ async function init() {
   buildAlertStrip();
   populateAssessmentDropdown();
   renderTypeGrid();
+  moduleReady = true;
   showPanel('dash');
+  handleStartupAction();
 }
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  if (typeof action === 'string') return {action};
+  return action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action'),
+    entity: q.get('entity'),
+    id: q.get('id') || q.get('permit_id'),
+    parent_id: q.get('parent_id'),
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  const entity = String(payload.entity || '').toLowerCase();
+  if (payload.action === 'new_permit' || payload.action === 'create_permit') {
+    showPanel('form');
+    return;
+  }
+  if ((entity === 'permit' || entity === 'permits' || entity.includes('permit')) && payload.id) {
+    viewPermit(payload.parent_id || payload.id);
+  }
+}
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
+});
 
 // ── KPIs ───────────────────────────────────────────────────────
 function renderKPIs() {

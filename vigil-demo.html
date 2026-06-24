@@ -1445,6 +1445,15 @@ function actionForNotification(n) {
     const action = title.includes('response overdue') || msg.includes('acknowledgement') || msg.includes('no recorded responder') ? 'acknowledge' : 'follow_up';
     return { action, entity: 'incident', id: entityId };
   }
+  if (type.includes('permit')) {
+    const action = text.includes('closeout') ? 'closeout' : text.includes('revalidat') ? 'revalidate' : text.includes('simops') ? 'simops' : 'open';
+    return { action, entity: 'permit', id: entityId };
+  }
+  if (type.includes('fleet') || type.includes('equipment') || type.includes('vehicle') || type.includes('defect')) {
+    const action = text.includes('maintenance') || text.includes('service') ? 'maintenance' : text.includes('defect') || text.includes('deficien') ? 'deficiencies' : 'open';
+    const entity = type.includes('defect') ? 'asset_defect' : type.includes('equipment') ? 'equipment' : 'fleet_asset';
+    return { action, entity, id: entityId };
+  }
   return { action: 'open', entity: type, id: entityId };
 }
 

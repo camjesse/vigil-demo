@@ -421,8 +421,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
 // ─── API ──────────────────────────────────────────────────────
-const API_BASE = window.VIGIL_API_BASE;
+const API_BASE = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let authToken = null;
+let fleetReady = false;
+let pendingModuleAction = null;
 
 async function apiLogin() {
   authToken = await getVigilToken();
@@ -582,11 +584,65 @@ async function init() {
     await loadData();
     showLoading(false);
     renderAll();
+    fleetReady = true;
+    handleStartupAction();
   } catch(err) {
     showLoading(false);
     showApiError(err.message + ' — is the Vigil API running at ' + API_BASE + '?');
   }
 }
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  if (typeof action === 'string') return {action};
+  return action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action'),
+    entity: q.get('entity'),
+    id: q.get('id') || q.get('asset_id') || q.get('vehicle_id'),
+    parent_id: q.get('parent_id'),
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!fleetReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  const entity = String(payload.entity || '').toLowerCase();
+  const id = payload.parent_id || payload.id;
+  if (entity.includes('defect') || payload.action === 'deficiencies') {
+    showPanel('deficiencies');
+    return;
+  }
+  if (entity.includes('maintenance') || payload.action === 'maintenance') {
+    showPanel('maintenance');
+    return;
+  }
+  if (entity.includes('equipment')) {
+    showPanel('equipment');
+    return;
+  }
+  if ((entity.includes('fleet') || entity.includes('vehicle') || entity.includes('asset')) && id) {
+    const found = vehicles.find(v => v.id === id || v.unit === id);
+    if (found) openVehicleDetail(found.id);
+    else showPanel('fleet');
+    return;
+  }
+  showPanel('fleet');
+}
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
+});
 
 let vehicles = [];
 let maintenance = [];

@@ -228,9 +228,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
-const API = window.VIGIL_API_BASE;
+const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 
 let token           = null;
+let session         = null;
 let frameworks      = [];
 let statsData       = {};
 let dashData        = {};
@@ -240,6 +241,9 @@ let evidenceSummary = null;
 let activeFrameworkId = null;
 let activeElements  = [];
 let activeEvidence  = null;
+let moduleReady     = false;
+let pendingModuleAction = null;
+let focusFindingId  = null;
 
 // ── API ────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -353,7 +357,7 @@ function gauge(score, big) {
 
 // ── INIT ───────────────────────────────────────────────────────
 async function init() {
-  const session = await getVigilSession();
+  session = await getVigilSession();
   token = session.token;
   if (!token) { toast('Auth failed','danger'); return; }
 
@@ -387,8 +391,52 @@ async function init() {
   renderGaps();
   renderFindings();
   buildAlertStrip();
+  moduleReady = true;
   showPanel('dash');
+  handleStartupAction();
 }
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  if (typeof action === 'string') return {action};
+  return action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action'),
+    entity: q.get('entity'),
+    id: q.get('id'),
+    parent_id: q.get('parent_id'),
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  const entity = String(payload.entity || '').toLowerCase();
+  if ((entity === 'framework' || entity === 'audit_framework') && payload.id) {
+    viewFramework(payload.id);
+    return;
+  }
+  if ((entity.includes('finding') || entity === 'audit') && payload.id) {
+    focusFindingId = payload.id;
+    showPanel('dash');
+    renderFindings();
+    setTimeout(() => document.getElementById('finding-' + payload.id)?.scrollIntoView({behavior:'smooth', block:'center'}), 80);
+  }
+}
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
+});
 
 // ── HERO ───────────────────────────────────────────────────────
 function renderHero() {
@@ -666,20 +714,52 @@ function renderFindings() {
     html += `<div class="tbl-wrap"><table class="tbl">
       <thead><tr>
         <th>Finding #</th><th>Type</th><th>Element</th><th>Description</th>
-        <th>Assigned To</th><th>Due Date</th><th>Status</th>
+        <th>Assigned To</th><th>Due Date</th><th>Status</th><th>Actions</th>
       </tr></thead>
-      <tbody>${findings.map(f => `<tr>
+      <tbody>${findings.map(f => `<tr id="finding-${f.id}" style="${focusFindingId===f.id?'outline:1px solid var(--accent);background:rgba(59,130,246,.06)':''}">
         <td style="font-size:11px;font-family:monospace;color:var(--accent)">${f.finding_number||'—'}</td>
         <td>${findingChip(f.finding_type)}</td>
         <td style="font-size:11px;color:var(--text2)">${f.element_code||'—'}</td>
         <td style="font-size:12px;max-width:220px;color:var(--text2)">${(f.description||'—').slice(0,80)}</td>
-        <td style="font-size:11px;color:var(--text2)">${f.assigned_to_name||'—'}</td>
+        <td style="font-size:11px;color:var(--text2)">${f.assigned_to_name||[f.first_name,f.last_name].filter(Boolean).join(' ')||'—'}</td>
         <td style="font-size:11px;color:var(--muted)">${fmtDate(f.due_date)}</td>
         <td><span class="chip muted">${fmt(f.status)}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${['open','in_progress'].includes(f.status)?`<button class="btn btn-primary btn-sm" onclick="correctFinding('${f.id}')">Correct</button>`:''}
+            ${f.status==='corrected'?`<button class="btn btn-ghost btn-sm" onclick="verifyFinding('${f.id}')">Verify</button>`:''}
+          </div>
+        </td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }
   el.innerHTML = html;
+}
+
+async function refreshFindings() {
+  const res = await apiGet('/api/audit/findings/open');
+  findings = (res && res.findings) || [];
+  renderFindings();
+}
+
+async function correctFinding(id) {
+  const notes = window.prompt('What corrective action was completed for this finding?');
+  if (!notes || !notes.trim()) return;
+  const res = await apiPost(`/api/audit/findings/${id}/correct`, {corrective_action_description: notes.trim()});
+  if (!res.ok) return toast(res.data?.error || 'Unable to correct finding', 'danger');
+  focusFindingId = id;
+  toast('Finding marked corrected', 'ok');
+  await refreshFindings();
+}
+
+async function verifyFinding(id) {
+  const verifiedBy = session?.worker?.name || session?.user?.email || 'Vigil user';
+  const body = {verified_by: verifiedBy};
+  const res = await apiPost(`/api/audit/findings/${id}/verify`, body);
+  if (!res.ok) return toast(res.data?.error || 'Unable to verify finding', 'danger');
+  focusFindingId = id;
+  toast('Finding verified', 'ok');
+  await refreshFindings();
 }
 
 // ── ALERT STRIP ────────────────────────────────────────────────
