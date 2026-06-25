@@ -427,6 +427,8 @@ let HOS_RULES = {
 // DRIVER DATA — populated from API on init
 let drivers = [];
 let authToken = null;
+let moduleReady = false;
+let pendingModuleAction = null;
 
 let overrides = [];
 
@@ -684,6 +686,8 @@ async function initApp() {
 
     hideLoading();
     renderAll();
+    moduleReady = true;
+    handleStartupAction();
     if (drivers.length === 0) {
       showToast('warn', '⚠️ No worker data returned from API');
     }
@@ -1504,6 +1508,54 @@ function showPanel(id){
   if(id==='overrides') renderOverridesPanel();
 }
 
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  return typeof action === 'string' ? {action} : action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action') || '',
+    entity: q.get('entity') || '',
+    id: q.get('id') || '',
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  pendingModuleAction = null;
+  const act = String(payload.action || '').toLowerCase();
+  const entity = String(payload.entity || '').toLowerCase();
+  const id = payload.id || payload.worker_id || payload.driver_id || '';
+  if (id) {
+    const match = drivers.find(d => d.id === id || d.workerId === id);
+    if (match) {
+      openDriverDetail(match.id);
+      return;
+    }
+  }
+  if (act.includes('dispatch') || entity.includes('dispatch')) {
+    showPanel('dispatch');
+    return;
+  }
+  if (act.includes('violation') || entity.includes('violation')) {
+    showPanel('violations');
+    return;
+  }
+  if (act.includes('review') || act.includes('analysis') || entity.includes('fatigue')) {
+    showPanel('fatigue-report');
+    return;
+  }
+  showPanel('dashboard');
+}
+
 function renderDriversPanel(){
   const el=document.getElementById('driversPanel');
   if(!el) return;
@@ -1579,6 +1631,8 @@ const HOS_RULES_US = {
 };
 
 window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
   if (e.data && e.data.type === 'VIGIL_JUR') {
     VIGIL_JUR = e.data.jur;
     Object.assign(HOS_RULES, VIGIL_JUR === 'us' ? HOS_RULES_US : HOS_RULES_CA);

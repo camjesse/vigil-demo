@@ -1415,17 +1415,17 @@ function routeForNotification(n) {
   const title = String(n?.title || '').toLowerCase();
   const msg = String(n?.message || '').toLowerCase();
   const text = `${type} ${title} ${msg}`;
-  if (type === 'meeting_action') return 'jhsc';
-  if (type === 'inspection_action') return 'inspections';
+  if (type === 'meeting_action' || type.includes('jhsc') || text.includes('meeting action')) return 'jhsc';
+  if (type === 'inspection_action' || text.includes('inspection action')) return 'inspections';
+  if (type === 'observation_action' || type.includes('observation')) return 'observations';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
-  if (type.includes('corrective') || type.includes('incident') || text.includes('capa')) return 'incidents';
-  if (type.includes('observation')) return 'observations';
+  if (type.includes('corrective') || type.includes('incident') || text.includes('capa') || text.includes('response overdue') || text.includes('follow-up')) return 'incidents';
   if (type.includes('hazard') || type.includes('flha')) return 'hazards';
-  if (type.includes('permit')) return 'permits';
-  if (type.includes('audit') || type.includes('finding')) return 'cor';
-  if (type.includes('fleet') || type.includes('equipment') || text.includes('vehicle')) return 'fleet';
-  if (type.includes('fatigue') || text.includes('fatigue')) return 'fatigue';
-  if (type.includes('risk') || type.includes('signal')) return 'ai';
+  if (type.includes('permit') || text.includes('permit')) return 'permits';
+  if (type.includes('audit') || type.includes('finding') || text.includes('audit finding')) return 'cor';
+  if (type.includes('fleet') || type.includes('equipment') || type.includes('vehicle') || type.includes('defect') || text.includes('vehicle') || text.includes('maintenance')) return 'fleet';
+  if (type.includes('fatigue') || text.includes('fatigue') || text.includes('hours of service') || text.includes('hos')) return 'fatigue';
+  if (type.includes('risk') || type.includes('signal') || text.includes('predictive')) return 'ai';
   return 'admin';
 }
 
@@ -1437,22 +1437,49 @@ function actionForNotification(n) {
   const type = String(n?.entity_type || '').toLowerCase();
   const title = String(n?.title || '').toLowerCase();
   const msg = String(n?.message || '').toLowerCase();
+  const text = `${type} ${title} ${msg}`;
   const entityId = n?.entity_id || '';
+  const verification = text.includes('verification') || text.includes('verify') || text.includes('awaiting review');
+  const completion = verification ? 'verify' : 'complete';
+  if (type === 'meeting_action') {
+    return { action: completion, entity: 'meeting_action', id: entityId };
+  }
+  if (type === 'inspection_action') {
+    return { action: completion, entity: 'inspection_action', id: entityId };
+  }
+  if (type === 'observation_action') {
+    return { action: completion, entity: 'observation_action', id: entityId };
+  }
   if (type.includes('corrective')) {
-    return { action: title.includes('verification') || msg.includes('verification') ? 'verify' : 'complete', entity: 'corrective_action', id: entityId };
+    return { action: completion, entity: 'corrective_action', id: entityId };
   }
   if (type.includes('incident')) {
     const action = title.includes('response overdue') || msg.includes('acknowledgement') || msg.includes('no recorded responder') ? 'acknowledge' : 'follow_up';
     return { action, entity: 'incident', id: entityId };
   }
+  if (type.includes('investigation')) {
+    return { action: text.includes('assign') ? 'assign' : 'open', entity: 'investigation', id: entityId };
+  }
   if (type.includes('permit')) {
     const action = text.includes('closeout') ? 'closeout' : text.includes('revalidat') ? 'revalidate' : text.includes('simops') ? 'simops' : 'open';
     return { action, entity: 'permit', id: entityId };
+  }
+  if (type.includes('audit') || type.includes('finding')) {
+    return { action: completion, entity: type.includes('framework') ? 'audit_framework' : 'audit_finding', id: entityId };
   }
   if (type.includes('fleet') || type.includes('equipment') || type.includes('vehicle') || type.includes('defect')) {
     const action = text.includes('maintenance') || text.includes('service') ? 'maintenance' : text.includes('defect') || text.includes('deficien') ? 'deficiencies' : 'open';
     const entity = type.includes('defect') ? 'asset_defect' : type.includes('equipment') ? 'equipment' : 'fleet_asset';
     return { action, entity, id: entityId };
+  }
+  if (type.includes('hazard') || type.includes('flha')) {
+    return { action: text.includes('review') ? 'review' : 'open', entity: 'hazard_assessment', id: entityId };
+  }
+  if (type.includes('fatigue')) {
+    return { action: text.includes('dispatch') ? 'dispatch_review' : 'open', entity: 'fatigue', id: entityId };
+  }
+  if (type.includes('risk') || type.includes('signal')) {
+    return { action: text.includes('action') ? 'action' : 'open', entity: 'risk_signal', id: entityId };
   }
   return { action: 'open', entity: type, id: entityId };
 }

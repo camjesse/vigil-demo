@@ -380,6 +380,8 @@ let predictions  = [];
 let scanResults  = null;
 let activeSignalId     = null;
 let pendingActionId    = null;
+let moduleReady        = false;
+let pendingModuleAction = null;
 
 // ── API ────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -573,9 +575,51 @@ async function init() {
   renderSignalTypes();
   buildAlertStrip();
   showPanel('dash');
+  moduleReady = true;
+  handleStartupAction();
 
   fetchActivePermits();
   fetchWeather();
+}
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  return typeof action === 'string' ? {action} : action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action') || '',
+    entity: q.get('entity') || '',
+    id: q.get('id') || '',
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  pendingModuleAction = null;
+  const entity = String(payload.entity || '').toLowerCase();
+  const act = String(payload.action || '').toLowerCase();
+  if ((entity.includes('risk') || entity.includes('signal')) && payload.id) {
+    viewSignal(payload.id);
+    return;
+  }
+  if (act === 'report' || entity.includes('report')) {
+    showReport();
+    return;
+  }
+  if (act === 'detect' || act === 'scan') {
+    runDetection();
+    return;
+  }
+  showPanel('dash');
 }
 
 // ── HERO ───────────────────────────────────────────────────────
@@ -1366,6 +1410,11 @@ function showPanel(id) {
   const el = document.getElementById('panel-'+id);
   if (el) { el.classList.remove('hidden'); el.scrollTop = 0; }
 }
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
+});
 
 init();
 </script>

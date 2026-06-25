@@ -681,6 +681,8 @@ let formControlResponses = {};
 let formCrewIds = [];
 let formData = {};
 let lastSubmittedId = null;
+let moduleReady = false;
+let pendingModuleAction = null;
 
 // ── HELPERS ───────────────────────────────────────────────────
 async function apiGet(path) {
@@ -807,6 +809,50 @@ async function init() {
   renderAssessmentsTable();
   renderTemplateLibrary();
   buildAlertStrip();
+  moduleReady = true;
+  handleStartupAction();
+}
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  return typeof action === 'string' ? {action} : action;
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = pendingModuleAction || {
+    action: q.get('action') || '',
+    entity: q.get('entity') || '',
+    id: q.get('id') || '',
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload) return;
+  if (!moduleReady) {
+    pendingModuleAction = payload;
+    return;
+  }
+  pendingModuleAction = null;
+  const entity = String(payload.entity || '').toLowerCase();
+  const act = String(payload.action || '').toLowerCase();
+  if (act === 'start_flha' || act === 'new_flha' || act === 'create' || act === 'report') {
+    showPanel('form');
+    return;
+  }
+  if ((entity.includes('hazard') || entity.includes('flha') || entity.includes('assessment')) && payload.id) {
+    showDetail(payload.id);
+    return;
+  }
+  if (act === 'review') {
+    const pending = assessments.find(a => ['flagged','supervisor_review'].includes(a.status));
+    if (pending) showDetail(pending.id);
+    else showPanel('dash');
+    return;
+  }
+  showPanel('dash');
 }
 
 // ── KPIs ──────────────────────────────────────────────────────
@@ -1703,6 +1749,11 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.ac-wrap')) {
     document.querySelectorAll('.ac-dropdown').forEach(d => d.style.display = 'none');
   }
+});
+
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'VIGIL_ACTION') handleModuleAction(e.data);
+  if (e.data && e.data.type === 'VIGIL_THEME') document.documentElement.classList.toggle('light-mode', e.data.theme === 'light');
 });
 
 // ── START ─────────────────────────────────────────────────────
