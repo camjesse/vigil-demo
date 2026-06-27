@@ -1484,6 +1484,37 @@ function actionForNotification(n) {
   return { action: 'open', entity: type, id: entityId };
 }
 
+function actionRouteFromNotificationUrl(n) {
+  if (!n?.action_url) return null;
+  try {
+    const url = new URL(n.action_url, window.location.href);
+    const module = url.searchParams.get('module');
+    if (!module) return null;
+    return {
+      route: module,
+      payload: {
+        action: url.searchParams.get('action') || 'open',
+        entity: url.searchParams.get('entity') || n.entity_type || '',
+        id: url.searchParams.get('id') || n.entity_id || '',
+        parent_id: url.searchParams.get('parent_id') || '',
+      },
+    };
+  } catch(e) {
+    return null;
+  }
+}
+
+function openNotificationTarget(n) {
+  const routed = actionRouteFromNotificationUrl(n);
+  if (routed) {
+    if (routed.route === 'notifications') return openNotificationWorkflow(routed.payload.id || n.entity_id || null);
+    return loadMod(routed.route, routed.payload);
+  }
+  const route = routeForNotification(n);
+  if (route === 'notifications') return openNotificationWorkflow(n.entity_id || null);
+  return loadMod(route, actionForNotification(n));
+}
+
 async function markNotificationRead(id, refreshOnly=false) {
   if (!dashToken || !id) return;
   await fetch(`${DASH_API}/api/notifications/${id}/read`, {method:'PATCH',headers:{Authorization:`Bearer ${dashToken}`}});
@@ -1494,11 +1525,7 @@ async function openNotification(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   await markNotificationRead(id, false);
   document.getElementById('notif-panel')?.classList.remove('open');
-  if (n) {
-    const route = routeForNotification(n);
-    if (route === 'notifications') openNotificationWorkflow(n.entity_id || null);
-    else loadMod(route, actionForNotification(n));
-  }
+  if (n) openNotificationTarget(n);
   loadNotifications();
 }
 
@@ -1506,9 +1533,7 @@ async function openNotificationRoute(id) {
   const n = dashboardNotifications.find(item=>item.id===id);
   if (!n) return;
   await markNotificationRead(id, false);
-  const route = routeForNotification(n);
-  if (route === 'notifications') openNotificationWorkflow(n.entity_id || null);
-  else loadMod(route, actionForNotification(n));
+  openNotificationTarget(n);
   loadNotifications();
 }
 
