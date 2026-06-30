@@ -81,7 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
-let token='', session=null, meetings=[], stats={}, engagement={}, recommendations=[], workers=[], actionItems=[], current=null, focusActionId=null, pendingAction=null;
+let token='', session=null, meetings=[], stats={}, engagement={}, recommendations=[], workers=[], actionItems=[], current=null, focusActionId=null, focusActionIntent='open', pendingAction=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=s=>String(s||'--').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -124,15 +124,16 @@ function handleStartupAction(){
   const payload=pendingAction||{action:q.get('action'),entity:q.get('entity'),id:q.get('id'),parent_id:q.get('parent_id')};
   if(payload.action||payload.entity||payload.id) handleModuleAction(payload);
 }
-window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_ACTION')handleModuleAction(e.data)});
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_ACTION')handleModuleAction(e.data);if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
 async function handleModuleAction(payload={}){
   if(!token){pendingAction=payload;return}
   const entity=String(payload.entity||'').toLowerCase();
-  if(entity==='meeting_action'&&payload.id){await openMeetingAction(payload.id,payload.parent_id||null);return}
+  if(entity==='meeting_action'&&payload.id){await openMeetingAction(payload.id,payload.parent_id||null,payload.action||'open');return}
   if((entity==='meeting'||entity==='meetings')&&payload.id){await openDetail(payload.id);return}
 }
-async function openMeetingAction(actionId,parentId=null){
+async function openMeetingAction(actionId,parentId=null,intent='open'){
   focusActionId=actionId;
+  focusActionIntent=String(intent||'open').toLowerCase();
   if(parentId){await openDetail(parentId);return}
   const found=actionItems.find(a=>a.id===actionId);
   if(found?.parent_id){await openDetail(found.parent_id);return}
@@ -193,10 +194,14 @@ async function openDetail(id){
     current=r.meeting;
     renderDetail();
     showPanel('detail');
-    if(focusActionId)setTimeout(()=>$('action-'+focusActionId)?.scrollIntoView({behavior:'smooth',block:'center'}),100);
+    if(focusActionId)setTimeout(()=>{
+      $('action-'+focusActionId)?.scrollIntoView({behavior:'smooth',block:'center'});
+      announceFocusedAction();
+    },100);
   }catch(e){toast(e.message)}
 }
 function showPanel(name){document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));$('panel-'+name).classList.remove('hidden')}
+function announceFocusedAction(){const a=(current?.action_items||[]).find(x=>x.id===focusActionId)||actionItems.find(x=>x.id===focusActionId);if(!a)return;const intent=focusActionIntent||'open';if(intent==='verify'||a.status==='completed')toast('Opened meeting action awaiting verification');else if(intent==='complete')toast('Opened meeting action completion workflow');else toast('Opened meeting action');}
 function renderDetail(){
   const m=current, attendance=m.attendance||[], actions=m.action_items||[];
   $('detail-root').innerHTML=`<div class="detail-head"><button class="btn btn-sm" onclick="showPanel('dash')">Back</button><div style="flex:1"><div>${chip(m.meeting_type)} ${chip(m.status)}</div><div class="detail-title">${esc(m.meeting_number)} · ${esc(m.title)}</div><div class="detail-meta">${esc(m.site||'No site')} · ${dt(m.scheduled_date)} · Facilitator ${esc(m.facilitator_first_name?`${m.facilitator_first_name} ${m.facilitator_last_name}`:'not assigned')}</div></div><div class="actions">${m.status==='scheduled'?`<button class="btn btn-primary" onclick="startMeeting()">Start</button>`:''}${['scheduled','in_progress'].includes(m.status)?`<button class="btn btn-ok" onclick="completeMeeting()">Complete</button>`:''}</div></div><div class="detail-grid"><div class="fact"><div class="fact-label">Attendance</div><div class="fact-value">${m.attendance_rate==null?'--':`${m.attendance_rate}%`}</div></div><div class="fact"><div class="fact-label">Invited</div><div class="fact-value">${m.total_invited||attendance.length||'--'}</div></div><div class="fact"><div class="fact-label">Attended</div><div class="fact-value">${m.total_attended||attendance.filter(a=>a.attended).length||0}</div></div><div class="fact"><div class="fact-label">Open Actions</div><div class="fact-value">${actions.filter(a=>['open','in_progress'].includes(a.status)).length}</div></div></div><div class="section-title">Agenda / Topics</div><div class="item"><div class="item-copy">${(m.topics_covered||[]).map(esc).join(', ')||'No topics recorded'}${m.discussion_notes?`<br><br>${esc(m.discussion_notes)}`:''}</div></div><div class="section-title">Attendance</div>${attendance.length?attendance.map(a=>`<div class="item"><div class="item-title">${esc(a.first_name)} ${esc(a.last_name)} ${a.attended?chip('attended'):chip('invited')}</div><div class="item-copy">${esc(a.job_title||'')} ${a.signed_at?`· signed ${dt(a.signed_at)}`:''}</div></div>`).join(''):'<div class="empty">No attendance recorded.</div>'}<div class="section-title">Action Items</div>${actions.length?actions.map(actionCard).join(''):'<div class="empty">No action items for this meeting.</div>'}`;

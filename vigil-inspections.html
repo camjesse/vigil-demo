@@ -86,7 +86,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
-let token='', session=null, inspections=[], stats={}, trends=[], overdue=[], workers=[], actionItems=[], current=null, focusActionId=null, pendingAction=null;
+let token='', session=null, inspections=[], stats={}, trends=[], overdue=[], workers=[], actionItems=[], current=null, focusActionId=null, focusActionIntent='open', pendingAction=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=s=>String(s||'--').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
@@ -135,11 +135,12 @@ window.addEventListener('message',e=>{
 async function handleModuleAction(payload={}){
   if(!token){pendingAction=payload;return}
   const entity=String(payload.entity||'').toLowerCase();
-  if(entity==='inspection_action'&&payload.id){await openInspectionAction(payload.id,payload.parent_id||null);return}
+  if(entity==='inspection_action'&&payload.id){await openInspectionAction(payload.id,payload.parent_id||null,payload.action||'open');return}
   if((entity==='inspection'||entity==='inspections')&&payload.id){await openDetail(payload.id);return}
 }
-async function openInspectionAction(actionId,parentId=null){
+async function openInspectionAction(actionId,parentId=null,intent='open'){
   focusActionId=actionId;
+  focusActionIntent=String(intent||'open').toLowerCase();
   if(parentId){await openDetail(parentId);return}
   const found=actionItems.find(a=>a.id===actionId);
   if(found?.parent_id){await openDetail(found.parent_id);return}
@@ -210,10 +211,14 @@ async function openDetail(id){
     current=r.inspection;
     renderDetail();
     showPanel('detail');
-    if(focusActionId)setTimeout(()=>$('action-'+focusActionId)?.scrollIntoView({behavior:'smooth',block:'center'}),100);
+    if(focusActionId)setTimeout(()=>{
+      $('action-'+focusActionId)?.scrollIntoView({behavior:'smooth',block:'center'});
+      announceFocusedAction();
+    },100);
   }catch(e){toast(e.message)}
 }
 function showPanel(name){document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));$('panel-'+name).classList.remove('hidden')}
+function announceFocusedAction(){const a=(current?.actions||[]).find(x=>x.id===focusActionId)||actionItems.find(x=>x.id===focusActionId);if(!a)return;const intent=focusActionIntent||'open';if(intent==='verify'||a.status==='completed')toast('Opened inspection action awaiting verification');else if(intent==='complete')toast('Opened inspection action completion workflow');else toast('Opened inspection action');}
 function lifecycleButtons(i){
   const parts=[];
   if(i.status==='scheduled')parts.push(`<button class="btn btn-primary" onclick="startInspection()">Start</button>`);
