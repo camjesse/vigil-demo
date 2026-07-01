@@ -1214,7 +1214,7 @@ function renderDetail(inc, detail = {}) {
             ${c.description ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px;line-height:1.5">${c.description}</div>` : ''}
             ${c.completion_notes ? `<div style="font-size:10.5px;color:var(--ok);margin-top:5px;line-height:1.5">Completion: ${escHtml(c.completion_notes)} · ${(c.completion_evidence_urls || []).length} evidence link(s)</div>` : ''}
           </div>
-          <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<span class="chip ok">Awaiting verification</span>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${c.id}','${inc.id}')">Submit completion</button>`}</div>
+          <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyCapa('${c.id}','${inc.id}')">Verify</button>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${c.id}','${inc.id}')">Submit completion</button>`}</div>
         </div>`;
       }).join('');
   const acknowledgementsHtml = acknowledgements.length
@@ -1333,6 +1333,18 @@ async function completeCapa(id, incidentId) {
   toast('Completion submitted for verification', 'ok');
   const fresh = await apiGet('/api/corrective-actions?limit=100');
   capas = (fresh && fresh.corrective_actions) || capas;
+  focusedCapaId = id;
+  showDetail(incidentId);
+}
+
+async function verifyCapa(id, incidentId) {
+  const notes = prompt('Verification notes for this completed CAPA:') || 'Verified from incident workflow';
+  const result = await apiPost(`/api/corrective-actions/${id}/verify`, {verification_notes: notes});
+  if (!result.ok) return toast(result.data?.error || 'Could not verify CAPA', 'danger');
+  toast('CAPA verified', 'ok');
+  const fresh = await apiGet('/api/corrective-actions?limit=100');
+  capas = (fresh && fresh.corrective_actions) || capas;
+  focusedCapaId = id;
   showDetail(incidentId);
 }
 

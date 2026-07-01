@@ -1057,6 +1057,7 @@ function startupWorkflowAction() {
     action: q.get('action') || 'open',
     entity: q.get('entity') || '',
     id: q.get('id') || '',
+    parent_id: q.get('parent_id') || '',
   };
   loadMod(module, payload);
   return true;
