@@ -1421,6 +1421,7 @@ function routeForNotification(n) {
   if (type === 'observation_action' || type.includes('observation')) return 'observations';
   if (type.includes('investigation') || text.includes('root cause') || text.includes('investigation')) return 'investigations';
   if (type.includes('corrective') || type.includes('incident') || text.includes('capa') || text.includes('response overdue') || text.includes('follow-up')) return 'incidents';
+  if (type.includes('credential') || type.includes('training') || text.includes('credential') || text.includes('training')) return 'employees';
   if (type.includes('hazard') || type.includes('flha')) return 'hazards';
   if (type.includes('permit') || text.includes('permit')) return 'permits';
   if (type.includes('audit') || type.includes('finding') || text.includes('audit finding')) return 'cor';
@@ -1460,6 +1461,14 @@ function actionForNotification(n) {
   }
   if (type.includes('investigation')) {
     return { action: text.includes('assign') ? 'assign' : 'open', entity: 'investigation', id: entityId };
+  }
+  if (type.includes('credential')) {
+    const action = text.includes('expired') ? 'credential_expired' : 'credential_expiring';
+    return { action, entity: 'credential', id: entityId };
+  }
+  if (type.includes('training')) {
+    const action = text.includes('expired') ? 'training_expired' : 'training_expiring';
+    return { action, entity: 'training_record', id: entityId };
   }
   if (type.includes('permit')) {
     const action = text.includes('closeout') ? 'closeout' : text.includes('revalidat') ? 'revalidate' : text.includes('simops') ? 'simops' : 'open';

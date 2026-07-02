@@ -848,6 +848,7 @@ async function init() {
     await loadData();
     showLoading(false);
     renderAll();
+    handleStartupAction();
   } catch (err) {
     showLoading(false);
     showApiError(err.message + ' — is the Vigil API running at ' + API_BASE + '?');
@@ -1570,6 +1571,58 @@ function renderAll() {
   renderStats();
   renderRoster();
 }
+
+function normalizeModuleAction(action) {
+  if (!action) return null;
+  return typeof action === "string" ? {action} : action;
+}
+
+function actionExpiryFilter(payload) {
+  const text = String((payload.action || "") + " " + (payload.entity || "")).toLowerCase();
+  if (text.includes("expired")) return "expired";
+  if (text.includes("expiring") || text.includes("renew") || text.includes("training") || text.includes("credential")) return "expiring";
+  return "all";
+}
+
+function handleModuleAction(action) {
+  const payload = normalizeModuleAction(action);
+  if (!payload || !employees.length) return;
+  const entity = String(payload.entity || "").toLowerCase();
+  const isEmployeeRoute = entity.includes("credential") || entity.includes("training") || entity.includes("worker") || entity.includes("employee");
+  if (!isEmployeeRoute && payload.action !== "open") return;
+
+  currentFilter = actionExpiryFilter(payload);
+  currentRoleFilter = "";
+  showPanel(currentFilter === "expired" ? "alerts" : currentFilter === "expiring" ? "expiring" : "roster");
+  renderAll();
+
+  const workerId = payload.parent_id || payload.worker_id || (entity.includes("worker") || entity.includes("employee") ? payload.id : "");
+  const emp = workerId ? employees.find(e => e._uuid === workerId || e.id === workerId) : null;
+  if (emp) {
+    showPanel("roster");
+    renderRoster();
+    openEmployeeDetail(emp.id);
+    showToast("success", "Opened " + emp.name + " for expiry follow-up");
+  } else if (entity.includes("training")) {
+    showToast("success", "Training expiry follow-up opened in Employee Registry");
+  }
+}
+
+function handleStartupAction() {
+  const q = new URLSearchParams(window.location.search);
+  const payload = {
+    action: q.get("action") || "",
+    entity: q.get("entity") || "",
+    id: q.get("id") || "",
+    parent_id: q.get("parent_id") || "",
+  };
+  if (payload.action || payload.entity || payload.id) handleModuleAction(payload);
+}
+
+window.addEventListener("message", function(e) {
+  if (e.data && e.data.type === "VIGIL_ACTION") handleModuleAction(e.data);
+  if (e.data && e.data.type === "VIGIL_THEME") document.documentElement.classList.toggle("light-mode", e.data.theme === "light");
+});
 
 // ============================================================
 // BOOT
