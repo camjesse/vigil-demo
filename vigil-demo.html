@@ -769,7 +769,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         <div class="workflow-actions">
           <button class="mini-btn primary" onclick="loadActionCenter()">↻ Refresh</button>
           <button class="mini-btn" onclick="openNotificationPreferences()">Preferences</button>
-          <button class="mini-btn" onclick="loadMod('admin')">Admin delivery</button>
+          <button class="mini-btn" onclick="loadMod('admin',{action:'delivery',entity:'notification_delivery'})">Admin delivery</button>
         </div>
       </section>
 
@@ -808,7 +808,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
             <div class="workflow-route"><span>Observation actions</span><button class="mini-btn" onclick="loadMod('observations')">Open</button></div>
             <div class="workflow-route"><span>Inspection actions</span><button class="mini-btn" onclick="loadMod('inspections')">Open</button></div>
             <div class="workflow-route"><span>Meeting/JHSC actions</span><button class="mini-btn" onclick="loadMod('jhsc')">Open</button></div>
-            <div class="workflow-route"><span>Email delivery audit</span><button class="mini-btn" onclick="loadMod('admin')">Open</button></div>
+            <div class="workflow-route"><span>Email delivery audit</span><button class="mini-btn" onclick="loadMod('admin',{action:'delivery',entity:'notification_delivery'})">Open</button></div>
           </div>
           <div class="workflow-side-block">
             <div class="workflow-side-title">Notification controls</div>
