@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Report - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn svg{width:13px;height:13px}
+.content{padding:22px;overflow:auto;max-width:1180px;margin:0 auto;width:100%}
+.controls{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px}
+.ctl{display:flex;flex-direction:column;gap:4px}.ctl label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.select,.date{height:34px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11.5px;outline:none}.select:focus,.date:focus{border-color:var(--accent)}
+.report-head{margin-bottom:16px}.report-title{font-size:22px;font-weight:800}.report-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px}
+.kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}
+.kpi-val{font-variant-numeric:tabular-nums;font-size:26px;font-weight:800;margin-top:6px}
+.kpi-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.kpi-val.bad{color:var(--danger)}.kpi-val.warn{color:var(--warn)}.kpi-val.good{color:var(--ok)}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:14px}
+.panel-hd{min-height:44px;display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--border)}.panel-title{font-size:12px;font-weight:700}
+.panel-body{padding:14px}
+.trend{display:flex;align-items:flex-end;gap:6px;height:150px}
+.trend .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.trend .bars{display:flex;align-items:flex-end;gap:2px;height:118px}
+.trend .b{width:14px;border-radius:2px 2px 0 0;background:var(--b2);min-height:2px}
+.trend .b.rec{background:var(--danger)}
+.trend .m{font-size:8.5px;color:var(--muted);white-space:nowrap}
+.trend .c{font-size:9.5px;color:var(--text2);font-variant-numeric:tabular-nums}
+.tbl{width:100%;border-collapse:collapse}.tbl th{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:11.5px;color:var(--text2);font-variant-numeric:tabular-nums}.tbl tr:last-child td{border-bottom:0}.tbl .identity{color:var(--text);font-weight:700}
+.legend{display:flex;gap:14px;margin-left:auto;font-size:9.5px;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.content{padding:14px}}
+@media print{
+  :root{--bg:#fff;--s1:#fff;--s2:#f4f6f8;--s3:#eceff2;--border:#c9d2da;--b2:#aab7c2;--text:#111;--text2:#333;--muted:#555}
+  html,body{background:#fff!important;color:#111}
+  .topbar,.controls,.no-print{display:none!important}
+  .content{max-width:none;padding:0}
+  .panel,.kpi{break-inside:avoid;border-color:#c9d2da}
+  .kpi-val.bad{color:#B91C1C}.kpi-val.good{color:#0F7B5F}.kpi-val.warn{color:#92600A}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Executive Report</span></div></div>
+    <div class="topbar-right"><button class="btn" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <main class="content">
+    <div class="controls no-print">
+      <div class="ctl"><label>Scope</label><select class="select" id="scope" onchange="load()"><option value="">Company-wide</option></select></div>
+      <div class="ctl"><label>From</label><input class="date" type="date" id="from" onchange="load()"></div>
+      <div class="ctl"><label>To</label><input class="date" type="date" id="to" onchange="load()"></div>
+      <button class="btn" onclick="load()">Refresh</button>
+      <div style="flex:1"></div>
+      <button class="btn" id="csv-btn" onclick="downloadCsv()">CSV</button>
+      <button class="btn primary" onclick="window.print()">Print / PDF</button>
+    </div>
+    <div id="report"><div class="empty">Loading executive report…</div></div>
+  </main>
+</div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE;let token=null,session=null,sites=[],data=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+async function api(path){const r=await fetch(API+path,{headers:{Authorization:`Bearer ${token}`}});const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.error||`Request failed (${r.status})`);return b}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+function num(v,dash='—'){return v===null||v===undefined?dash:Number(v).toLocaleString()}
+function kpiCard(label,value,sub,cls=''){return `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-val ${cls}">${value}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`}
+
+function render(){
+  const d=data;
+  const scopeName=d.scope.company_wide?'Company-wide':esc(d.scope.name)+' (including sub-sites)';
+  const maxTrend=Math.max(1,...d.incidents.monthly_trend.map(m=>m.incidents));
+  const trendHtml=d.incidents.monthly_trend.length?`<div class="trend">${d.incidents.monthly_trend.map(m=>`
+    <div class="bar-col"><div class="c">${m.incidents}</div><div class="bars">
+      <div class="b" style="height:${Math.round(m.incidents/maxTrend*100)}%" title="${m.month}: ${m.incidents} incidents"></div>
+      <div class="b rec" style="height:${Math.round(m.recordable/maxTrend*100)}%" title="${m.month}: ${m.recordable} recordable"></div>
+    </div><div class="m">${m.month.slice(2)}</div></div>`).join('')}</div>`
+    :'<div class="empty">No incidents in this period.</div>';
+
+  $('report').innerHTML=`
+    <div class="report-head">
+      <div class="report-title">Safety Performance Report</div>
+      <div class="report-sub">${scopeName} · ${d.period.from} to ${d.period.to} · ${num(d.hours_worked)} hours worked</div>
+    </div>
+    <div class="kpis">
+      ${kpiCard('TRIR',num(d.rates.trir),'Recordable rate / 200k hrs',d.rates.trir===null?'':d.rates.trir>3?'bad':d.rates.trir>1?'warn':'good')}
+      ${kpiCard('LTIF',num(d.rates.ltif),'Lost-time rate / 200k hrs',d.rates.ltif===null?'':d.rates.ltif>1?'bad':'good')}
+      ${kpiCard('DART',num(d.rates.dart),'Days away/restricted/transferred rate',d.rates.dart===null?'':d.rates.dart>3?'bad':'good')}
+      ${kpiCard('Lost days',num(d.incidents.lost_days),'Total lost-time days',d.incidents.lost_days>0?'warn':'good')}
+    </div>
+    <div class="kpis">
+      ${kpiCard('Incidents',num(d.incidents.total),`${num(d.incidents.recordable)} recordable · ${num(d.incidents.near_miss)} near miss`)}
+      ${kpiCard('Overdue actions',num(d.actions.overdue),`${num(d.actions.open)} open · ${num(d.actions.awaiting_verification)} awaiting verification`,d.actions.overdue>0?'bad':'good')}
+      ${kpiCard('Observation closure',d.observations.closure_rate===null?'—':d.observations.closure_rate+'%',`${num(d.observations.total)} reported`,d.observations.closure_rate===null?'':d.observations.closure_rate<50?'warn':'good')}
+      ${kpiCard('Credential compliance',d.training.compliance_rate===null?'—':d.training.compliance_rate+'%',`${num(d.training.expired)} expired · ${num(d.training.expiring_30d)} expiring 30d`,d.training.compliance_rate===null?'':d.training.compliance_rate<90?'bad':'good')}
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><div class="panel-title">Incident trend — monthly</div>
+        <div class="legend"><span><i style="background:var(--b2)"></i>All incidents</span><span><i style="background:var(--danger)"></i>Recordable</span></div></div>
+      <div class="panel-body">${trendHtml}</div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-title">Site breakdown${d.scope.company_wide?'':' — children of '+esc(d.scope.name)}</div></div>
+        ${d.sites.length?`<table class="tbl"><thead><tr><th>Site (incl. subtree)</th><th>Incidents</th><th>Recordable</th><th>Hours</th><th>TRIR</th><th>Open obs</th></tr></thead><tbody>
+          ${d.sites.map(s=>`<tr><td class="identity">${esc(s.name)}</td><td>${num(s.incidents)}</td><td>${num(s.recordable)}</td><td>${num(s.hours_worked)}</td><td>${num(s.trir,'n/a')}</td><td>${num(s.open_observations)}</td></tr>`).join('')}
+        </tbody></table>`:'<div class="empty">No child sites at this level.</div>'}
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-title">Incidents by severity</div></div>
+        ${d.incidents.by_severity.length?`<table class="tbl"><thead><tr><th>Severity</th><th>Count</th></tr></thead><tbody>
+          ${d.incidents.by_severity.map(s=>`<tr><td class="identity">${esc(s.severity.replaceAll('_',' '))}</td><td>${num(s.count)}</td></tr>`).join('')}
+        </tbody></table>`:'<div class="empty">No incidents in this period.</div>'}
+      </div>
+    </div>`;
+}
+
+function query(){
+  const q=new URLSearchParams();
+  if($('scope').value)q.set('site_id',$('scope').value);
+  if($('from').value)q.set('from_date',$('from').value);
+  if($('to').value)q.set('to_date',$('to').value);
+  return q.toString()?'?'+q.toString():'';
+}
+async function load(){
+  try{data=await api('/api/exec/kpis'+query());render()}
+  catch(e){$('report').innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+async function downloadCsv(){
+  const btn=$('csv-btn');btn.disabled=true;
+  try{
+    const r=await fetch(API+'/api/exec/report.csv'+query(),{headers:{Authorization:`Bearer ${token}`}});
+    if(!r.ok)throw new Error('Export failed ('+r.status+')');
+    const blob=await r.blob();
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=(r.headers.get('content-disposition')||'').match(/filename="([^"]+)"/)?.[1]||'vigil-executive-report.csv';
+    a.click();URL.revokeObjectURL(a.href);
+  }catch(e){$('report').insertAdjacentHTML('afterbegin',`<div class="empty">${esc(e.message)}</div>`)}
+  finally{btn.disabled=false}
+}
+function treeOrder(list){
+  const byParent={};list.forEach(s=>{(byParent[s.parent_id||'root']=byParent[s.parent_id||'root']||[]).push(s)});
+  Object.values(byParent).forEach(a=>a.sort((x,y)=>x.name.localeCompare(y.name)));
+  const out=[];(function walk(pid,depth){(byParent[pid]||[]).forEach(s=>{out.push({...s,depth});walk(s.id,depth+1)})})('root',0);
+  return out;
+}
+async function init(){
+  session=await getVigilSession();token=session.token;
+  if(!['admin','superadmin','manager','supervisor'].includes(session.user.role)){
+    $('report').innerHTML='<div class="empty">Elevated permission is required for executive reporting.</div>';
+    document.querySelector('.controls').style.display='none';return;
+  }
+  try{sites=(await api('/api/sites')).sites}catch(e){sites=[]}
+  $('scope').innerHTML='<option value="">Company-wide</option>'+treeOrder(sites).map(s=>`<option value="${s.id}">${' '.repeat(s.depth*3)}${esc(s.name)}</option>`).join('');
+  const to=new Date(),from=new Date(new Date().setFullYear(to.getFullYear()-1));
+  $('to').value=to.toISOString().slice(0,10);$('from').value=from.toISOString().slice(0,10);
+  await load();
+}
+init().catch(e=>$('report').innerHTML=`<div class="empty">${esc(e.message)}</div>`);
+</script>
+</body>
+</html>
