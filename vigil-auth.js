@@ -17,24 +17,24 @@
     const style = document.createElement('style');
     style.id = 'vigil-auth-styles';
     style.textContent = `
-      .vigil-auth-backdrop{position:fixed;inset:0;background:#070B12;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:auto}
-      .vigil-auth-card{box-sizing:border-box;width:min(400px,100%);max-width:100%;max-height:calc(100vh - 40px);overflow:auto;background:#0D121B;border:1px solid #263648;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:24px;color:#D7E3EE;font-family:'Inter',system-ui,sans-serif}
+      .vigil-auth-backdrop{position:fixed;inset:0;background:#F4F7FA;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:auto}
+      .vigil-auth-card{box-sizing:border-box;width:min(400px,100%);max-width:100%;max-height:calc(100vh - 40px);overflow:auto;background:#FFFFFF;border:1px solid #D8E1EB;border-radius:8px;box-shadow:0 18px 60px rgba(15,32,51,.10);padding:24px;color:#102033;font-family:'Inter',system-ui,sans-serif}
       .vigil-auth-brand{display:flex;align-items:center;gap:9px;margin-bottom:20px}
       .vigil-auth-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#21B8E6,#19C995);display:flex;align-items:center;justify-content:center;font-size:14px}
-      .vigil-auth-brand-name{font-variant-numeric:tabular-nums;font-size:16px;font-weight:800;color:#D7E3EE}
+      .vigil-auth-brand-name{font-variant-numeric:tabular-nums;font-size:16px;font-weight:800;color:#102033}
       .vigil-auth-title{font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;margin-bottom:6px}
-      .vigil-auth-copy{font-size:12.5px;line-height:1.55;color:#93A9BC;margin-bottom:18px}
+      .vigil-auth-copy{font-size:12.5px;line-height:1.55;color:#42566B;margin-bottom:18px}
       .vigil-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
-      .vigil-auth-field label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#93A9BC;font-weight:700}
-      .vigil-auth-field input{box-sizing:border-box;width:100%;min-width:0;height:40px;border-radius:6px;border:1px solid #2A394C;background:#080B12;color:#D7E3EE;padding:0 11px;font:inherit;font-size:13px;outline:none}
-      .vigil-auth-field input:focus{border-color:#21B8E6;box-shadow:0 0 0 2px rgba(33,184,230,.1)}
-      .vigil-auth-error{display:none;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(239,68,68,.3);border-radius:6px;background:rgba(239,68,68,.08);color:#FCA5A5;font-size:11.5px;line-height:1.45}
+      .vigil-auth-field label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64788D;font-weight:700}
+      .vigil-auth-field input{box-sizing:border-box;width:100%;min-width:0;height:40px;border-radius:6px;border:1px solid #CBD5E1;background:#FFFFFF;color:#102033;padding:0 11px;font:inherit;font-size:13px;outline:none}
+      .vigil-auth-field input:focus{border-color:#21B8E6;box-shadow:0 0 0 2px rgba(33,184,230,.14)}
+      .vigil-auth-error{display:none;margin:0 0 12px;padding:9px 10px;border:1px solid rgba(220,38,38,.25);border-radius:6px;background:rgba(220,38,38,.06);color:#B91C1C;font-size:11.5px;line-height:1.45}
       .vigil-auth-error.show{display:block}
       .vigil-auth-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px;flex-wrap:wrap}
-      .vigil-auth-link{border:0;background:transparent;color:#21B8E6;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;padding:0}
+      .vigil-auth-link{border:0;background:transparent;color:#0E7CA8;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;padding:0}
       .vigil-auth-link:hover{text-decoration:underline}
-      .vigil-auth-btn{height:36px;border-radius:6px;border:1px solid #2A394C;background:#111823;color:#D7E3EE;padding:0 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
-      .vigil-auth-btn.primary{border-color:rgba(33,184,230,.45);background:#21B8E6;color:#061018}
+      .vigil-auth-btn{height:36px;border-radius:6px;border:1px solid #CBD5E1;background:#EDF2F7;color:#102033;padding:0 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+      .vigil-auth-btn.primary{border-color:#1899C2;background:#21B8E6;color:#061018}
       .vigil-auth-btn:disabled{opacity:.55;cursor:wait}
       .vigil-session-control{display:flex;align-items:center;gap:7px;flex-shrink:0}
       .vigil-session-user{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--text2,#93A9BC)}
