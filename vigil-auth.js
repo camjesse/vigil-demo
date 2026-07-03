@@ -244,6 +244,9 @@
           <div class="vigil-auth-actions">
             <button class="vigil-auth-btn primary" type="submit">Sign in</button>
           </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E8F0;text-align:center;font-size:11.5px;color:#64788D">
+            New to Vigil? <a href="vigil-signup.html" style="color:#0E7CA8;font-weight:700;text-decoration:none">Create your company</a>
+          </div>
         </form>
       `;
 

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create your company - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F4F7FA;--card:#FFFFFF;--soft:#EDF2F7;--border:#CBD5E1;--b2:#D8E1EB;--text:#102033;--text2:#42566B;--muted:#64788D;--accent:#21B8E6;--accent-d:#0E7CA8;--ok:#0FA57C;--danger:#DC2626}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:min(560px,100%);background:var(--card);border:1px solid var(--b2);border-radius:10px;box-shadow:0 18px 60px rgba(15,32,51,.08);padding:28px}
+.brand{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#21B8E6,#19C995);display:grid;place-items:center;color:#04141B;font-weight:800}
+.brand-name{font-size:16px;font-weight:800}
+.steps{display:flex;gap:6px;margin:18px 0 22px}
+.step-dot{flex:1;height:4px;border-radius:2px;background:var(--soft)}
+.step-dot.on{background:var(--accent)}
+h1{font-size:21px;margin-bottom:6px}
+.copy{font-size:12.5px;color:var(--text2);line-height:1.55;margin-bottom:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.field label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+.field input,.field select{height:40px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);padding:0 11px;font:inherit;font-size:13px;outline:none}
+.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(33,184,230,.14)}
+.hint{font-size:10.5px;color:var(--muted)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.choice{border:1px solid var(--border);border-radius:8px;padding:13px;cursor:pointer;background:#fff}
+.choice:hover{border-color:var(--accent)}
+.choice.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(33,184,230,.16)}
+.choice b{font-size:12.5px;display:block;margin-bottom:4px}
+.choice span{font-size:10.5px;color:var(--text2);line-height:1.45;display:block}
+.site-row{display:flex;gap:8px;margin-bottom:8px}
+.site-row input{flex:1}
+.btn{height:38px;border-radius:6px;border:1px solid var(--border);background:var(--soft);color:var(--text);padding:0 15px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:#1899C2;color:#04141B}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--accent-d)}
+.actions{display:flex;justify-content:space-between;gap:8px;margin-top:20px}
+.error{display:none;margin-bottom:13px;padding:10px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:rgba(220,38,38,.06);color:#B91C1C;font-size:12px;line-height:1.45}
+.error.show{display:block}
+.check-list{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+.check-item{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--b2);border-radius:8px}
+.check-item .dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;margin-top:1px;border:2px solid var(--border);font-size:11px}
+.check-item.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.check-item b{font-size:12.5px;display:block}
+.check-item span{font-size:10.5px;color:var(--text2)}
+.progress{font-size:11.5px;color:var(--text2);font-weight:600}
+.signin-link{text-align:center;margin-top:16px;font-size:11.5px;color:var(--muted)}
+.signin-link a{color:var(--accent-d);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+  <div class="brand"><div class="mark">V</div><div class="brand-name">VIGIL HSE</div></div>
+  <div class="steps" id="steps"></div>
+  <div class="error" id="err"></div>
+  <div id="body"></div>
+</div></div>
+<script>
+const API='https://vigil-production-17ca.up.railway.app';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const state={companyName:'',slug:'',firstName:'',lastName:'',email:'',password:'',industry:'general',jurisdiction:'canada',sites:['','']};
+let step=0;const TOTAL=4;
+
+const INDUSTRIES=[
+  {key:'trucking',name:'Trucking & Transport',desc:'Pre-trip inspections, hours of service, cargo securement, winter driving.'},
+  {key:'oil_gas',name:'Oil & Gas',desc:'H2S, hot work, ground disturbance, confined space, well site inspections.'},
+  {key:'general',name:'General Industry',desc:'Workplace inspections, ladder safety, hot work, mobile equipment.'},
+  {key:'',name:'Start empty',desc:'No templates — build your own library from scratch.'},
+];
+
+function slugify(name){return name.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)}
+function setErr(msg){const e=$('err');if(!msg){e.classList.remove('show');return}e.textContent=msg;e.classList.add('show')}
+function dots(){$('steps').innerHTML=Array.from({length:TOTAL},(_,i)=>`<div class="step-dot ${i<=step?'on':''}"></div>`).join('')}
+
+function render(){
+  dots();setErr('');
+  if(step===0)$('body').innerHTML=`
+    <h1>Create your company</h1>
+    <div class="copy">Vigil sets up your safety workspace in about a minute — templates, sites, and your admin account.</div>
+    <div class="field"><label>Company name</label><input id="f-company" value="${esc(state.companyName)}" autofocus></div>
+    <div class="row">
+      <div class="field"><label>Your first name</label><input id="f-first" value="${esc(state.firstName)}"></div>
+      <div class="field"><label>Your last name</label><input id="f-last" value="${esc(state.lastName)}"></div>
+    </div>
+    <div class="field"><label>Work email</label><input id="f-email" type="email" value="${esc(state.email)}"></div>
+    <div class="field"><label>Password</label><input id="f-password" type="password" value="${esc(state.password)}">
+      <div class="hint">At least 12 characters with an uppercase letter, a lowercase letter, and a number.</div></div>
+    <div class="actions"><span></span><button class="btn primary" onclick="next()">Continue</button></div>
+    <div class="signin-link">Already using Vigil? <a href="index.html">Sign in</a></div>`;
+  if(step===1)$('body').innerHTML=`
+    <h1>What kind of work do you do?</h1>
+    <div class="copy">Vigil loads a starter library built for your industry — hazard assessment templates, inspection checklists, training programs, and draft policies. You can edit everything later.</div>
+    <div class="choices">${INDUSTRIES.map(i=>`
+      <div class="choice ${state.industry===i.key?'sel':''}" onclick="state.industry='${i.key}';render()">
+        <b>${i.name}</b><span>${i.desc}</span>
+      </div>`).join('')}</div>
+    <div class="actions"><button class="btn" onclick="back()">Back</button><button class="btn primary" onclick="next()">Continue</button></div>`;
+  if(step===2)$('body').innerHTML=`
+    <h1>Where do you operate?</h1>
+    <div class="copy">Jurisdiction drives which regulators Vigil flags on reportable incidents (WCB and provincial OHS in Canada, OSHA/DOT in the US). Individual sites can override this later.</div>
+    <div class="choices" style="grid-template-columns:1fr 1fr 1fr">
+      ${[['canada','Canada','WCB · provincial OHS · TSB'],['us','United States','OSHA · DOT · EPA'],['both','Both','Cross-border operations']].map(([k,n,d])=>`
+      <div class="choice ${state.jurisdiction===k?'sel':''}" onclick="state.jurisdiction='${k}';render()"><b>${n}</b><span>${d}</span></div>`).join('')}</div>
+    <div class="actions"><button class="btn" onclick="back()">Back</button><button class="btn primary" onclick="next()">Continue</button></div>`;
+  if(step===3)$('body').innerHTML=`
+    <h1>Your sites</h1>
+    <div class="copy">List your yards, branches, or work locations (optional — add or reorganize into regions anytime). Your head office is created automatically.</div>
+    <div id="site-rows">${state.sites.map((s,i)=>`
+      <div class="site-row"><input placeholder="e.g. Calgary Yard" value="${esc(s)}" oninput="state.sites[${i}]=this.value">
+      ${state.sites.length>1?`<button class="btn" onclick="state.sites.splice(${i},1);render()">✕</button>`:''}</div>`).join('')}</div>
+    <button class="btn ghost" onclick="state.sites.push('');render()">+ Add another site</button>
+    <div class="actions"><button class="btn" onclick="back()">Back</button><button class="btn primary" id="create-btn" onclick="submit()">Create workspace</button></div>`;
+}
+
+function collect0(){
+  state.companyName=$('f-company').value.trim();
+  state.firstName=$('f-first').value.trim();
+  state.lastName=$('f-last').value.trim();
+  state.email=$('f-email').value.trim();
+  state.password=$('f-password').value;
+  state.slug=slugify(state.companyName);
+}
+function next(){
+  if(step===0){
+    collect0();
+    if(!state.companyName)return setErr('Company name is required.');
+    if(!state.firstName||!state.lastName)return setErr('Your name is required — it becomes your worker profile for reporting.');
+    if(!/.+@.+\..+/.test(state.email))return setErr('Enter a valid work email.');
+    if(state.password.length<12||!/[a-z]/.test(state.password)||!/[A-Z]/.test(state.password)||!/[0-9]/.test(state.password))
+      return setErr('Password needs 12+ characters including uppercase, lowercase, and a number.');
+    if(!state.slug)return setErr('Company name must include letters or numbers.');
+  }
+  step++;render();
+}
+function back(){step--;render()}
+
+async function submit(){
+  const btn=$('create-btn');btn.disabled=true;btn.textContent='Creating…';setErr('');
+  try{
+    const body={
+      companyName:state.companyName,companySlug:state.slug,
+      email:state.email,password:state.password,
+      jurisdiction:state.jurisdiction,
+      admin_first_name:state.firstName,admin_last_name:state.lastName,
+      sites:state.sites.map(s=>s.trim()).filter(Boolean),
+    };
+    if(state.industry)body.industry=state.industry;
+    const r=await fetch(API+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok){
+      if(r.status===409){setErr('That company name is taken — try a variation.');step=0;render();return}
+      throw new Error(data.error||data.details?.[0]?.message||`Signup failed (${r.status})`);
+    }
+    localStorage.setItem('vigil_session',JSON.stringify({token:data.token,user:data.user,companyId:data.companyId}));
+    await showChecklist(data);
+  }catch(e){setErr(e.message);const b=$('create-btn');if(b){b.disabled=false;b.textContent='Create workspace'}}
+}
+
+async function showChecklist(reg){
+  step=TOTAL-1;dots();
+  let checklist={items:[],completed:0,total:0};
+  try{
+    const r=await fetch(API+'/api/onboarding/checklist',{headers:{Authorization:`Bearer ${reg.token}`}});
+    if(r.ok)checklist=await r.json();
+  }catch(e){}
+  $('body').innerHTML=`
+    <h1>Welcome to Vigil, ${esc(state.firstName)}</h1>
+    <div class="copy">${esc(state.companyName)} is ready${reg.starterPack?.applied?` — the ${esc(state.industry.replace('_',' '))} starter library is loaded`:''}. Here's your getting-started path:</div>
+    <div class="progress">${checklist.completed} of ${checklist.total} complete</div>
+    <div class="check-list">${checklist.items.map(i=>`
+      <div class="check-item ${i.done?'done':''}"><div class="dot">${i.done?'✓':''}</div>
+        <div><b>${esc(i.label)}${i.optional?' <span style="font-weight:400;color:var(--muted)">(optional)</span>':''}</b><span>${esc(i.hint)}</span></div></div>`).join('')}</div>
+    <div class="actions"><span></span><button class="btn primary" onclick="window.location.href='vigil-demo.html'">Go to your dashboard</button></div>`;
+}
+
+render();
+</script>
+</body>
+</html>
