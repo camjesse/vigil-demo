@@ -458,6 +458,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         <span style="color:var(--muted);display:flex"><svg style="width:14px;height:14px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21 21-4.34-4.34"/> <circle cx="11" cy="11" r="8"/> </svg></span>
         <input type="text" placeholder="Search by name, ID, or role..." id="searchInput" oninput="filterRoster()">
       </div>
+      <button class="btn" id="csv-import-btn" onclick="document.getElementById('csv-import-input').click()">Import CSV</button>
+      <input id="csv-import-input" type="file" accept=".csv,text/csv" style="display:none" onchange="importWorkersCsv(this)">
       <button class="btn btn-primary" onclick="openDrawer('add')">+ Add Employee</button>
     </div>
   </div>
@@ -709,6 +711,36 @@ let authToken = null;
 
 async function apiLogin() {
   authToken = await getVigilToken();
+}
+
+// Bulk CSV import — reads the file locally, posts to /api/workers/import,
+// then reloads the roster. Per-row errors are summarized, never fatal.
+async function importWorkersCsv(input) {
+  const file = input.files && input.files[0];
+  input.value = '';
+  if (!file) return;
+  const btn = document.getElementById('csv-import-btn');
+  btn.disabled = true; btn.textContent = 'Importing…';
+  try {
+    const csv = await file.text();
+    const res = await fetch(`${API_BASE}/api/workers/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ csv }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Import failed (${res.status})`);
+    showToast('success', `Imported ${data.created} worker${data.created === 1 ? '' : 's'}${data.skipped ? ` · ${data.skipped} skipped` : ''}`);
+    if (data.skipped) {
+      const lines = data.errors.slice(0, 12).map(e => `Row ${e.row}: ${e.reason}`).join('\n');
+      window.setTimeout(() => window.alert(`Import finished with ${data.skipped} skipped row${data.skipped === 1 ? '' : 's'}:\n\n${lines}${data.errors.length > 12 ? `\n…and ${data.errors.length - 12} more` : ''}\n\nExpected columns: first_name, last_name, email, phone, job_title, department, site, employee_number, employment_type, hire_date (YYYY-MM-DD). Only first and last name are required.`), 50);
+    }
+    await loadData();
+  } catch (e) {
+    showToast('error', e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Import CSV';
+  }
 }
 
 async function apiFetch(path, opts = {}, _retry = true) {
