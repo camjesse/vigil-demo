@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sites & Access - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}.stat-val{font-variant-numeric:tabular-nums;font-size:23px;font-weight:800;margin-top:5px}.stat-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border)}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.search,.select{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}.search:focus,.select:focus{border-color:var(--accent)}
+.table-wrap{overflow:auto}.tbl{width:100%;min-width:760px;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.identity{color:var(--text);font-weight:700}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.chip.accent{color:var(--accent);background:rgba(33,184,230,.09)}.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.tree-name{display:flex;align-items:center;gap:7px}.tree-branch{color:var(--muted);font-family:'DM Mono',monospace;font-size:11px}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.toggle-row{display:flex;align-items:flex-start;gap:12px;padding:14px}.toggle-row input{width:18px;height:18px;accent-color:var(--accent);margin-top:2px}.toggle-copy{flex:1;font-size:11.5px;color:var(--text2);line-height:1.5}.toggle-copy strong{color:var(--text);display:block;margin-bottom:3px;font-size:12px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-size:17px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select{height:38px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 10px;outline:none}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.page-hdr{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Sites &amp; Access</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Sites &amp; Access</div>
+      <button class="nav-item active" data-view="sites" onclick="showView('sites')">Site structure</button>
+      <button class="nav-item" data-view="departments" onclick="showView('departments')">Departments</button>
+      <button class="nav-item" data-view="access" onclick="showView('access')">Site access</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-sites">
+        <div class="page-hdr">
+          <div><h1>Site Structure</h1><div class="page-sub">Your locations as a hierarchy — corporate, regions, branches. Records, rollups, and access permissions follow this tree.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openAddSite()">Add site</button></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Active sites</div><div class="stat-val" id="stat-sites">-</div><div class="stat-sub">All levels</div></div>
+          <div class="stat"><div class="stat-label">Top level</div><div class="stat-val" id="stat-roots">-</div><div class="stat-sub">Root of the tree</div></div>
+          <div class="stat"><div class="stat-label">With jurisdiction</div><div class="stat-val" id="stat-jur">-</div><div class="stat-sub">Regulatory override set</div></div>
+          <div class="stat"><div class="stat-label">Departments</div><div class="stat-val" id="stat-depts">-</div><div class="stat-sub">Company-wide + site</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Site tree</div><div class="spacer"></div></div>
+          <div class="table-wrap"><table class="tbl"><thead><tr><th>Site</th><th>Type</th><th>Jurisdiction</th><th>Timezone</th><th>Children</th><th>Actions</th></tr></thead><tbody id="site-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-departments" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Departments</h1><div class="page-sub">Company-wide departments (HSE, Operations) or site-specific ones (Calgary Dispatch).</div></div>
+          <div class="actions"><button class="btn primary" onclick="openAddDept()">Add department</button></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Departments</div><div class="spacer"></div></div>
+          <div class="table-wrap"><table class="tbl" style="min-width:560px"><thead><tr><th>Department</th><th>Scope</th><th>Actions</th></tr></thead><tbody id="dept-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-access" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Site Access</h1><div class="page-sub">Grant users visibility over a site and everything beneath it. Admins always see all sites; users with no grants see everything until enforcement is on.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openGrant()">Grant access</button></div>
+        </div>
+        <div class="panel">
+          <div class="toggle-row">
+            <input type="checkbox" id="enforce-toggle">
+            <div class="toggle-copy">
+              <strong>Enforce site scoping</strong>
+              When on, non-admin users with site grants only see records in their subtree, and can only create records at their own sites. Users with no grants keep company-wide visibility. When off, grants below are saved but not enforced.
+            </div>
+            <button class="btn" id="enforce-save" onclick="saveEnforcement()">Save</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Access grants</div><div class="spacer"></div></div>
+          <div class="table-wrap"><table class="tbl" style="min-width:640px"><thead><tr><th>User</th><th>Site (includes subtree)</th><th>Expires</th><th>Actions</th></tr></thead><tbody id="grant-rows"></tbody></table></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE;let token=null,session=null,sites=[],departments=[],memberships=[],adminUsers=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||`Request failed (${r.status})`);return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2800)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='access')loadAccess()}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+// ── Tree helpers ─────────────────────────────────────────────
+function treeOrder(list){
+  const byParent={};list.forEach(s=>{(byParent[s.parent_id||'root']=byParent[s.parent_id||'root']||[]).push(s)});
+  Object.values(byParent).forEach(a=>a.sort((x,y)=>x.name.localeCompare(y.name)));
+  const out=[];(function walk(pid,depth){(byParent[pid]||[]).forEach(s=>{out.push({...s,depth});walk(s.id,depth+1)})})('root',0);
+  return out;
+}
+function descendantsOf(id){
+  const kids={};sites.forEach(s=>{if(s.parent_id)(kids[s.parent_id]=kids[s.parent_id]||[]).push(s.id)});
+  const seen=new Set();(function walk(x){(kids[x]||[]).forEach(c=>{if(!seen.has(c)){seen.add(c);walk(c)}})})(id);
+  return seen;
+}
+const UNIT_TYPES=['corporate','division','country','province','region','city','town','branch','site','other'];
+
+// ── Sites ────────────────────────────────────────────────────
+async function loadSites(){sites=(await api('/api/sites')).sites;renderSites()}
+function renderSites(){
+  const ordered=treeOrder(sites);
+  document.getElementById('stat-sites').textContent=sites.length;
+  document.getElementById('stat-roots').textContent=sites.filter(s=>!s.parent_id).length;
+  document.getElementById('stat-jur').textContent=sites.filter(s=>s.jurisdiction).length;
+  document.getElementById('site-rows').innerHTML=ordered.map(s=>{
+    const indent=s.depth?`<span class="tree-branch" style="padding-left:${(s.depth-1)*18}px">└─</span>`:'';
+    return `<tr>
+      <td><div class="tree-name">${indent}<div><div class="identity">${esc(s.name)}</div>${s.address?`<div class="meta">${esc(s.address)}</div>`:''}</div></div></td>
+      <td>${s.unit_type?`<span class="chip">${esc(s.unit_type)}</span>`:'—'}</td>
+      <td>${s.jurisdiction?`<span class="chip accent">${esc(s.jurisdiction)}</span>`:'<span class="meta">inherits</span>'}</td>
+      <td>${esc(s.timezone||'—')}</td>
+      <td><span class="chip ${s.child_count?'ok':''}">${s.child_count}</span></td>
+      <td><div class="row-actions">
+        <button class="btn small" onclick="openAddSite('${s.id}')">Add child</button>
+        <button class="btn small" onclick="openEditSite('${s.id}')">Edit</button>
+        <button class="btn small" onclick="openMerge('${s.id}')">Merge</button>
+        <button class="btn small danger" onclick="deactivateSite('${s.id}')">Deactivate</button>
+      </div></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" class="empty">No sites yet</td></tr>';
+}
+function siteOptions(selected,excludeSet){
+  return treeOrder(sites).filter(s=>!excludeSet||!excludeSet.has(s.id))
+    .map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${'&nbsp;'.repeat(s.depth*3)}${esc(s.name)}</option>`).join('');
+}
+function unitOptions(selected){return UNIT_TYPES.map(t=>`<option ${t===selected?'selected':''}>${t}</option>`).join('')}
+function jurOptions(selected){return `<option value="">Inherit from parent / company</option>`+['canada','us','both'].map(j=>`<option ${j===selected?'selected':''}>${j}</option>`).join('')}
+
+function modal(title,copy,fields,onSubmit,reload){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;
+  document.querySelector('.modal form').onsubmit=async e=>{
+    e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;
+    try{await onSubmit(new FormData(e.target));closeModal();if(reload)await reload()}
+    catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}
+  };
+}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+
+function openAddSite(parentId){
+  modal('Add site','New sites inherit jurisdiction from their parent unless set here.',
+    `<div class="field"><label>Name</label><input name="name" required maxlength="200"></div>
+     <div class="field"><label>Parent</label><select name="parent_id">${siteOptions(parentId||sites.find(s=>!s.parent_id)?.id)}</select></div>
+     <div class="field"><label>Type</label><select name="unit_type">${unitOptions('branch')}</select></div>
+     <div class="field"><label>Jurisdiction</label><select name="jurisdiction">${jurOptions('')}</select></div>
+     <div class="field"><label>Timezone</label><input name="timezone" placeholder="America/Edmonton"></div>
+     <div class="field"><label>Address</label><input name="address" maxlength="500"></div>`,
+    async f=>{const o=Object.fromEntries(f);['jurisdiction','timezone','address'].forEach(k=>{if(!o[k])o[k]=null});await api('/api/sites',{method:'POST',body:JSON.stringify(o)});toast('Site created')},loadSites);
+}
+function openEditSite(id){
+  const s=sites.find(x=>x.id===id);const exclude=descendantsOf(id);exclude.add(id);
+  modal('Edit site','Moving a site moves its whole subtree. Cycles are rejected.',
+    `<div class="field"><label>Name</label><input name="name" value="${esc(s.name)}" required maxlength="200"></div>
+     <div class="field"><label>Parent</label><select name="parent_id">${s.parent_id?'':'<option value="">(top level)</option>'}${siteOptions(s.parent_id,exclude)}</select></div>
+     <div class="field"><label>Type</label><select name="unit_type">${unitOptions(s.unit_type||'branch')}</select></div>
+     <div class="field"><label>Jurisdiction</label><select name="jurisdiction">${jurOptions(s.jurisdiction||'')}</select></div>
+     <div class="field"><label>Timezone</label><input name="timezone" value="${esc(s.timezone||'')}" placeholder="America/Edmonton"></div>
+     <div class="field"><label>Address</label><input name="address" value="${esc(s.address||'')}" maxlength="500"></div>`,
+    async f=>{const o=Object.fromEntries(f);['jurisdiction','timezone','address'].forEach(k=>{if(!o[k])o[k]=null});if(!o.parent_id)delete o.parent_id;await api('/api/sites/'+id,{method:'PUT',body:JSON.stringify(o)});toast('Site updated')},loadSites);
+}
+function openMerge(id){
+  const s=sites.find(x=>x.id===id);const exclude=descendantsOf(id);exclude.add(id);
+  modal('Merge site','Everything at '+esc(s.name)+' — records, children, departments, access grants — moves to the target, then this site is deactivated. Use this to consolidate duplicates.',
+    `<div class="field"><label>Merge into</label><select name="target_site_id" required>${siteOptions(null,exclude)}</select></div>`,
+    async f=>{const r=await api('/api/sites/'+id+'/merge',{method:'POST',body:JSON.stringify({target_site_id:f.get('target_site_id')})});toast(r.message+' — '+Object.entries(r.moved).filter(([,v])=>v).map(([k,v])=>`${v} ${k.replaceAll('_',' ')}`).join(', ')||r.message)},loadSites);
+}
+async function deactivateSite(id){
+  const s=sites.find(x=>x.id===id);
+  if(!confirm(`Deactivate ${s.name}? Records keep their history; the site disappears from pickers.`))return;
+  try{await api('/api/sites/'+id,{method:'PUT',body:JSON.stringify({is_active:false})});toast('Site deactivated');await loadSites()}catch(e){toast(e.message)}
+}
+
+// ── Departments ──────────────────────────────────────────────
+async function loadDepartments(){departments=(await api('/api/sites/departments')).departments;renderDepartments()}
+function renderDepartments(){
+  document.getElementById('stat-depts').textContent=departments.length;
+  document.getElementById('dept-rows').innerHTML=departments.map(d=>`<tr>
+    <td><div class="identity">${esc(d.name)}</div></td>
+    <td>${d.site_id?`<span class="chip">${esc(d.site_name)}</span>`:'<span class="chip accent">Company-wide</span>'}</td>
+    <td><div class="row-actions">
+      <button class="btn small" onclick="openEditDept('${d.id}')">Edit</button>
+      <button class="btn small danger" onclick="deactivateDept('${d.id}')">Deactivate</button>
+    </div></td>
+  </tr>`).join('')||'<tr><td colspan="3" class="empty">No departments yet</td></tr>';
+}
+function deptScopeOptions(selected){return `<option value="">Company-wide</option>`+siteOptions(selected)}
+function openAddDept(){
+  modal('Add department','Company-wide departments apply everywhere; site departments belong to one location.',
+    `<div class="field"><label>Name</label><input name="name" required maxlength="200"></div>
+     <div class="field"><label>Scope</label><select name="site_id">${deptScopeOptions()}</select></div>`,
+    async f=>{await api('/api/sites/departments',{method:'POST',body:JSON.stringify({name:f.get('name'),site_id:f.get('site_id')||null})});toast('Department created')},loadDepartments);
+}
+function openEditDept(id){
+  const d=departments.find(x=>x.id===id);
+  modal('Edit department','',
+    `<div class="field"><label>Name</label><input name="name" value="${esc(d.name)}" required maxlength="200"></div>
+     <div class="field"><label>Scope</label><select name="site_id">${deptScopeOptions(d.site_id)}</select></div>`,
+    async f=>{await api('/api/sites/departments/'+id,{method:'PUT',body:JSON.stringify({name:f.get('name'),site_id:f.get('site_id')||null})});toast('Department updated')},loadDepartments);
+}
+async function deactivateDept(id){
+  if(!confirm('Deactivate this department?'))return;
+  try{await api('/api/sites/departments/'+id,{method:'PUT',body:JSON.stringify({is_active:false})});toast('Department deactivated');await loadDepartments()}catch(e){toast(e.message)}
+}
+
+// ── Access ───────────────────────────────────────────────────
+async function loadAccess(){
+  const [flag,m,u]=await Promise.all([api('/api/admin/site-scoping'),api('/api/sites/memberships'),adminUsers.length?Promise.resolve({users:adminUsers}):api('/api/admin/users')]);
+  document.getElementById('enforce-toggle').checked=flag.enforce_site_scoping;
+  memberships=m.memberships;adminUsers=u.users;renderGrants();
+}
+function renderGrants(){
+  document.getElementById('grant-rows').innerHTML=memberships.map(m=>{
+    const expired=m.expires_at&&new Date(m.expires_at)<new Date();
+    return `<tr>
+      <td><div class="identity">${esc(m.user_email)}</div></td>
+      <td><span class="chip">${esc(m.site_name)}</span></td>
+      <td>${m.expires_at?`<span class="chip ${expired?'warn':''}">${new Date(m.expires_at).toLocaleDateString()}${expired?' · expired':''}</span>`:'<span class="meta">Never</span>'}</td>
+      <td><button class="btn small danger" onclick="revokeGrant('${m.id}')">Revoke</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="4" class="empty">No grants — all users currently see every site</td></tr>';
+}
+function openGrant(){
+  const userOpts=adminUsers.filter(u=>!['admin','superadmin'].includes(u.role)).map(u=>`<option value="${u.id}">${esc(u.email)} (${esc(u.role)})</option>`).join('');
+  modal('Grant site access','The user sees this site and its whole subtree. Admins are always unrestricted and cannot be scoped.',
+    `<div class="field"><label>User</label><select name="user_id" required>${userOpts||'<option value="">No non-admin users</option>'}</select></div>
+     <div class="field"><label>Site</label><select name="site_id" required>${siteOptions()}</select></div>
+     <div class="field"><label>Expires (optional — for auditors and temporary access)</label><input name="expires_at" type="date"></div>`,
+    async f=>{const o={user_id:f.get('user_id'),site_id:f.get('site_id')};const d=f.get('expires_at');if(d)o.expires_at=new Date(d+'T23:59:59').toISOString();await api('/api/sites/memberships',{method:'POST',body:JSON.stringify(o)});toast('Access granted')},loadAccess);
+}
+async function revokeGrant(id){
+  if(!confirm('Revoke this access grant?'))return;
+  try{await api('/api/sites/memberships/'+id,{method:'DELETE'});toast('Access revoked');await loadAccess()}catch(e){toast(e.message)}
+}
+async function saveEnforcement(){
+  const btn=document.getElementById('enforce-save');btn.disabled=true;
+  try{const r=await api('/api/admin/site-scoping',{method:'PATCH',body:JSON.stringify({enforce_site_scoping:document.getElementById('enforce-toggle').checked})});toast('Site scoping '+(r.enforce_site_scoping?'enforced':'off'))}
+  catch(e){toast(e.message)}finally{btn.disabled=false}
+}
+
+// ── Boot ─────────────────────────────────────────────────────
+async function init(){
+  session=await getVigilSession();token=session.token;
+  if(!['admin','superadmin'].includes(session.user.role)){document.querySelector('.content').innerHTML='<div class="empty">Administrator permission is required.</div>';return}
+  await Promise.all([loadSites(),loadDepartments()]);
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${esc(e.message)}</div>`);
+</script>
+</body>
+</html>

@@ -646,10 +646,15 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
           <textarea class="form-textarea" id="f-immediate-actions" rows="3" placeholder="What was done immediately after the incident? (first aid, area secured, notified supervisor…)"></textarea>
         </div>
 
-        <div class="upload-zone" onclick="toast('File upload available in full release')">
-          <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/> <path d="M14 2v4a2 2 0 0 0 2 2h4"/> <path d="m9 15 2 2 4-4"/> </svg></div>
-          <div class="upload-text"><b>Drop photos here</b> or click to upload<br>JPG, PNG, PDF — max 10MB each</div>
+        <div class="upload-zone" onclick="document.getElementById('f-documents').click()"
+          ondragover="event.preventDefault()"
+          ondrop="event.preventDefault();handleDocFiles(event.dataTransfer.files)">
+          <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg></div>
+          <div class="upload-text"><b>Attach photos or documents</b> — drag here or click to browse<br>JPG, PNG, PDF, Word — max 15MB each</div>
         </div>
+        <input type="file" id="f-documents" multiple accept="image/jpeg,image/png,image/gif,image/webp,image/heic,application/pdf,.doc,.docx" style="display:none" onchange="handleDocFiles(this.files);this.value=''">
+        <div id="doc-error" style="display:none;font-size:11px;color:var(--danger);margin:-8px 0 12px"></div>
+        <div id="doc-pending" style="display:none;margin:-8px 0 14px"></div>
 
         <div class="toggle-row">
           <span class="toggle-label">Is this incident OSHA/WCB recordable?</span>
@@ -762,6 +767,78 @@ function fmt(str) {
 }
 function escHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ── FILE UPLOADS ──────────────────────────────────────────────
+async function vigilUploadFile(file, entityType) {
+  const fd = new FormData();
+  fd.append('file', file);
+  if (entityType) fd.append('entity_type', entityType);
+  const r = await fetch((window.VIGIL_API_BASE||'') + '/api/files', {method:'POST', headers:{Authorization:`Bearer ${token}`}, body:fd});
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(b.error || 'Upload failed ('+r.status+')');
+  return b.file;
+}
+async function vigilFileBlobUrl(url) {
+  const full = url.startsWith('/api/') ? (window.VIGIL_API_BASE||'') + url : url;
+  const r = await fetch(full, {headers:{Authorization:`Bearer ${token}`}});
+  if (!r.ok) throw new Error('File unavailable');
+  return URL.createObjectURL(await r.blob());
+}
+function fmtSize(n) {
+  if (n == null) return '';
+  if (n >= 1048576) return (n/1048576).toFixed(1)+' MB';
+  if (n >= 1024) return Math.round(n/1024)+' KB';
+  return n+' B';
+}
+
+let pendingDocs = [];
+let docUploadsInFlight = 0;
+
+function renderPendingDocs() {
+  const el = document.getElementById('doc-pending');
+  if (!el) return;
+  el.style.display = pendingDocs.length ? 'block' : 'none';
+  el.innerHTML = pendingDocs.map((d,i) => `
+    <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;margin-bottom:6px;font-size:11.5px">
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${escHtml(d.name)}</span>
+      <span style="color:var(--muted);flex-shrink:0">${fmtSize(d.size)}</span>
+      ${d.uploading
+        ? `<span style="color:var(--muted);flex-shrink:0">Uploading…</span>`
+        : `<button class="btn btn-ghost btn-sm" style="padding:1px 7px;flex-shrink:0" title="Remove" onclick="removePendingDoc(${i})">✕</button>`}
+    </div>`).join('');
+}
+function removePendingDoc(i) { pendingDocs.splice(i,1); renderPendingDocs(); }
+function updateDocUploadState() {
+  const btn = document.getElementById('submit-btn');
+  if (!btn) return;
+  if (docUploadsInFlight > 0) { btn.disabled = true; btn.textContent = 'Uploading files…'; }
+  else { btn.disabled = false; btn.textContent = 'Submit Incident Report'; }
+}
+function handleDocFiles(files) {
+  const errEl = document.getElementById('doc-error');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+  Array.from(files || []).forEach(file => {
+    const entry = {name:file.name, size:file.size, url:null, uploading:true};
+    pendingDocs.push(entry);
+    docUploadsInFlight++;
+    updateDocUploadState();
+    renderPendingDocs();
+    vigilUploadFile(file, 'incident')
+      .then(f => { entry.uploading = false; entry.url = f.url; })
+      .catch(e => {
+        pendingDocs = pendingDocs.filter(d => d !== entry);
+        if (errEl) { errEl.textContent = file.name + ': ' + (e.message || 'Upload failed'); errEl.style.display = 'block'; }
+      })
+      .finally(() => { docUploadsInFlight = Math.max(0, docUploadsInFlight - 1); updateDocUploadState(); renderPendingDocs(); });
+  });
+}
+async function openIncidentAttachment(ev, el) {
+  ev.preventDefault();
+  try {
+    const blobUrl = await vigilFileBlobUrl(el.getAttribute('data-url'));
+    window.open(blobUrl, '_blank');
+  } catch (e) { toast(e.message || 'File unavailable', 'danger'); }
 }
 function fmtDate(s) {
   if (!s) return '—';
@@ -1219,6 +1296,14 @@ function renderDetail(inc, detail = {}) {
           <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyCapa('${c.id}','${inc.id}')">Verify</button>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${c.id}','${inc.id}')">Submit completion</button>`}</div>
         </div>`;
       }).join('');
+  const docUrls = ((detail.incident && detail.incident.document_urls) || inc.document_urls || []).filter(Boolean);
+  const attachmentsHtml = docUrls.length ? `
+    <div class="section-title">Attachments (${docUrls.length})</div>
+    <div class="desc-box" style="display:flex;flex-direction:column;gap:6px">
+      ${docUrls.map((u,i) => u.startsWith('/api/files/')
+        ? `<a href="#" data-url="${escHtml(u)}" onclick="openIncidentAttachment(event,this)" style="font-size:11.5px;color:var(--accent)">Attachment ${i+1}</a>`
+        : `<a href="${escHtml(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);word-break:break-all">${escHtml(u)}</a>`).join('')}
+    </div>` : '';
   const acknowledgementsHtml = acknowledgements.length
     ? acknowledgements.map(a => `<div class="capa-item"><div class="capa-dot" style="background:var(--ok)"></div><div class="capa-info"><div class="capa-title">${escHtml(a.first_name)} ${escHtml(a.last_name)}</div><div class="capa-meta">${escHtml(a.job_title || 'Responder')} · ${new Date(a.acknowledged_at).toLocaleString()}</div>${a.response_notes ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px">${escHtml(a.response_notes)}</div>` : ''}</div><span class="chip ok">Acknowledged</span></div>`).join('')
     : '<div class="desc-box">No responder has acknowledged this incident yet.</div>';
@@ -1258,6 +1343,7 @@ function renderDetail(inc, detail = {}) {
     ${inc.description ? `<div class="section-title">Description</div><div class="desc-box">${inc.description}</div>` : ''}
     ${inc.immediate_actions ? `<div class="section-title">Immediate Actions</div><div class="desc-box">${inc.immediate_actions}</div>` : ''}
     ${inc.root_cause_summary ? `<div class="section-title">Root Cause Summary</div><div class="desc-box">${inc.root_cause_summary}</div>` : ''}
+    ${attachmentsHtml}
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px">
       <div class="section-title" style="margin:0">Corrective Actions (${incCapas.length})</div>
@@ -1405,6 +1491,13 @@ function resetForm() {
   document.getElementById('regulatory-body-wrap').style.display = 'none';
   document.getElementById('lost-time-days-wrap').style.display = 'none';
   document.getElementById('severity-suggestion').style.display = 'none';
+  pendingDocs = [];
+  docUploadsInFlight = 0;
+  renderPendingDocs();
+  const derr = document.getElementById('doc-error');
+  if (derr) { derr.style.display = 'none'; derr.textContent = ''; }
+  const sbtn = document.getElementById('submit-btn');
+  if (sbtn) { sbtn.disabled = false; sbtn.textContent = 'Submit Incident Report'; }
   updateBodySelected();
   goStep(1, true);
 }
@@ -1680,6 +1773,7 @@ async function submitIncident() {
     lost_time_days: formData.lost_time_days || null,
     was_recordable: formData.was_recordable || false,
     body_map: formData.body_regions?.length > 0 ? {regions: formData.body_regions} : null,
+    document_urls: pendingDocs.filter(d => d.url).map(d => d.url),
   };
 
   const res = await apiPost('/api/incidents', payload);

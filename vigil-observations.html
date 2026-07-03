@@ -493,10 +493,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="photo-drop" id="photo-drop"
           ondragover="this.classList.add('dragover');event.preventDefault()"
           ondragleave="this.classList.remove('dragover')"
-          ondrop="this.classList.remove('dragover');event.preventDefault()">
-          <div style="font-size:12.5px;font-weight:600;color:var(--text2)">Drag photos here or tap to add</div>
+          ondrop="this.classList.remove('dragover');event.preventDefault();handlePhotoFiles(event.dataTransfer.files)"
+          onclick="document.getElementById('f-photos').click()">
+          <div style="display:flex;align-items:center;justify-content:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text2)"><svg style="width:14px;height:14px;flex-shrink:0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg>Attach photos — drag here or tap to add</div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Photos help supervisors understand the situation faster</div>
         </div>
+        <input type="file" id="f-photos" multiple accept="image/jpeg,image/png,image/gif,image/webp,image/heic" style="display:none" onchange="handlePhotoFiles(this.files);this.value=''">
+        <div id="photo-error" style="display:none;font-size:11px;color:var(--danger);margin:-8px 0 12px"></div>
+        <div id="photo-pending" style="display:none;margin:-8px 0 14px"></div>
 
         <!-- ANON -->
         <div class="anon-box" id="anon-box">
@@ -669,6 +673,74 @@ async function apiPost(path, body) {
     try { return {ok:r.ok, status:r.status, data:JSON.parse(text)}; }
     catch { return {ok:false, status:r.status, data:{error:text.slice(0,200)}}; }
   } catch(e) { return {ok:false, status:0, data:{error:String(e)}}; }
+}
+
+// ── FILE UPLOADS ───────────────────────────────────────────────
+async function vigilUploadFile(file, entityType) {
+  const fd = new FormData();
+  fd.append('file', file);
+  if (entityType) fd.append('entity_type', entityType);
+  const r = await fetch((window.VIGIL_API_BASE||'') + '/api/files', {method:'POST', headers:{Authorization:'Bearer '+token}, body:fd});
+  const b = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(b.error || 'Upload failed ('+r.status+')');
+  return b.file;
+}
+async function vigilFileBlobUrl(url) {
+  const full = url.startsWith('/api/') ? (window.VIGIL_API_BASE||'') + url : url;
+  const r = await fetch(full, {headers:{Authorization:'Bearer '+token}});
+  if (!r.ok) throw new Error('File unavailable');
+  return URL.createObjectURL(await r.blob());
+}
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtSize(n) {
+  if (n == null) return '';
+  if (n >= 1048576) return (n/1048576).toFixed(1)+' MB';
+  if (n >= 1024) return Math.round(n/1024)+' KB';
+  return n+' B';
+}
+
+let pendingPhotos = [];
+let photoUploadsInFlight = 0;
+
+function renderPendingPhotos() {
+  const el = document.getElementById('photo-pending');
+  if (!el) return;
+  el.style.display = pendingPhotos.length ? 'block' : 'none';
+  el.innerHTML = pendingPhotos.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;margin-bottom:6px;font-size:11.5px">
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${esc(p.name)}</span>
+      <span style="color:var(--muted);flex-shrink:0">${fmtSize(p.size)}</span>
+      ${p.uploading
+        ? `<span style="color:var(--muted);flex-shrink:0">Uploading…</span>`
+        : `<button class="btn btn-ghost btn-sm" style="padding:1px 7px;flex-shrink:0" title="Remove" onclick="removePendingPhoto(${i})">✕</button>`}
+    </div>`).join('');
+}
+function removePendingPhoto(i) { pendingPhotos.splice(i,1); renderPendingPhotos(); }
+function updatePhotoUploadState() {
+  const btn = document.getElementById('submit-btn');
+  if (!btn) return;
+  if (photoUploadsInFlight > 0) { btn.disabled = true; btn.textContent = 'Uploading photos…'; }
+  else { btn.disabled = false; btn.textContent = 'Submit Observation →'; }
+}
+function handlePhotoFiles(files) {
+  const errEl = document.getElementById('photo-error');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+  Array.from(files || []).forEach(file => {
+    const entry = {name:file.name, size:file.size, url:null, uploading:true};
+    pendingPhotos.push(entry);
+    photoUploadsInFlight++;
+    updatePhotoUploadState();
+    renderPendingPhotos();
+    vigilUploadFile(file, 'observation')
+      .then(f => { entry.uploading = false; entry.url = f.url; })
+      .catch(e => {
+        pendingPhotos = pendingPhotos.filter(p => p !== entry);
+        if (errEl) { errEl.textContent = file.name + ': ' + (e.message || 'Upload failed'); errEl.style.display = 'block'; }
+      })
+      .finally(() => { photoUploadsInFlight = Math.max(0, photoUploadsInFlight - 1); updatePhotoUploadState(); renderPendingPhotos(); });
+  });
 }
 
 // ── TOAST ──────────────────────────────────────────────────────
@@ -1142,7 +1214,7 @@ async function submitObservation() {
     anonymous:                    isAnon,
     immediate_action_taken:       urgentChecked,
     immediate_action_description: urgentChecked ? (urgentAction||null) : null,
-    photo_urls:                   [],
+    photo_urls:                   pendingPhotos.filter(p => p.url).map(p => p.url),
   };
 
   const btn = document.getElementById('submit-btn');
@@ -1200,6 +1272,11 @@ function resetForm() {
   document.getElementById('urgent-detail').style.display = 'none';
   document.getElementById('urgency-box').className = 'urgency-box';
   document.getElementById('anon-box').className = 'anon-box';
+  pendingPhotos = [];
+  photoUploadsInFlight = 0;
+  renderPendingPhotos();
+  const perr = document.getElementById('photo-error');
+  if (perr) { perr.style.display = 'none'; perr.textContent = ''; }
   const btn = document.getElementById('submit-btn');
   btn.disabled = false; btn.textContent = 'Submit Observation →';
   renderTypeGrid();
@@ -1296,6 +1373,18 @@ async function viewObservation(id, focusActionId=null) {
       ${f.improvement_verified?`<div style="font-size:10.5px;color:var(--ok);margin-top:5px">Improvement verified</div>`:''}
     </div>`).join('');
 
+  // Photos HTML
+  const photoUrls = Array.isArray(o.photo_urls) ? o.photo_urls.filter(Boolean) : [];
+  const photosHtml = photoUrls.length ? `
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-title" style="margin-top:0">Photos (${photoUrls.length})</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        ${photoUrls.map((u,i) => u.startsWith('/api/files/')
+          ? `<div id="obs-photo-${i}" style="width:96px;height:96px;border:1px solid var(--border);border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);overflow:hidden;flex-shrink:0">Loading…</div>`
+          : `<a href="${esc(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);word-break:break-all">${esc(u)}</a>`).join('')}
+      </div>
+    </div>` : '';
+
   // Action buttons
   const canAssign = o.status === 'open' || o.status === 'under_review';
   const canClose  = o.status !== 'closed' && o.status !== 'cancelled';
@@ -1366,6 +1455,8 @@ async function viewObservation(id, focusActionId=null) {
       </div>`:''}
     </div>` : ''}
 
+    ${photosHtml}
+
     <!-- ACTIONS + TIMELINE -->
     <div class="row2" style="margin-bottom:12px">
       <div class="card">
@@ -1393,6 +1484,20 @@ async function viewObservation(id, focusActionId=null) {
       ${feedbackHtml||`<div style="font-size:11.5px;color:var(--muted)">No feedback sent yet. Feedback closes the loop with the reporter — this is critical for trust.</div>`}
     </div>`:``}
   `;
+
+  // Hydrate photo thumbnails through authenticated blob fetch
+  photoUrls.forEach((u,i) => {
+    if (!u.startsWith('/api/files/')) return;
+    vigilFileBlobUrl(u).then(blobUrl => {
+      const ph = document.getElementById('obs-photo-'+i);
+      if (!ph) return;
+      ph.innerHTML = `<img src="${blobUrl}" alt="Observation photo" style="width:100%;height:100%;object-fit:cover;cursor:pointer">`;
+      ph.onclick = () => window.open(blobUrl, '_blank');
+    }).catch(() => {
+      const ph = document.getElementById('obs-photo-'+i);
+      if (ph) ph.textContent = 'Unavailable';
+    });
+  });
 
   if (activeActionFocusId) {
     setTimeout(() => {
