@@ -12,7 +12,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* TOP BAR */
-.topbar{background:linear-gradient(90deg,#060A14,#091220);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100}
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100}
 .logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
 .logo-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:14px}
 .logo-title{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;color:var(--text)}
@@ -44,7 +44,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .panel-pad{padding:18px}
 
 /* ALERT STRIP */
-.astrip{background:linear-gradient(90deg,rgba(239,68,68,.06),transparent);border-bottom:1px solid rgba(239,68,68,.1);padding:5px 18px;display:flex;align-items:center;gap:8px;font-size:10.5px;flex-shrink:0}
+.astrip{background:rgba(239,68,68,.06);border-bottom:1px solid rgba(239,68,68,.1);padding:5px 18px;display:flex;align-items:center;gap:8px;font-size:10.5px;flex-shrink:0}
 .al{color:var(--danger);font-weight:700;font-size:10px}
 .ai-item{display:flex;align-items:center;gap:4px}
 .adot{width:5px;height:5px;border-radius:50%}
@@ -54,11 +54,11 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .kpi-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;position:relative;overflow:hidden}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.kpi-card.bl::before{background:linear-gradient(90deg,var(--accent),transparent)}
-.kpi-card.ok::before{background:linear-gradient(90deg,var(--ok),transparent)}
-.kpi-card.warn::before{background:linear-gradient(90deg,var(--warn),transparent)}
-.kpi-card.danger::before{background:linear-gradient(90deg,var(--danger),transparent)}
-.kpi-card.pu::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.kpi-card.bl::before{background:var(--b2)}
+.kpi-card.ok::before{background:var(--b2)}
+.kpi-card.warn::before{background:var(--b2)}
+.kpi-card.danger::before{background:var(--b2)}
+.kpi-card.pu::before{background:var(--b2)}
 .kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
 .kpi-val{font-variant-numeric:tabular-nums;font-size:26px;font-weight:800;line-height:1}
 .kpi-card.bl .kpi-val{color:var(--accent)}
@@ -210,7 +210,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .flag-item{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--warn);margin-bottom:6px}
 
 /* SUCCESS */
-.success-card{background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(16,185,129,.04));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:28px;text-align:center}
+.success-card{background:var(--s1);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:28px;text-align:center}
 .success-icon{font-size:44px;margin-bottom:12px}
 .success-num{font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;color:var(--warn);margin-bottom:4px}
 .success-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
@@ -266,6 +266,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   .kpi-strip{grid-template-columns:1fr 1fr}
   .form-row{grid-template-columns:1fr}
 }
+.logo-mark svg{width:15px;height:15px;color:#04141B}.btn svg{width:14px;height:14px;vertical-align:middle}.step-dot svg,.tl-node svg{width:12px;height:12px}.empty-icon svg{width:32px;height:32px}.success-icon svg{width:44px;height:44px;color:var(--ok)}.site-haz-remove svg,.crew-remove svg{width:12px;height:12px}
 </style>
 <link rel="stylesheet" href="vigil-module.css?v=20260607-3">
 </head>
@@ -275,7 +276,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- TOP BAR -->
 <header class="topbar">
   <div class="logo">
-    <div class="logo-mark">⚠️</div>
+    <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/> <path d="M12 9v4"/> <path d="M12 17h.01"/> </svg></div>
     <div>
       <div class="logo-title">Hazard Assessment</div>
       <div class="logo-sub">Vigil HSE Platform</div>
@@ -290,16 +291,16 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
   <div class="topbar-right">
     <div class="lpill"><div class="pd"></div><span id="worker-pill">— Workers</span></div>
-    <div class="co-tag">🚛 Northern Express Transport</div>
-    <button class="btn btn-primary" onclick="showPanel('form')">⚠️ Start FLHA</button>
+    <div class="co-tag">Northern Express Transport</div>
+    <button class="btn btn-primary" onclick="showPanel('form')">Start FLHA</button>
   </div>
 </header>
 
 <!-- ALERT STRIP -->
 <div class="astrip" id="astrip" style="display:none">
-  <span class="al">⚠️ Alerts:</span>
+  <span class="al">Alerts:</span>
   <span id="astrip-content"></span>
-  <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="document.getElementById('astrip').style.display='none'">✕</button>
+  <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="document.getElementById('astrip').style.display='none'"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M18 6 6 18"/> <path d="m6 6 12 12"/> </svg></button>
 </div>
 
 <div class="main">
@@ -336,7 +337,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="row2">
         <div class="card">
           <div class="card-hdr">
-            <div class="card-title">📡 Live Today</div>
+            <div class="card-title">Live Today</div>
             <span class="chip warn" id="live-date" style="font-size:9.5px"></span>
           </div>
           <div class="live-row" id="live-stats-row">
@@ -358,7 +359,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
         <div class="card">
           <div class="card-hdr">
-            <div class="card-title">📊 Quality Distribution</div>
+            <div class="card-title">Quality Distribution</div>
             <div id="chart-avg-badge" style="font-size:10.5px;color:var(--muted)"></div>
           </div>
           <div class="card-body">
@@ -378,7 +379,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <!-- ASSESSMENTS TABLE -->
       <div class="card">
         <div class="card-hdr">
-          <div class="card-title">📋 Recent Assessments
+          <div class="card-title">Recent Assessments
             <span class="chip danger" id="flagged-badge" style="display:none"></span>
           </div>
           <div style="display:flex;gap:6px;align-items:center">
@@ -409,7 +410,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <!-- TEMPLATE LIBRARY -->
       <div class="card">
         <div class="card-hdr">
-          <div class="card-title">📚 Task Template Library</div>
+          <div class="card-title">Task Template Library</div>
           <span class="card-action" onclick="showPanel('form')">+ Start FLHA from template</span>
         </div>
         <div class="card-body">
@@ -432,7 +433,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
           <div class="form-title">Start a Field Hazard Assessment</div>
           <div class="form-sub">Northern Express Transport — Vigil HSE</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
 
       <!-- STEP BAR -->
@@ -524,7 +525,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         </div>
 
         <div class="form-nav">
-          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
           <button class="btn btn-primary" onclick="goStep(2)">Next: Confirm Hazards →</button>
         </div>
       </div>
@@ -537,7 +538,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         </div>
         <div id="reflection-prompt-wrap" style="display:none;margin-top:14px">
           <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:12px 14px">
-            <div style="font-size:9.5px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">💭 Reflection Prompt</div>
+            <div style="font-size:9.5px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Reflection Prompt</div>
             <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:10px" id="reflection-prompt-text"></div>
             <div class="form-group" style="margin-bottom:0">
               <label class="form-label">Your Response</label>
@@ -552,7 +553,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(3)">Next: Site Hazards →</button>
@@ -562,14 +563,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <!-- STEP 3: SITE-SPECIFIC HAZARDS -->
       <div class="form-section" id="step-3">
         <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:7px;padding:12px 14px;margin-bottom:16px">
-          <div style="font-size:12px;font-weight:600;color:var(--warn);margin-bottom:3px">⚠️ What else could hurt you today?</div>
+          <div style="font-size:12px;font-weight:600;color:var(--warn);margin-bottom:3px">What else could hurt you today?</div>
           <div style="font-size:11px;color:var(--text2);line-height:1.5">Think about the specific conditions at this location right now. What hazards are present that are NOT in the template above?</div>
         </div>
         <div id="site-hazards-list"></div>
         <button class="btn btn-ghost btn-sm" onclick="addSiteHazard()" style="margin-bottom:14px">+ Add Site-Specific Hazard</button>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(4)">Next: Confirm Controls →</button>
@@ -584,7 +585,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(5)">Next: Crew & Submit →</button>
@@ -621,17 +622,17 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
           </div>
-          <button class="btn btn-ok" id="submit-btn-flha" onclick="submitFlha()">✓ Submit FLHA</button>
+          <button class="btn btn-ok" id="submit-btn-flha" onclick="submitFlha()">Submit FLHA</button>
         </div>
       </div>
 
       <!-- SUCCESS STATE -->
       <div id="form-success" style="display:none">
         <div class="success-card">
-          <div class="success-icon">✅</div>
+          <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>
           <div class="success-num" id="success-assessment-num">FLHA-2026-0001</div>
           <div class="success-sub">Assessment submitted successfully</div>
           <div class="success-score" id="success-quality-score">—</div>
@@ -714,6 +715,8 @@ function fmtTime(s) {
   if (!s) return '—';
   return new Date(s).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'});
 }
+const ICON_CHECK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICON_X = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M18 6 6 18"/> <path d="m6 6 12 12"/> </svg>';
 function toast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -752,14 +755,6 @@ function severityChip(s) {
   const map = {fatality:['danger','Fatality'],critical:['danger','Critical'],serious:['warn','Serious'],minor:['accent','Minor'],negligible:['muted','Negligible']};
   const [cls, lbl] = map[s] || ['muted', fmt(s)];
   return `<span class="chip ${cls}">${lbl}</span>`;
-}
-function taskCatIcon(cat) {
-  const icons = {
-    mechanical:'⚙️',electrical:'⚡',hydraulic:'🔧',lifting_rigging:'🏗️',working_at_heights:'🧗',
-    confined_space:'🕳️',hot_work:'🔥',excavation:'⛏️',driving:'🚛',loading_unloading:'📦',
-    field_service:'🔨',chemical:'🧪',cold_weather:'❄️',customer_site:'🏢',general:'✅',other:'⚠️',
-  };
-  return icons[cat] || '📋';
 }
 function hazCatColor(cat) {
   const map = {
@@ -947,7 +942,7 @@ function renderAssessmentsTable(list) {
   list = list || assessments;
   const el = document.getElementById('assessments-table');
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>No assessments found</div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/> <path d="m9 14 2 2 4-4"/> </svg></div>No assessments found</div>`;
     return;
   }
   el.innerHTML = `<table class="tbl">
@@ -990,14 +985,13 @@ function filterAssessments() {
 function renderTemplateLibrary() {
   const el = document.getElementById('tmpl-library');
   if (!templates.length) {
-    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📚</div>No templates found</div>`;
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/> <path d="m9 14 2 2 4-4"/> </svg></div>No templates found</div>`;
     return;
   }
   el.innerHTML = templates.slice(0, 9).map(t => `
     <div class="tmpl-item" onclick="showPanel('form')">
       <div class="tmpl-item-top">
-        <div class="tmpl-icon">${taskCatIcon(t.task_category)}</div>
-        <div class="tmpl-name">${t.title}</div>
+                <div class="tmpl-name">${t.title}</div>
         ${riskChip(t.risk_tier)}
       </div>
       <div class="tmpl-meta">${fmt(t.task_category)} · ${t.hazard_count || 0} hazards · ${t.control_count || 0} controls</div>
@@ -1087,8 +1081,7 @@ function onTemplateSelectChange() {
   summary.style.display = 'block';
   summary.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:10px">
-      <span style="font-size:22px;flex-shrink:0">${taskCatIcon(t.task_category)}</span>
-      <div style="flex:1;min-width:0">
+            <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;margin-bottom:4px">${t.title}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
           ${riskChip(t.risk_tier)}
@@ -1173,7 +1166,7 @@ function updateStepIndicator() {
     const lbl = document.getElementById(`slbl-${i}`);
     if (!dot || !lbl) continue;
     dot.className = 'step-dot' + (i < formStep ? ' done' : i === formStep ? ' active' : '');
-    dot.textContent = i < formStep ? '✓' : String(i);
+    dot.innerHTML = i < formStep ? ICON_CHECK : String(i);
     lbl.className = 'step-lbl' + (i < formStep ? ' done' : i === formStep ? ' active' : '');
   }
 }
@@ -1201,8 +1194,7 @@ async function renderStep2() {
   }
 
   hdr.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:7px">
-    <span style="font-size:20px">${taskCatIcon(formTemplate.task_category)}</span>
-    <div><div style="font-size:13px;font-weight:600">${formTemplate.title}</div>
+        <div><div style="font-size:13px;font-weight:600">${formTemplate.title}</div>
     <div style="font-size:10.5px;color:var(--muted)">${fmt(formTemplate.task_category)} · ${riskChip(formTemplate.risk_tier)}</div></div>
   </div>`;
 
@@ -1220,7 +1212,7 @@ async function renderStep2() {
   const prompts  = formTemplate.prompts || [];
 
   if (!hazards.length) {
-    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">✓</div>No pre-defined hazards for this template</div>`;
+    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>No pre-defined hazards for this template</div>`;
   } else {
     container.innerHTML = hazards.map(h => `
       <div class="haz-card" id="hcard-${h.id}">
@@ -1233,8 +1225,8 @@ async function renderStep2() {
           ${h.is_required ? '<span class="chip danger" style="flex-shrink:0;font-size:9px">Required</span>' : ''}
         </div>
         <div class="haz-actions">
-          <button class="haz-btn ${formHazardResponses[h.id]==='present'?'sel-present':''}" onclick="setHazardResponse('${h.id}','present')">✓ Present</button>
-          <button class="haz-btn ${formHazardResponses[h.id]==='not_present'?'sel-not_present':''}" onclick="setHazardResponse('${h.id}','not_present')">✕ Not Present</button>
+          <button class="haz-btn ${formHazardResponses[h.id]==='present'?'sel-present':''}" onclick="setHazardResponse('${h.id}','present')">Present</button>
+          <button class="haz-btn ${formHazardResponses[h.id]==='not_present'?'sel-not_present':''}" onclick="setHazardResponse('${h.id}','not_present')">Not Present</button>
           <button class="haz-btn ${formHazardResponses[h.id]==='unsure'?'sel-unsure':''}" onclick="setHazardResponse('${h.id}','unsure')">? Unsure</button>
         </div>
         <textarea class="form-textarea" style="min-height:42px;font-size:11px" placeholder="Notes (optional)…" oninput="formHazardNotes['${h.id}']=this.value">${formHazardNotes[h.id]||''}</textarea>
@@ -1270,7 +1262,7 @@ function renderSiteHazardList() {
   }
   el.innerHTML = formSiteHazards.map((h, i) => `
     <div class="site-haz-item">
-      <button class="site-haz-remove" onclick="removeSiteHazard(${i})">✕</button>
+      <button class="site-haz-remove" onclick="removeSiteHazard(${i})">${ICON_X}</button>
       <div class="form-row" style="margin-bottom:8px">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Hazard Description</label>
@@ -1338,7 +1330,7 @@ async function renderStep4() {
   const controls = (formTemplate.controls || []).sort((a,b) => (a.sort_order||0)-(b.sort_order||0));
 
   if (!controls.length) {
-    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">✓</div>No controls defined for this template</div>`;
+    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>No controls defined for this template</div>`;
     return;
   }
 
@@ -1415,7 +1407,7 @@ function renderCrewList() {
     return `<div class="crew-member">
       <div class="crew-avatar">${initials}</div>
       <div class="crew-name">${w.first_name} ${w.last_name} <span style="font-size:9.5px;color:var(--muted)">· ${w.job_title||'Worker'}</span></div>
-      <button class="crew-remove" onclick="removeCrewMember('${id}')">✕</button>
+      <button class="crew-remove" onclick="removeCrewMember('${id}')">${ICON_X}</button>
     </div>`;
   }).join('');
 
@@ -1455,8 +1447,8 @@ function computeQualityPreview() {
   }
   if (fl) {
     fl.innerHTML = flags.length
-      ? flags.map(f => `<div style="font-size:10.5px;color:var(--warn);margin-bottom:4px;display:flex;align-items:baseline;gap:5px"><span style="color:var(--warn)">⚠</span>${f}</div>`).join('')
-      : '<div style="color:var(--ok);font-size:11.5px">✓ Looking good — ready to submit!</div>';
+      ? flags.map(f => `<div style="font-size:10.5px;color:var(--warn);margin-bottom:4px;display:flex;align-items:baseline;gap:5px">${f}</div>`).join('')
+      : '<div style="color:var(--ok);font-size:11.5px">Looking good — ready to submit!</div>';
   }
   return score;
 }
@@ -1490,9 +1482,9 @@ async function submitFlha() {
   const createRes = await apiPost('/api/hazard/assessments', payload);
 
   if (!createRes.ok || !createRes.data?.assessment) {
-    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    btn.textContent = 'Submit FLHA'; btn.disabled = false;
     const errDetail = createRes.data?.message || createRes.data?.error || `HTTP ${createRes.status}`;
-    toast(`⚠️ Failed: ${errDetail}`, 'danger');
+    toast(`Failed: ${errDetail}`, 'danger');
     console.error('[Vigil] FLHA create error:', createRes.status, createRes.data);
     return;
   }
@@ -1537,23 +1529,23 @@ async function submitFlha() {
   }
   const failedSync = syncResults.find(r => !r.ok);
   if (failedSync) {
-    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    btn.textContent = 'Submit FLHA'; btn.disabled = false;
     const errDetail = failedSync.data?.message || failedSync.data?.error || `HTTP ${failedSync.status}`;
-    toast(`⚠️ FLHA details failed to save: ${errDetail}`, 'danger');
+    toast(`FLHA details failed to save: ${errDetail}`, 'danger');
     return;
   }
 
   // Submit for quality scoring
   const submitRes = await apiPost(`/api/hazard/assessments/${created.id}/submit`, {time_to_complete_seconds:300});
   if (!submitRes.ok || !submitRes.data?.assessment) {
-    btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+    btn.textContent = 'Submit FLHA'; btn.disabled = false;
     const errDetail = submitRes.data?.message || submitRes.data?.error || `HTTP ${submitRes.status}`;
-    toast(`⚠️ FLHA submit failed: ${errDetail}`, 'danger');
+    toast(`FLHA submit failed: ${errDetail}`, 'danger');
     return;
   }
   const final = submitRes.data.assessment;
 
-  btn.textContent = '✓ Submit FLHA'; btn.disabled = false;
+  btn.textContent = 'Submit FLHA'; btn.disabled = false;
 
   assessments.unshift(final);
   renderAssessmentsTable();
@@ -1571,7 +1563,7 @@ async function submitFlha() {
     qsEl.style.color = qs >= 86 ? 'var(--ok)' : qs >= 71 ? 'var(--accent)' : qs >= 50 ? 'var(--warn)' : 'var(--danger)';
   }
 
-  toast(`✅ ${final.assessment_number} submitted`, 'ok');
+  toast(`${final.assessment_number} submitted`, 'ok');
 }
 
 function viewSubmittedDetail() {
@@ -1589,7 +1581,7 @@ async function showDetail(id) {
     // Fall back to cached data
     const cached = assessments.find(x => x.id === id);
     if (cached) renderDetail(cached);
-    else document.getElementById('detail-content').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assessment</div>`;
+    else document.getElementById('detail-content').innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/> <path d="M12 9v4"/> <path d="M12 17h.01"/> </svg></div>Could not load assessment</div>`;
     return;
   }
   renderDetail(a);
@@ -1607,7 +1599,7 @@ function renderDetail(a) {
   const timelineHtml = WORKFLOW.map((w, i) => {
     const isDone = i < curIdx, isActive = i === curIdx;
     const lineCls = i < WORKFLOW.length - 1 ? (isDone ? 'tl-line done' : 'tl-line') : '';
-    return `<div class="tl-step"><div class="tl-node ${isDone?'done':isActive?'active':''}">${isDone?'✓':isActive?'●':i+1}</div><div class="tl-lbl ${isDone?'done':isActive?'active':''}">${w.label}</div></div>${i<WORKFLOW.length-1?`<div class="${lineCls}"></div>`:''}`;
+    return `<div class="tl-step"><div class="tl-node ${isDone?'done':isActive?'active':''}">${isDone?ICON_CHECK:isActive?'●':i+1}</div><div class="tl-lbl ${isDone?'done':isActive?'active':''}">${w.label}</div></div>${i<WORKFLOW.length-1?`<div class="${lineCls}"></div>`:''}`;
   }).join('');
 
   const worker = a.submitted_by_first_name ? `${a.submitted_by_first_name} ${a.submitted_by_last_name}` : '—';
@@ -1631,7 +1623,7 @@ function renderDetail(a) {
   // Quality flags
   const flags = a.quality_flags || [];
   const flagsHtml = flags.length
-    ? `<div class="section-title">Quality Flags</div>${flags.map(f => `<div class="flag-item">⚠️ ${fmt(f)}</div>`).join('')}`
+    ? `<div class="section-title">Quality Flags</div>${flags.map(f => `<div class="flag-item">${fmt(f)}</div>`).join('')}`
     : '';
 
   // Hazard confirmations
@@ -1640,7 +1632,7 @@ function renderDetail(a) {
     <div class="section-title">Hazard Confirmations (${hazConfs.length})</div>
     ${hazConfs.map(h => {
       const statCls = h.confirmation_status==='present' ? 'danger' : h.confirmation_status==='not_present' ? 'ok' : 'warn';
-      const statLbl = h.confirmation_status==='present' ? '⚠ Present' : h.confirmation_status==='not_present' ? '✓ Not Present' : '? Unsure';
+      const statLbl = h.confirmation_status==='present' ? 'Present' : h.confirmation_status==='not_present' ? 'Not Present' : '? Unsure';
       return `<div class="haz-card" style="margin-bottom:6px">
         <div class="haz-card-top">
           <div class="haz-cat-dot" style="background:${hazCatColor(h.hazard_category)}"></div>
@@ -1675,7 +1667,7 @@ function renderDetail(a) {
       <div class="ctrl-row ${c.confirmed?'confirmed':''}">
         <span class="ctrl-hier ${c.control_type||'administrative'}">${fmt(c.control_type||'admin').slice(0,5)}</span>
         <span class="ctrl-desc">${c.control_description}</span>
-        <span class="chip ${c.confirmed?'ok':'danger'}">${c.confirmed?'✓ Confirmed':'✕ Not Confirmed'}</span>
+        <span class="chip ${c.confirmed?'ok':'danger'}">${c.confirmed?'Confirmed':'Not Confirmed'}</span>
       </div>
     `).join('')}
   ` : '';
@@ -1690,7 +1682,7 @@ function renderDetail(a) {
       return `<div class="crew-member" style="margin-bottom:6px">
         <div class="crew-avatar">${initials}</div>
         <div class="crew-name">${name}</div>
-        <span class="chip ok" style="font-size:9.5px">✓ Signed</span>
+        <span class="chip ok" style="font-size:9.5px">Signed</span>
       </div>`;
     }).join('')}
   ` : '';

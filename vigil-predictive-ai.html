@@ -70,6 +70,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:24px 16px;color:var(--muted)}
 .empty-icon{font-size:26px;margin-bottom:6px}
+.empty-icon svg{width:26px;height:26px}
 
 /* TOAST */
 .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
@@ -80,8 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 @keyframes slide-in{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,#0C1018 0%,#0d1220 100%);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:16px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(239,68,68,.04) 0%,transparent 60%);pointer-events:none}
+.hero{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:16px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;position:relative;overflow:hidden}
 .hero-text{flex:1;min-width:200px}
 .hero-title{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px}
 .hero-title span{color:var(--danger)}
@@ -148,10 +148,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .scan-logo span{color:var(--danger)}
 .scan-subtitle{font-size:11.5px;color:var(--muted);margin-bottom:24px}
 .scan-bar-wrap{height:6px;background:var(--s4);border-radius:3px;margin-bottom:16px;overflow:hidden}
-.scan-bar{height:6px;background:linear-gradient(90deg,var(--accent),var(--danger));border-radius:3px;transition:width .4s ease;width:0%}
+.scan-bar{height:6px;background:var(--accent);border-radius:3px;transition:width .4s ease;width:0%}
 .scan-log{min-height:96px;font-size:11px;color:var(--text2);font-family:monospace;display:flex;flex-direction:column;gap:4px}
 .scan-log-item{animation:fade-in .3s ease}
-.scan-log-item.ok::before{content:'✓ ';color:var(--ok)}
+.scan-log-item.ok{color:var(--ok)}
 .scan-log-item.scanning::before{content:'⟳ ';color:var(--accent)}
 @keyframes fade-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .scan-result{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:none}
@@ -229,7 +229,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <!-- ALERT STRIP -->
 <div class="alert-strip">
-  <div class="alert-strip-label">⚡ AI</div>
+  <div class="alert-strip-label">AI</div>
   <div class="alert-strip-body" id="astrip-content">
     <span style="color:var(--muted);font-size:10.5px">Loading…</span>
   </div>
@@ -256,7 +256,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
     <!-- WEATHER PANEL -->
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title">🌤️ Live Site Weather
+      <div class="card-title">Live Site Weather
         <span id="weather-updated-label">Loading…</span>
         <div style="margin-left:auto">
           <button class="btn btn-ghost btn-sm" onclick="fetchWeather()">↻ Refresh</button>
@@ -273,7 +273,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <!-- SIGNALS BOARD -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-family:var(--font-head);font-size:13px;font-weight:700;letter-spacing:-.2px">🚨 Active Risk Signals</div>
+          <div style="font-family:var(--font-head);font-size:13px;font-weight:700;letter-spacing:-.2px">Active Risk Signals</div>
           <div id="signal-count-badge"></div>
         </div>
         <div id="signals-board">
@@ -284,13 +284,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <!-- SITE RISK + ACTIONS -->
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="card">
-          <div class="card-title">📍 Site Risk Rankings</div>
+          <div class="card-title">Site Risk Rankings</div>
           <div id="site-risk-list">
             <div class="loading-wrap" style="padding:16px"><div class="spinner"></div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-title">📊 Signals by Type</div>
+          <div class="card-title">Signals by Type</div>
           <div id="by-type-chart"></div>
         </div>
       </div>
@@ -299,7 +299,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
     <!-- 14 SIGNAL TYPES -->
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title">🧠 14 Signal Types Monitored
+      <div class="card-title">14 Signal Types Monitored
         <span>AI cross-module pattern detection — active signals highlighted</span>
       </div>
       <div class="sig-type-grid" id="sig-type-grid">
@@ -361,7 +361,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost btn-sm" onclick="closeActionModal()">Cancel</button>
-      <button class="btn btn-ok btn-sm" onclick="confirmAction()">✓ Mark Actioned</button>
+      <button class="btn btn-ok btn-sm" onclick="confirmAction()">Mark Actioned</button>
     </div>
   </div>
 </div>
@@ -415,39 +415,39 @@ function toast(msg, type='ok', ms=4000) {
 
 // ── CONFIG ─────────────────────────────────────────────────────
 const SIGNAL_CFG = {
-  environmental_exceedance:   {icon:'🌿', label:'Environmental Exceedance'},
-  overdue_capa:               {icon:'⚠️', label:'Overdue CAPA'},
-  low_inspection_score:       {icon:'🔍', label:'Low Inspection Score'},
-  high_fatigue:               {icon:'😴', label:'Fatigue Risk'},
-  repeat_observations:        {icon:'🔄', label:'Repeat Observations'},
-  near_miss_cluster:          {icon:'🚨', label:'Near Miss Cluster'},
-  observation_volume_drop:    {icon:'📉', label:'Observation Volume Drop'},
-  flha_quality_decline:       {icon:'📋', label:'FLHA Quality Decline'},
-  training_gap:               {icon:'🎓', label:'Training Gap'},
-  credential_expiry_cluster:  {icon:'🏅', label:'Credential Expiry Cluster'},
-  permit_compliance_decline:  {icon:'📝', label:'Permit Compliance Decline'},
-  contractor_performance_decline:{icon:'📊', label:'Contractor Performance'},
-  incident_precursor:         {icon:'⚡', label:'Incident Precursor'},
-  equipment_defect_cluster:   {icon:'🏗️', label:'Equipment Defect Cluster'},
-  work_alone_missed_checkin:  {icon:'👁️', label:'Work Alone Missed Check-in'},
-  meeting_attendance_decline: {icon:'👥', label:'Meeting Attendance Decline'},
+  environmental_exceedance:   {label:'Environmental Exceedance'},
+  overdue_capa:               {label:'Overdue CAPA'},
+  low_inspection_score:       {label:'Low Inspection Score'},
+  high_fatigue:               {label:'Fatigue Risk'},
+  repeat_observations:        {label:'Repeat Observations'},
+  near_miss_cluster:          {label:'Near Miss Cluster'},
+  observation_volume_drop:    {label:'Observation Volume Drop'},
+  flha_quality_decline:       {label:'FLHA Quality Decline'},
+  training_gap:               {label:'Training Gap'},
+  credential_expiry_cluster:  {label:'Credential Expiry Cluster'},
+  permit_compliance_decline:  {label:'Permit Compliance Decline'},
+  contractor_performance_decline:{label:'Contractor Performance'},
+  incident_precursor:         {label:'Incident Precursor'},
+  equipment_defect_cluster:   {label:'Equipment Defect Cluster'},
+  work_alone_missed_checkin:  {label:'Work Alone Missed Check-in'},
+  meeting_attendance_decline: {label:'Meeting Attendance Decline'},
 };
 
 const ALL_14_TYPES = [
-  {key:'observation_volume_drop',    icon:'📉', name:'Observation Volume Drop',      desc:'Reporting silence signals fear or disengagement — workers have stopped filing observations'},
-  {key:'near_miss_cluster',          icon:'🚨', name:'Near Miss Cluster',             desc:'Multiple near misses at the same location within 30 days — an incident is imminent'},
-  {key:'flha_quality_decline',       icon:'📋', name:'FLHA Quality Decline',          desc:'Average FLHA quality score dropping is the clearest signal of pencil-whipping'},
-  {key:'low_inspection_score',       icon:'🔍', name:'Inspection Score Decline',      desc:'Falling inspection scores signal deteriorating site conditions before an incident occurs'},
-  {key:'training_gap',               icon:'🎓', name:'Training Gap',                  desc:'More than 20% of workers with expired mandatory training at the same site'},
-  {key:'credential_expiry_cluster',  icon:'🏅', name:'Credential Expiry Cluster',     desc:'5+ credentials expiring at the same site signals a systemic competency risk'},
-  {key:'high_fatigue',               icon:'😴', name:'Fatigue Risk Cluster',          desc:'3+ workers with high fatigue scores at the same site — most injuries happen when people are tired'},
-  {key:'permit_compliance_decline',  icon:'📝', name:'Permit Compliance Decline',     desc:'Permits not being closed out properly signals process breakdown in high-risk work'},
-  {key:'overdue_capa',               icon:'⚠️', name:'CAPA Overdue Cluster',          desc:'Corrective actions going unresolved means root causes are not being fixed after incidents'},
-  {key:'contractor_performance_decline',icon:'📊',name:'Contractor Performance',      desc:'Contractor safety score dropping — third-party workers are often highest risk'},
-  {key:'incident_precursor',         icon:'⚡', name:'Incident Precursor Pattern',    desc:'Observations that preceded past incidents reappearing — history about to repeat'},
-  {key:'equipment_defect_cluster',   icon:'🏗️', name:'Equipment Defect Cluster',      desc:'Critical equipment defects accumulating at a site without resolution'},
-  {key:'work_alone_missed_checkin',  icon:'👁️', name:'Work Alone Missed Check-ins',   desc:'Workers not checking in during lone work — highest severity signal in the system'},
-  {key:'meeting_attendance_decline', icon:'👥', name:'Meeting Attendance Decline',    desc:'Falling safety meeting attendance is the earliest signal of disengagement'},
+  {key:'observation_volume_drop',    name:'Observation Volume Drop',      desc:'Reporting silence signals fear or disengagement — workers have stopped filing observations'},
+  {key:'near_miss_cluster',          name:'Near Miss Cluster',             desc:'Multiple near misses at the same location within 30 days — an incident is imminent'},
+  {key:'flha_quality_decline',       name:'FLHA Quality Decline',          desc:'Average FLHA quality score dropping is the clearest signal of pencil-whipping'},
+  {key:'low_inspection_score',       name:'Inspection Score Decline',      desc:'Falling inspection scores signal deteriorating site conditions before an incident occurs'},
+  {key:'training_gap',               name:'Training Gap',                  desc:'More than 20% of workers with expired mandatory training at the same site'},
+  {key:'credential_expiry_cluster',  name:'Credential Expiry Cluster',     desc:'5+ credentials expiring at the same site signals a systemic competency risk'},
+  {key:'high_fatigue',               name:'Fatigue Risk Cluster',          desc:'3+ workers with high fatigue scores at the same site — most injuries happen when people are tired'},
+  {key:'permit_compliance_decline',  name:'Permit Compliance Decline',     desc:'Permits not being closed out properly signals process breakdown in high-risk work'},
+  {key:'overdue_capa',               name:'CAPA Overdue Cluster',          desc:'Corrective actions going unresolved means root causes are not being fixed after incidents'},
+  {key:'contractor_performance_decline',name:'Contractor Performance',      desc:'Contractor safety score dropping — third-party workers are often highest risk'},
+  {key:'incident_precursor',         name:'Incident Precursor Pattern',    desc:'Observations that preceded past incidents reappearing — history about to repeat'},
+  {key:'equipment_defect_cluster',   name:'Equipment Defect Cluster',      desc:'Critical equipment defects accumulating at a site without resolution'},
+  {key:'work_alone_missed_checkin',  name:'Work Alone Missed Check-ins',   desc:'Workers not checking in during lone work — highest severity signal in the system'},
+  {key:'meeting_attendance_decline', name:'Meeting Attendance Decline',    desc:'Falling safety meeting attendance is the earliest signal of disengagement'},
 ];
 
 const SIGNAL_ACTIONS_CFG = {
@@ -544,8 +544,8 @@ function sevChip(sev) {
 }
 
 function statusBadge(status) {
-  if (status === 'acknowledged') return `<span class="chip ok" style="font-size:9px">✓ Acknowledged</span>`;
-  if (status === 'actioned')     return `<span class="chip ok" style="font-size:9px">✓ Actioned</span>`;
+  if (status === 'acknowledged') return `<span class="chip ok" style="font-size:9px">Acknowledged</span>`;
+  if (status === 'actioned')     return `<span class="chip ok" style="font-size:9px">Actioned</span>`;
   return '';
 }
 
@@ -648,9 +648,9 @@ function renderHero() {
         <div class="hero-meta">${signals.length} active signal${signals.length!==1?'s':''} · ${(dashData.signal_summary||{}).critical||0} critical</div>
       </div>
       <button class="btn btn-danger" onclick="runDetection()" id="detect-btn">
-        ⚡ Run Detection
+        Run Detection
       </button>
-      <button class="btn btn-ghost btn-sm" onclick="loadReport()">📄 Intelligence Report</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadReport()">Intelligence Report</button>
     </div>`;
 }
 
@@ -700,7 +700,7 @@ function renderSignals() {
 
   if (!signals.length) {
     el.innerHTML = `<div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:24px;text-align:center">
-      <div style="font-size:28px;margin-bottom:8px">🟢</div>
+      <div style="margin-bottom:8px;color:var(--ok)"><svg width="28" height="28" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
       <div style="font-size:13px;font-weight:700;color:var(--ok)">No Active Risk Signals</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">All 14 signal types are within normal parameters. Run detection to scan for new signals.</div>
     </div>`;
@@ -713,7 +713,7 @@ function renderSignals() {
   });
 
   el.innerHTML = sorted.map(s => {
-    const cfg = SIGNAL_CFG[s.signal_type] || {icon:'⚡', label:fmt(s.signal_type)};
+    const cfg = SIGNAL_CFG[s.signal_type] || {label:fmt(s.signal_type)};
     const actions = (SIGNAL_ACTIONS_CFG[s.signal_type] || []).slice(0,3);
     const canAck    = s.status === 'active';
     const canAction = s.status === 'active' || s.status === 'acknowledged';
@@ -722,7 +722,6 @@ function renderSignals() {
       <div class="signal-top">
         <div style="flex:1;min-width:0">
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px">
-            <span style="font-size:16px">${cfg.icon}</span>
             <span class="chip muted" style="font-size:9px">${cfg.label}</span>
             ${sevChip(s.severity)}
             ${statusBadge(s.status)}
@@ -735,10 +734,10 @@ function renderSignals() {
         </div>
       </div>
       <div class="signal-meta">
-        ${s.site ? `<span>📍 ${s.site}</span>` : ''}
-        ${s.department ? `<span>🏢 ${s.department}</span>` : ''}
-        <span>🕐 ${fmtDateTime(s.detected_at)}</span>
-        ${s.source_module ? `<span>📦 ${fmt(s.source_module)}</span>` : ''}
+        ${s.site ? `<span>${s.site}</span>` : ''}
+        ${s.department ? `<span>${s.department}</span>` : ''}
+        <span>${fmtDateTime(s.detected_at)}</span>
+        ${s.source_module ? `<span>${fmt(s.source_module)}</span>` : ''}
       </div>
       ${actions.length ? `
       <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">Recommended Actions</div>
@@ -746,8 +745,8 @@ function renderSignals() {
         ${actions.map(a=>`<li>${a}</li>`).join('')}
       </ul>` : ''}
       <div class="signal-footer" onclick="event.stopPropagation()">
-        ${canAck ? `<button class="btn btn-ghost btn-sm" onclick="acknowledge('${s.id}',this)">👁 Acknowledge</button>` : ''}
-        ${canAction ? `<button class="btn btn-sm" style="background:rgba(16,185,129,.12);color:var(--ok);border:1px solid rgba(16,185,129,.25)" onclick="openActionModal('${s.id}')">✓ Mark Actioned</button>` : ''}
+        ${canAck ? `<button class="btn btn-ghost btn-sm" onclick="acknowledge('${s.id}',this)">Acknowledge</button>` : ''}
+        ${canAction ? `<button class="btn btn-sm" style="background:rgba(16,185,129,.12);color:var(--ok);border:1px solid rgba(16,185,129,.25)" onclick="openActionModal('${s.id}')">Mark Actioned</button>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="viewSignal('${s.id}')">Details →</button>
       </div>
     </div>`;
@@ -795,12 +794,12 @@ function renderByType() {
   }
   const max = Math.max(...types.map(t=>parseInt(t.count)||0));
   el.innerHTML = types.map(t => {
-    const cfg = SIGNAL_CFG[t.signal_type] || {icon:'⚡', label:fmt(t.signal_type)};
+    const cfg = SIGNAL_CFG[t.signal_type] || {label:fmt(t.signal_type)};
     const pct = max > 0 ? Math.round(parseInt(t.count)/max*100) : 0;
     return `
     <div style="margin-bottom:8px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:11px;color:var(--text2)">${cfg.icon} ${cfg.label}</span>
+        <span style="font-size:11px;color:var(--text2)">${cfg.label}</span>
         <span style="font-size:10.5px;font-weight:700;color:var(--text)">${t.count}</span>
       </div>
       <div style="height:4px;background:var(--s4);border-radius:2px">
@@ -822,7 +821,6 @@ function renderSignalTypes() {
     const cls = isCritical ? 'active-critical' : isActive ? 'active-type' : '';
     return `
     <div class="sig-type-item ${cls}">
-      <div class="sig-type-icon">${t.icon}</div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
         <div class="sig-type-name">${t.name}</div>
         ${isActive ? `<span class="chip ${isCritical?'danger':'warn'}" style="font-size:8px">ACTIVE</span>` : ''}
@@ -847,7 +845,7 @@ function buildAlertStrip() {
     parts.push(`<span style="color:var(--ok)">No active risk signals — all modules nominal</span>`);
   }
   if (weatherStopWorkSites.length) {
-    parts.push(`<span style="color:var(--danger);font-weight:700">⛅ WEATHER: Stop-work conditions at ${weatherStopWorkSites.join(', ')}</span>`);
+    parts.push(`<span style="color:var(--danger);font-weight:700">WEATHER: Stop-work conditions at ${weatherStopWorkSites.join(', ')}</span>`);
   }
   document.getElementById('astrip-content').innerHTML = parts.join('<span class="asep">·</span>');
 }
@@ -862,11 +860,11 @@ async function viewSignal(id) {
   const res = await apiGet(`/api/risk/signals/${id}`);
   const s = res && res.signal;
   if (!s) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load signal</div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>Could not load signal</div>`;
     return;
   }
 
-  const cfg     = SIGNAL_CFG[s.signal_type] || {icon:'⚡', label:fmt(s.signal_type)};
+  const cfg     = SIGNAL_CFG[s.signal_type] || {label:fmt(s.signal_type)};
   const actions = SIGNAL_ACTIONS_CFG[s.signal_type] || [];
   const modLink = MODULE_LINKS[s.source_module];
   const canAck  = s.status === 'active';
@@ -897,7 +895,6 @@ async function viewSignal(id) {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div style="flex:1">
           <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-            <span style="font-size:20px">${cfg.icon}</span>
             <span class="chip muted">${cfg.label}</span>
             ${sevChip(s.severity)}
             ${statusBadge(s.status)}
@@ -916,7 +913,7 @@ async function viewSignal(id) {
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
       <div class="detail-field">
         <div class="detail-field-label">Site</div>
-        <div class="detail-field-val">📍 ${s.site||'—'}</div>
+        <div class="detail-field-val">${s.site||'—'}</div>
       </div>
       <div class="detail-field">
         <div class="detail-field-label">Department</div>
@@ -945,7 +942,7 @@ async function viewSignal(id) {
     <!-- RECOMMENDED ACTIONS -->
     ${actions.length ? `
     <div class="card" style="margin-bottom:12px">
-      <div class="card-title">🎯 Recommended Actions <span>priority order</span></div>
+      <div class="card-title">Recommended Actions <span>priority order</span></div>
       ${actions.map((a,i)=>`
       <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(26,34,50,.6)">
         <div style="font-family:var(--font-head);font-size:12px;font-weight:800;color:var(--accent);width:20px;flex-shrink:0;padding-top:1px">${i+1}</div>
@@ -955,17 +952,17 @@ async function viewSignal(id) {
 
     ${s.action_notes ? `
     <div class="card" style="margin-bottom:12px;border-color:rgba(16,185,129,.3)">
-      <div class="card-title" style="color:var(--ok)">✓ Action Notes</div>
+      <div class="card-title" style="color:var(--ok)">Action Notes</div>
       <div style="font-size:12.5px;color:var(--text2);line-height:1.6">${s.action_notes}</div>
     </div>` : ''}
 
     <!-- WORKFLOW ACTIONS -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-title">📋 Signal Workflow</div>
+      <div class="card-title">Signal Workflow</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        ${canAck ? `<button class="btn btn-ghost" id="detail-ack-btn" onclick="acknowledge('${s.id}',this)">👁 Acknowledge Signal</button>` : ''}
-        ${canAct ? `<button class="btn btn-ok" onclick="openActionModal('${s.id}')">✓ Mark as Actioned</button>` : ''}
-        ${!canAck && !canAct ? `<div style="font-size:12px;color:var(--ok)">✓ This signal has been fully actioned</div>` : ''}
+        ${canAck ? `<button class="btn btn-ghost" id="detail-ack-btn" onclick="acknowledge('${s.id}',this)">Acknowledge Signal</button>` : ''}
+        ${canAct ? `<button class="btn btn-ok" onclick="openActionModal('${s.id}')">Mark as Actioned</button>` : ''}
+        ${!canAck && !canAct ? `<div style="font-size:12px;color:var(--ok)">This signal has been fully actioned</div>` : ''}
         ${modLink ? `<a href="${modLink.url}" class="btn btn-ghost btn-sm" style="margin-left:auto">${modLink.label}</a>` : ''}
       </div>
     </div>
@@ -987,7 +984,7 @@ async function acknowledge(id, btn) {
     if (activeSignalId === id) viewSignal(id);
   } else {
     toast('Failed to acknowledge','danger');
-    if (btn) { btn.disabled = false; btn.textContent = '👁 Acknowledge'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Acknowledge'; }
   }
 }
 
@@ -1021,7 +1018,7 @@ async function confirmAction() {
     if (activeSignalId === pendingActionId) viewSignal(pendingActionId);
   } else {
     toast('Failed to save action','danger');
-    btn.disabled = false; btn.textContent = '✓ Mark Actioned';
+    btn.disabled = false; btn.textContent = 'Mark Actioned';
   }
 }
 document.getElementById('action-modal').addEventListener('click', e => {
@@ -1096,8 +1093,8 @@ async function runDetection() {
       </div>
       ${topTypes.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">
         ${topTypes.map(([k,v])=>{
-          const cfg = SIGNAL_CFG[k]||{icon:'⚡',label:fmt(k)};
-          return `<span class="chip warn">${cfg.icon} ${cfg.label}: ${v}</span>`;
+          const cfg = SIGNAL_CFG[k]||{label:fmt(k)};
+          return `<span class="chip warn">${cfg.label}: ${v}</span>`;
         }).join('')}
       </div>` : ''}`;
 
@@ -1151,7 +1148,7 @@ async function loadReport() {
 
       <!-- CURRENT SNAPSHOT AS REPORT -->
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title">📊 Current Risk Snapshot <span>live — ${new Date().toLocaleDateString('en-CA',{month:'long',day:'numeric',year:'numeric'})}</span></div>
+        <div class="card-title">Current Risk Snapshot <span>live — ${new Date().toLocaleDateString('en-CA',{month:'long',day:'numeric',year:'numeric'})}</span></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
           <div class="detail-field">
             <div class="detail-field-label">Company Risk Score</div>
@@ -1168,15 +1165,15 @@ async function loadReport() {
         </div>
         <div style="font-size:11px;color:var(--muted);padding:10px;background:var(--s2);border-radius:7px;line-height:1.6">
           ${signals.length===0
-            ? '✅ No active risk signals detected. All 14 signal types are within normal parameters. Maintain current safety management practices.'
-            : `⚠️ ${signals.length} active risk signal${signals.length!==1?'s are':' is'} currently detected across your operation. ${(summ.critical||0)>0?`${summ.critical} critical signal${summ.critical>1?'s require':'requires'} immediate attention.`:''} Run detection regularly to maintain current risk intelligence.`}
+            ? 'No active risk signals detected. All 14 signal types are within normal parameters. Maintain current safety management practices.'
+            : `${signals.length} active risk signal${signals.length!==1?'s are':' is'} currently detected across your operation. ${(summ.critical||0)>0?`${summ.critical} critical signal${summ.critical>1?'s require':'requires'} immediate attention.`:''} Run detection regularly to maintain current risk intelligence.`}
         </div>
       </div>
 
       <!-- TOP SIGNALS TABLE -->
       ${signals.length ? `
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title">🚨 Active Signals Ranked by Risk Score</div>
+        <div class="card-title">Active Signals Ranked by Risk Score</div>
         <div class="tbl-wrap"><table style="width:100%;border-collapse:collapse;font-size:12px">
           <thead><tr>
             <th style="text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border)">Signal</th>
@@ -1202,7 +1199,7 @@ async function loadReport() {
       <!-- SITES RANKING -->
       ${(dashData.top_sites_at_risk||[]).length ? `
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title">📍 Site Risk Rankings</div>
+        <div class="card-title">Site Risk Rankings</div>
         ${[...(dashData.top_sites_at_risk||[])].sort((a,b)=>b.max_score-a.max_score).map((s,i)=>`
         <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(26,34,50,.6)">
           <div style="font-family:var(--font-head);font-size:14px;font-weight:800;color:var(--muted);width:20px">${i+1}</div>
@@ -1215,7 +1212,7 @@ async function loadReport() {
       </div>` : ''}
 
       <div style="text-align:center;padding:16px">
-        <button class="btn btn-danger" onclick="showPanel('dash');setTimeout(runDetection,100)">⚡ Run Detection to Generate Full Report</button>
+        <button class="btn btn-danger" onclick="showPanel('dash');setTimeout(runDetection,100)">Run Detection to Generate Full Report</button>
       </div>
     `;
   } else {
@@ -1232,19 +1229,6 @@ const WEATHER_SITES = [
   {name:'Site B Pipeline',   lat:56.7267, lon:-111.3790},
   {name:'Red Deer Terminal', lat:52.2681, lon:-113.8112},
 ];
-
-const WMO_ICONS = {
-  0:'☀️',  1:'🌤️',  2:'⛅',  3:'☁️',
-  45:'🌫️', 48:'🌫️',
-  51:'🌦️', 53:'🌦️', 55:'🌦️',
-  56:'🌨️', 57:'🌨️',
-  61:'🌧️', 63:'🌧️', 65:'🌧️',
-  66:'🌨️', 67:'🌨️',
-  71:'🌨️', 73:'🌨️', 75:'🌨️', 77:'🌨️',
-  80:'🌦️', 81:'🌦️', 82:'🌦️',
-  85:'🌨️', 86:'🌨️',
-  95:'⛈️', 96:'⛈️', 99:'⛈️',
-};
 
 const WMO_LABELS = {
   0:'Clear sky',          1:'Mainly clear',           2:'Partly cloudy',         3:'Overcast',
@@ -1273,23 +1257,23 @@ function evalWeatherFlags(w) {
   const code  = w.weather_code;
 
   if (wind > 65)
-    flags.push({level:'stop', msg:'🚨 Suspend Crane/Heights Operations'});
+    flags.push({level:'stop', msg:'Suspend Crane/Heights Operations'});
   else if (wind > 40)
-    flags.push({level:'warn', msg:'⚠️ Working at Heights Risk'});
+    flags.push({level:'warn', msg:'Working at Heights Risk'});
 
   if (temp < -30)
-    flags.push({level:'stop', msg:'🥶 Extreme Cold — Cold Weather Protocols Required'});
+    flags.push({level:'stop', msg:'Extreme Cold — Cold Weather Protocols Required'});
   else if (temp < -20)
-    flags.push({level:'warn', msg:'❄️ Cold Weather Work Protocols Active'});
+    flags.push({level:'warn', msg:'Cold Weather Work Protocols Active'});
 
   if (code >= 95 && code <= 99)
-    flags.push({level:'stop', msg:'⛈️ Stop Work — Lightning Risk'});
+    flags.push({level:'stop', msg:'Stop Work — Lightning Risk'});
 
   if ((code >= 71 && code <= 77) || code === 85 || code === 86)
-    flags.push({level:'warn', msg:'❄️ Snow — Driving Risk Elevated'});
+    flags.push({level:'warn', msg:'Snow — Driving Risk Elevated'});
 
   if (prec > 0)
-    flags.push({level:'info', msg:'🌧️ Slip/Fall Risk — Wet Surfaces'});
+    flags.push({level:'info', msg:'Slip/Fall Risk — Wet Surfaces'});
 
   return flags;
 }
@@ -1330,7 +1314,7 @@ async function fetchWeather() {
     weatherRefreshTimer = setInterval(fetchWeather, 15 * 60 * 1000);
     renderWeather();
   } catch(e) {
-    if (el) el.innerHTML = `<div class="empty-state"><div class="empty-icon">🌤️</div><div style="font-size:11.5px">Weather data unavailable</div></div>`;
+    if (el) el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></div><div style="font-size:11.5px">Weather data unavailable</div></div>`;
   }
 }
 
@@ -1358,7 +1342,6 @@ function renderWeather() {
     const flags     = evalWeatherFlags(w);
     const hasCrit   = flags.some(f => f.level === 'stop');
     const cls       = hasCrit ? 'has-critical-flags' : flags.length ? 'has-flags' : '';
-    const icon      = WMO_ICONS[w.weather_code] ?? '🌤️';
     const condition = WMO_LABELS[w.weather_code] ?? 'Unknown';
     const tempColor = w.temperature_2m < -30 ? 'var(--danger)'
                     : w.temperature_2m < -20 ? 'var(--warn)'
@@ -1373,7 +1356,7 @@ function renderWeather() {
 
     const sitePermits = flags.length ? permitsForSite(site.name) : [];
     const permitHtml  = sitePermits.length
-      ? `<div class="weather-permit-link">⚠️ ${sitePermits.length} active permit${sitePermits.length!==1?'s':''} at this site may require review — <a href="vigil-permit-to-work.html" style="color:var(--accent)">Review Permits →</a></div>`
+      ? `<div class="weather-permit-link">${sitePermits.length} active permit${sitePermits.length!==1?'s':''} at this site may require review — <a href="vigil-permit-to-work.html" style="color:var(--accent)">Review Permits →</a></div>`
       : '';
 
     return `
@@ -1381,7 +1364,6 @@ function renderWeather() {
       <div class="weather-top">
         <div>
           <div style="font-size:12.5px;font-weight:700;margin-bottom:5px">${site.name}</div>
-          <div style="font-size:30px;line-height:1;margin-bottom:3px">${icon}</div>
           <div class="weather-condition">${condition}</div>
         </div>
         <div style="text-align:right">
@@ -1390,13 +1372,13 @@ function renderWeather() {
         </div>
       </div>
       <div class="weather-stats">
-        <span>💨 Wind <strong style="color:${windColor}">${Math.round(w.wind_speed_10m)} km/h</strong></span>
-        <span>🌧️ Precip <strong>${w.precipitation > 0 ? w.precipitation.toFixed(1)+' mm' : 'None'}</strong></span>
+        <span>Wind <strong style="color:${windColor}">${Math.round(w.wind_speed_10m)} km/h</strong></span>
+        <span>Precip <strong>${w.precipitation > 0 ? w.precipitation.toFixed(1)+' mm' : 'None'}</strong></span>
       </div>
       ${flags.length ? `
       <div class="weather-flags">
         ${flags.map(f=>`<div class="weather-flag flag-${f.level}">${f.msg}</div>`).join('')}
-      </div>` : `<div style="font-size:10.5px;color:var(--ok);margin-top:5px">✓ No weather risk flags</div>`}
+      </div>` : `<div style="font-size:10.5px;color:var(--ok);margin-top:5px">No weather risk flags</div>`}
       ${permitHtml}
     </div>`;
   }).join('')}</div>`;

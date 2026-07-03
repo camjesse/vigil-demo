@@ -18,17 +18,18 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* TOPBAR */
-.topbar{background:linear-gradient(90deg,#090E18,#0C1520);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50}
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-shield{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00C2FF,#00E5A0);display:flex;align-items:center;justify-content:center;font-size:15px}
-.logo-name{font-variant-numeric:tabular-nums;font-size:17px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-shield svg{width:16px;height:16px;color:#04141B}
+.logo-name{font-variant-numeric:tabular-nums;font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--text)}
 .logo-mod{font-size:11px;color:var(--muted);margin-left:4px}
 .topbar-right{display:flex;align-items:center;gap:12px}
 .co-badge{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2)}
-.user-dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+.user-dot{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
 
 /* ALERT BANNER */
-.alert-banner{background:linear-gradient(90deg,rgba(255,69,69,.08),rgba(255,184,0,.04));border-bottom:1px solid rgba(255,69,69,.15);padding:6px 24px;display:flex;align-items:center;gap:12px;font-size:11.5px;flex-shrink:0}
+.alert-banner{background:rgba(255,69,69,.08);border-bottom:1px solid rgba(255,69,69,.15);padding:6px 24px;display:flex;align-items:center;gap:12px;font-size:11.5px;flex-shrink:0}
 .ab-item{display:flex;align-items:center;gap:5px;cursor:pointer}.ab-item:hover{text-decoration:underline}
 .ab-dot{width:5px;height:5px;border-radius:50%}.ab-sep{color:var(--b2)}
 
@@ -43,6 +44,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .ni:hover{background:var(--s2);color:var(--text)}
 .ni.active{background:rgba(0,194,255,.1);color:var(--accent);font-weight:500}
 .nicon{font-size:13px;width:16px;text-align:center}
+.nicon svg{width:14px;height:14px;display:block;margin:0 auto}
 .nbadge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 5px;border-radius:5px}
 .nb-rd{background:rgba(255,69,69,.2);color:var(--danger)}.nb-yw{background:rgba(255,184,0,.2);color:var(--warn)}.nb-bl{background:rgba(0,194,255,.2);color:var(--accent)}.nb-gr{background:rgba(0,229,160,.2);color:var(--a3)}
 
@@ -67,7 +69,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 /* CARD */
 .card{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
-.card.wx-card{border-color:rgba(255,184,0,.25);background:linear-gradient(160deg,#120E05,#0F1520)}
+.card.wx-card{border-color:rgba(255,184,0,.25);background:var(--s1)}
 .ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .ct{font-size:13px;font-weight:600}.ca{font-size:11px;color:var(--accent);cursor:pointer}
 .cb{padding:14px}
@@ -80,6 +82,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .veh-card.active{border-color:rgba(0,229,160,.25)}
 .veh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .veh-icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;margin-right:10px}
+.veh-icon svg{width:20px;height:20px}
 .veh-info{flex:1}
 .veh-unit{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;margin-bottom:2px}
 .veh-type{font-size:11.5px;color:var(--muted)}
@@ -119,7 +122,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .btn-rd{background:var(--danger);color:#fff}
 .btn-g{background:transparent;color:var(--accent);border:1px solid rgba(0,194,255,.35)}.btn-g:hover{background:rgba(0,194,255,.08)}
 .btn-yw{background:rgba(255,184,0,.12);color:var(--warn);border:1px solid rgba(255,184,0,.3)}
-.btn-pu{background:linear-gradient(135deg,#9B6DFF,#7040D0);color:#fff}
+.btn-pu{background:var(--purple);color:#fff}
 .btn-gr{background:var(--a3);color:#000}
 .btn-sm{padding:5px 11px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px}
 
@@ -135,6 +138,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .dh{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .dt{font-variant-numeric:tabular-nums;font-size:16px;font-weight:700}
 .dc{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted)}
+.dc svg{width:14px;height:14px}
 .dc:hover{color:var(--text)}
 .db{flex:1;overflow-y:auto;padding:18px}
 .df{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
@@ -164,6 +168,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .tl-item::before{content:'';position:absolute;left:11px;top:24px;bottom:0;width:1px;background:var(--border)}
 .tl-item:last-child::before{display:none}
 .tl-dot{width:23px;height:23px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:1}
+.tl-dot svg{width:12px;height:12px}
 .tl-body{flex:1}
 .tl-title{font-size:12px;font-weight:600;margin-bottom:2px}
 .tl-meta{font-size:11px;color:var(--muted)}
@@ -187,6 +192,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 /* MAINT ROW */
 .maint-row{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
 .mr-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.mr-icon svg{width:15px;height:15px}
 .mr-body{flex:1}
 .mr-title{font-size:12.5px;font-weight:600;margin-bottom:2px}
 .mr-meta{font-size:11px;color:var(--muted)}
@@ -213,23 +219,23 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-shield">🛡️</div>
+    <div class="logo-shield"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></div>
     <div><span class="logo-name">VIGIL</span><span class="logo-mod">/ Fleet & Equipment</span></div>
   </div>
   <div class="topbar-right">
-    <div class="co-badge">🚛 Northern Express Transport Ltd.</div>
+    <div class="co-badge">Northern Express Transport Ltd.</div>
     <div class="user-dot">C</div>
   </div>
 </div>
 
 <!-- ALERT BANNER -->
 <div class="alert-banner" id="alertBanner">
-  <span style="color:var(--danger);font-weight:700;font-size:11px">⚠️ Fleet Alerts:</span>
+  <span style="color:var(--danger);font-weight:700;font-size:11px">Fleet Alerts:</span>
   <div class="ab-item" style="color:var(--muted)"><div class="ab-dot" style="background:var(--muted)"></div>Loading fleet data…</div>
   <div style="margin-left:auto"><button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button></div>
 </div>
 <div class="api-error-banner" id="apiErrorBanner">
-  ⚠️ <span id="apiErrorMsg">API connection failed.</span>
+  <span id="apiErrorMsg">API connection failed.</span>
   <button class="btn btn-g btn-xs" style="margin-left:auto" onclick="init()">↺ Retry</button>
 </div>
 
@@ -238,26 +244,26 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <div class="sidenav">
   <div class="nav-sec">
     <div class="nav-lbl">Fleet</div>
-    <div class="ni active" onclick="showPanel('dashboard')"><span class="nicon">📊</span>Dashboard</div>
-    <div class="ni" onclick="showPanel('fleet')"><span class="nicon">🚛</span>All Vehicles<span class="nbadge nb-bl" id="nav-fleet">0</span></div>
-    <div class="ni" onclick="showPanel('restricted')"><span class="nicon">⛔</span>Restricted<span class="nbadge nb-rd" id="nav-rest">0</span></div>
-    <div class="ni" onclick="showPanel('dispatched')"><span class="nicon">🟢</span>Dispatched<span class="nbadge nb-gr" id="nav-disp">0</span></div>
+    <div class="ni active" onclick="showPanel('dashboard')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>Dashboard</div>
+    <div class="ni" onclick="showPanel('fleet')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>All Vehicles<span class="nbadge nb-bl" id="nav-fleet">0</span></div>
+    <div class="ni" onclick="showPanel('restricted')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>Restricted<span class="nbadge nb-rd" id="nav-rest">0</span></div>
+    <div class="ni" onclick="showPanel('dispatched')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>Dispatched<span class="nbadge nb-gr" id="nav-disp">0</span></div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">Maintenance</div>
-    <div class="ni" onclick="showPanel('maintenance')"><span class="nicon">🔧</span>Maintenance Schedule<span class="nbadge nb-yw" id="nav-maint">0</span></div>
-    <div class="ni" onclick="showPanel('deficiencies')"><span class="nicon">⚠️</span>Deficiencies<span class="nbadge nb-rd" id="nav-defic">0</span></div>
-    <div class="ni" onclick="showPanel('certifications')"><span class="nicon">🏅</span>Certifications<span class="nbadge nb-yw" id="nav-cert">0</span></div>
+    <div class="ni" onclick="showPanel('maintenance')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg></span>Maintenance Schedule<span class="nbadge nb-yw" id="nav-maint">0</span></div>
+    <div class="ni" onclick="showPanel('deficiencies')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>Deficiencies<span class="nbadge nb-rd" id="nav-defic">0</span></div>
+    <div class="ni" onclick="showPanel('certifications')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg></span>Certifications<span class="nbadge nb-yw" id="nav-cert">0</span></div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">Roads & Routes</div>
-    <div class="ni" onclick="showPanel('roads')"><span class="nicon">🛣️</span>Road Conditions<span class="nbadge nb-yw">1</span></div>
-    <div class="ni" onclick="showPanel('journey')"><span class="nicon">📍</span>Journey Plans</div>
+    <div class="ni" onclick="showPanel('roads')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></svg></span>Road Conditions<span class="nbadge nb-yw">1</span></div>
+    <div class="ni" onclick="showPanel('journey')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></span>Journey Plans</div>
   </div>
   <div class="nav-sec">
     <div class="nav-lbl">Equipment</div>
-    <div class="ni" onclick="showPanel('equipment')"><span class="nicon">⚙️</span>Equipment Registry</div>
-    <div class="ni" onclick="showPanel('analytics')"><span class="nicon">📈</span>Fleet Analytics</div>
+    <div class="ni" onclick="showPanel('equipment')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>Equipment Registry</div>
+    <div class="ni" onclick="showPanel('analytics')"><span class="nicon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></span>Fleet Analytics</div>
   </div>
 </div>
 
@@ -269,14 +275,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <div class="page-hdr">
     <div><div class="page-title">Fleet & Equipment</div><div class="page-sub">Vehicle safety compliance · Maintenance tracking · Road conditions · Dispatch gating</div></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-yw btn-sm" onclick="showPanel('roads')">⛅ Road Conditions</button>
+      <button class="btn btn-yw btn-sm" onclick="showPanel('roads')">Road Conditions</button>
       <button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button>
     </div>
   </div>
 
   <div class="stats" id="dashStats"></div>
 
-  <div class="alert wx" id="roadAlert">⛅ <strong>Active Road Advisory:</strong> Hwy 2 Southbound (Red Deer–Calgary) — Black ice reported. <span style="color:var(--accent);cursor:pointer" onclick="showPanel('roads')">View conditions →</span> Journey plans have been updated for affected routes.</div>
+  <div class="alert wx" id="roadAlert"><strong>Active Road Advisory:</strong> Hwy 2 Southbound (Red Deer–Calgary) — Black ice reported. <span style="color:var(--accent);cursor:pointer" onclick="showPanel('roads')">View conditions →</span> Journey plans have been updated for affected routes.</div>
 
   <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
     <div>
@@ -290,19 +296,19 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       </div>
       <!-- MAINTENANCE DUE -->
       <div class="card">
-        <div class="ch"><div class="ct">🔧 Maintenance Due — Next 30 Days</div><div class="ca" onclick="showPanel('maintenance')">Schedule →</div></div>
+        <div class="ch"><div class="ct">Maintenance Due — Next 30 Days</div><div class="ca" onclick="showPanel('maintenance')">Schedule →</div></div>
         <div class="cb" style="padding:10px" id="maintDue"></div>
       </div>
     </div>
     <div>
       <!-- ROAD CONDITIONS SUMMARY -->
       <div class="card wx-card">
-        <div class="ch"><div class="ct" style="color:var(--warn)">⛅ Active Route Conditions</div><div class="ca" style="color:var(--warn)" onclick="showPanel('roads')">Full View →</div></div>
+        <div class="ch"><div class="ct" style="color:var(--warn)">Active Route Conditions</div><div class="ca" style="color:var(--warn)" onclick="showPanel('roads')">Full View →</div></div>
         <div class="cb" style="padding:10px" id="roadSummary"></div>
       </div>
       <!-- CERT EXPIRING -->
       <div class="card">
-        <div class="ch"><div class="ct">🏅 Certifications Expiring</div><div class="ca" onclick="showPanel('certifications')">All Certs →</div></div>
+        <div class="ch"><div class="ct">Certifications Expiring</div><div class="ca" onclick="showPanel('certifications')">All Certs →</div></div>
         <div class="cb" style="padding:0" id="certExpiring"></div>
       </div>
     </div>
@@ -363,9 +369,9 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- ===== ROAD CONDITIONS ===== -->
 <div class="panel" id="panel-roads">
   <div class="page-hdr">
-    <div><div class="page-title">Road Conditions <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--warn);margin-left:8px">⛅ 511 Live Feed</span></div>
+    <div><div class="page-title">Road Conditions <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--warn);margin-left:8px">511 Live Feed</span></div>
     <div class="page-sub">Alberta 511 · BC DriveBC · Manitoba 511 · Route-matched to active fleet</div></div>
-    <button class="btn btn-yw btn-sm" onclick="issueAdvisory()">📢 Issue Driver Advisory</button>
+    <button class="btn btn-yw btn-sm" onclick="issueAdvisory()">Issue Driver Advisory</button>
   </div>
   <div id="roadsPanel"></div>
 </div>
@@ -401,7 +407,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
-  <div class="dh"><div class="dt" id="drawerTitle">Vehicle</div><div class="dc" onclick="closeDrawer()">✕</div></div>
+  <div class="dh"><div class="dt" id="drawerTitle">Vehicle</div><div class="dc" onclick="closeDrawer()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div></div>
   <div class="db" id="drawerBody"></div>
   <div class="df" id="drawerFooter"></div>
 </div>
@@ -416,7 +422,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastMsg"></span></div>
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
 <script src="vigil-auth.js?v=20260607-1"></script>
 <script>
@@ -569,7 +575,7 @@ function updateAlertBanner(dash) {
   if (maint.length) parts.push(`<div class="ab-item" style="color:var(--warn)" onclick="showPanel('maintenance')"><div class="ab-dot" style="background:var(--warn)"></div>${maint.length} service${maint.length>1?'s':''} due this week</div><span class="ab-sep">·</span>`);
   const banner = document.getElementById('alertBanner');
   if (banner && parts.length) {
-    banner.innerHTML = `<span style="color:var(--danger);font-weight:700;font-size:11px">⚠️ Fleet Alerts:</span>
+    banner.innerHTML = `<span style="color:var(--danger);font-weight:700;font-size:11px">Fleet Alerts:</span>
       ${parts.join('')}
       <div style="margin-left:auto"><button class="btn btn-p btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button></div>`;
   }
@@ -668,7 +674,6 @@ function statusChip(s){
   return`<span class="chip ${m[s]||'gy'}">${s}</span>`;
 }
 function roadStatusColor(s){return{clear:'var(--a3)',caution:'var(--warn)',advisory:'var(--danger)'}[s]||'var(--muted)'}
-function roadStatusIcon(s){return{clear:'✅',caution:'⚠️',advisory:'🚨'}[s]||'📍'}
 function daysUntil(dt){return Math.round((new Date(dt)-new Date())/86400000)}
 function certColor(dt){const d=daysUntil(dt);return d<0?'var(--danger)':d<30?'var(--warn)':d<60?'var(--accent)':'var(--a3)'}
 function odomPct(v){if(!v.nextServiceKm||!v.odometer) return 0;return Math.min(98,Math.round((v.odometer/v.nextServiceKm)*100))}
@@ -712,7 +717,7 @@ function renderFleetTable(){
       <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.site}</td>
       <td>${v.pretripToday==='Pass'?'<span class="chip gr">Pass</span>':v.pretripToday==='Pass w/ Note'?'<span class="chip yw">Pass*</span>':v.pretripToday==='Fail'?'<span class="chip rd">Fail</span>':'<span class="chip gy">Pending</span>'}</td>
       <td style="font-size:11px;color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</td>
-      <td>${route?`<span class="chip ${route.status==='clear'?'gr':route.status==='advisory'?'rd':'yw'}">${roadStatusIcon(route.status)} ${route.status==='advisory'?'Advisory':route.status==='caution'?'Caution':'Clear'}</span>`:'<span class="chip gy">N/A</span>'}</td>
+      <td>${route?`<span class="chip ${route.status==='clear'?'gr':route.status==='advisory'?'rd':'yw'}">${route.status==='advisory'?'Advisory':route.status==='caution'?'Caution':'Clear'}</span>`:'<span class="chip gy">N/A</span>'}</td>
       <td>${statusChip(v.status)}</td>
     </tr>`;
   }).join('');
@@ -725,7 +730,7 @@ function renderMaintDue(){
   const due=maintenance.filter(m=>m.status!=='Complete').slice(0,4);
   el.innerHTML=due.map(m=>`
     <div class="maint-row" style="border-color:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.25)':m.status==='Due Today'?'rgba(255,184,0,.25)':'var(--border)'}">
-      <div class="mr-icon" style="background:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.1)':m.status==='Due Today'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}">🔧</div>
+      <div class="mr-icon" style="background:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.1)':m.status==='Due Today'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
       <div class="mr-body">
         <div class="mr-title">${m.unit} — ${m.type}</div>
         <div class="mr-meta">Due: <span style="color:${m.status==='Overdue'||m.status==='Urgent'?'var(--danger)':m.status==='Due Today'?'var(--warn)':'var(--text)'}">${fmtDate(m.dueDate)}</span> · Est. ${m.estimatedHours}h${m.cost>0?' · $'+m.cost.toLocaleString():''}</div>
@@ -746,9 +751,9 @@ function renderRoadSummary(){
   el.innerHTML=active.map(r=>`
     <div class="route-pill" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.2)':r.status==='caution'?'rgba(255,184,0,.2)':'var(--border)'}">
       <div>
-        <div style="font-size:12px;font-weight:600">${roadStatusIcon(r.status)} ${r.route}</div>
+        <div style="font-size:12px;font-weight:600">${r.route}</div>
         <div style="font-size:10px;color:var(--muted)">${r.condition}</div>
-        ${r.activeDrivers.length>0?`<div style="font-size:10px;color:var(--accent);margin-top:2px">👤 ${r.activeDrivers.join(', ')}</div>`:''}
+        ${r.activeDrivers.length>0?`<div style="font-size:10px;color:var(--accent);margin-top:2px">${r.activeDrivers.join(', ')}</div>`:''}
       </div>
       <span class="chip ${r.status==='advisory'?'rd':r.status==='caution'?'yw':'gr'}">${r.status}</span>
     </div>
@@ -791,21 +796,21 @@ function renderFleetRegistry(filter=''){
     <div class="veh-card ${v.status==='Restricted'?'restricted':v.status==='Service Due'?'service-due':v.status==='Dispatched'?'active':''}" onclick="openVehicleDetail('${v.id}')">
       <div class="veh-top">
         <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
-          <div class="veh-icon" style="background:${v.status==='Restricted'?'rgba(255,69,69,.1)':v.status==='Service Due'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}">${v.type.includes('Semi')||v.type.includes('Class 1')?'🚛':v.type.includes('Pickup')?'🛻':v.type.includes('Van')?'🚐':v.type.includes('Crane')?'🏗️':'🚚'}</div>
+          <div class="veh-icon" style="background:${v.status==='Restricted'?'rgba(255,69,69,.1)':v.status==='Service Due'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></div>
           <div class="veh-info">
             <div class="veh-unit">${v.unit}</div>
             <div class="veh-type">${v.year} ${v.make} ${v.model} · ${v.type}</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${v.site}</div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
           ${statusChip(v.status)}
-          ${v.driver?`<span class="chip bl">👤 ${v.driver}</span>`:''}
+          ${v.driver?`<span class="chip bl">${v.driver}</span>`:''}
         </div>
       </div>
       <div class="veh-meta">
         <div class="vm-item">
-          <div class="vm-val" style="color:${v.pretripToday==='Pass'?'var(--a3)':v.pretripToday==='Fail'?'var(--danger)':v.pretripToday==='Pass w/ Note'?'var(--warn)':'var(--muted)'}">${v.pretripToday==='Pass'?'✅ Pass':v.pretripToday==='Fail'?'❌ Fail':v.pretripToday==='Pass w/ Note'?'⚠️ Pass*':'⏳ Pending'}</div>
+          <div class="vm-val" style="color:${v.pretripToday==='Pass'?'var(--a3)':v.pretripToday==='Fail'?'var(--danger)':v.pretripToday==='Pass w/ Note'?'var(--warn)':'var(--muted)'}">${v.pretripToday==='Pass'?'Pass':v.pretripToday==='Fail'?'Fail':v.pretripToday==='Pass w/ Note'?'Pass*':'Pending'}</div>
           <div class="vm-lbl">Pre-Trip Today</div>
         </div>
         <div class="vm-item">
@@ -821,13 +826,13 @@ function renderFleetRegistry(filter=''){
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px"><span>Distance to next service</span><span>${v.nextServiceKm?((v.nextServiceKm-v.odometer).toLocaleString()+' km remaining'):'km interval TBD'}</span></div>
         <div class="odo-bar"><div class="odo-fill" style="width:${pct}%;background:${pct>90?'var(--danger)':pct>75?'var(--warn)':'var(--a3)'}"></div></div>
       </div>
-      ${v.deficiencies.length>0?`<div class="alert rd" style="margin-bottom:8px;padding:7px 10px">⚠️ ${v.deficiencies.length} open deficien${v.deficiencies.length>1?'cies':'cy'}: ${v.deficiencies.join(' · ')}</div>`:''}
-      ${certIssue?`<div class="alert yw" style="margin-bottom:8px;padding:7px 10px">🏅 Certification expiring within 30 days — renewal required</div>`:''}
+      ${v.deficiencies.length>0?`<div class="alert rd" style="margin-bottom:8px;padding:7px 10px">${v.deficiencies.length} open deficien${v.deficiencies.length>1?'cies':'cy'}: ${v.deficiencies.join(' · ')}</div>`:''}
+      ${certIssue?`<div class="alert yw" style="margin-bottom:8px;padding:7px 10px">Certification expiring within 30 days — renewal required</div>`:''}
       <div class="veh-footer">
         <button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">View Details</button>
         ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="event.stopPropagation();dispatchVehicle('${v.id}')">Dispatch →</button>`:''}
-        ${v.status==='Restricted'?`<button class="btn btn-rd btn-sm" onclick="event.stopPropagation()">⛔ Restricted</button>`:''}
-        ${v.status==='Service Due'?`<button class="btn btn-yw btn-sm" onclick="event.stopPropagation();openAddMaintenance('${v.id}')">🔧 Schedule Service</button>`:''}
+        ${v.status==='Restricted'?`<button class="btn btn-rd btn-sm" onclick="event.stopPropagation()">Restricted</button>`:''}
+        ${v.status==='Service Due'?`<button class="btn btn-yw btn-sm" onclick="event.stopPropagation();openAddMaintenance('${v.id}')">Schedule Service</button>`:''}
         <div style="margin-left:auto;font-size:10px;color:var(--muted)">${v.plate} · VIN ${v.vin.slice(-6)}</div>
       </div>
     </div>`;
@@ -843,11 +848,11 @@ function openVehicleDetail(id){
 
   document.getElementById('drawerTitle').innerHTML=`<span style="color:var(--accent)">${v.unit}</span> — ${v.make} ${v.model}`;
   document.getElementById('drawerBody').innerHTML=`
-    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">${statusChip(v.status)}${v.driver?`<span class="chip bl">👤 ${v.driver}</span>`:''}${route?`<span class="chip ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}">${roadStatusIcon(route.status)} ${route.route}</span>`:''}</div>
+    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">${statusChip(v.status)}${v.driver?`<span class="chip bl">${v.driver}</span>`:''}${route?`<span class="chip ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}">${route.route}</span>`:''}</div>
 
-    ${v.status==='Restricted'?`<div class="alert rd">⛔ <strong>RESTRICTED FROM SERVICE:</strong> ${v.deficiencies.join(', ')}. Vehicle cannot be dispatched until deficiencies are resolved and re-inspection passed.</div>`:''}
-    ${v.status==='Service Due'?`<div class="alert yw">🔧 <strong>SERVICE OVERDUE:</strong> Schedule maintenance immediately. Vehicle should not be dispatched on long routes until serviced.</div>`:''}
-    ${route&&route.status==='advisory'?`<div class="alert wx">⛅ <strong>Road Advisory:</strong> Driver ${v.driver} is on ${route.route} — ${route.condition}. Last check-in required.</div>`:''}
+    ${v.status==='Restricted'?`<div class="alert rd"><strong>RESTRICTED FROM SERVICE:</strong> ${v.deficiencies.join(', ')}. Vehicle cannot be dispatched until deficiencies are resolved and re-inspection passed.</div>`:''}
+    ${v.status==='Service Due'?`<div class="alert yw"><strong>SERVICE OVERDUE:</strong> Schedule maintenance immediately. Vehicle should not be dispatched on long routes until serviced.</div>`:''}
+    ${route&&route.status==='advisory'?`<div class="alert wx"><strong>Road Advisory:</strong> Driver ${v.driver} is on ${route.route} — ${route.condition}. Last check-in required.</div>`:''}
 
     <div class="tabs">
       <div class="tab active" onclick="switchTab(this,'vd-info')">Details</div>
@@ -871,7 +876,7 @@ function openVehicleDetail(id){
         <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Distance to next service</span><span>${v.nextServiceKm?((v.nextServiceKm-v.odometer).toLocaleString()+' km remaining'):'km interval TBD'}</span></div>
         <div class="odo-bar" style="height:10px"><div class="odo-fill" style="width:${odomPct(v)}%;background:${odomPct(v)>90?'var(--danger)':odomPct(v)>75?'var(--warn)':'var(--a3)'}"></div></div>
       </div>
-      ${v.deficiencies.length>0?`<div class="sec-lbl">Open Deficiencies</div>${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:7px;padding:8px 12px">⚠️ ${d}</div>`).join('')}`:''}
+      ${v.deficiencies.length>0?`<div class="sec-lbl">Open Deficiencies</div>${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:7px;padding:8px 12px">${d}</div>`).join('')}`:''}
     </div>
 
     <!-- MAINTENANCE -->
@@ -880,7 +885,7 @@ function openVehicleDetail(id){
       ${maintItems.length===0?`<div style="text-align:center;padding:24px;color:var(--muted)">No maintenance records</div>`:
       maintItems.map(m=>`
         <div class="maint-row" style="border-color:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.25)':'var(--border)'}">
-          <div class="mr-icon" style="background:rgba(0,194,255,.08)">🔧</div>
+          <div class="mr-icon" style="background:rgba(0,194,255,.08)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
           <div class="mr-body">
             <div class="mr-title">${m.type}</div>
             <div class="mr-meta">Due: ${fmtDate(m.dueDate)} · ${m.estimatedHours}h · ${m.cost>0?'$'+m.cost.toLocaleString():'Cost TBD'}</div>
@@ -893,11 +898,11 @@ function openVehicleDetail(id){
 
     <!-- CERTS -->
     <div id="vd-certs" style="display:none">
-      <div class="alert bl">🏅 All certifications must be current for vehicle to be legally operated. Expired certifications restrict the vehicle from service immediately.</div>
+      <div class="alert bl">All certifications must be current for vehicle to be legally operated. Expired certifications restrict the vehicle from service immediately.</div>
       ${Object.entries(v.certs).map(([type,dt])=>{
         const d=daysUntil(dt);
         return`<div class="maint-row" style="border-color:${d<0?'rgba(255,69,69,.25)':d<30?'rgba(255,184,0,.2)':'var(--border)'}">
-          <div class="mr-icon" style="background:rgba(155,109,255,.1)">🏅</div>
+          <div class="mr-icon" style="background:rgba(155,109,255,.1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg></div>
           <div class="mr-body">
             <div class="mr-title">${type.toUpperCase()}</div>
             <div class="mr-meta">Expires: <span style="color:${certColor(dt)}">${fmtDate(dt)}</span> · ${d<0?Math.abs(d)+' days overdue':d+' days remaining'}</div>
@@ -911,11 +916,11 @@ function openVehicleDetail(id){
     <div id="vd-history" style="display:none">
       <div>
         ${[
-          {icon:'🔧',title:'Scheduled Service — 275k km',date:rd(-18),color:'rgba(0,194,255,.1)',tc:'var(--accent)'},
-          {icon:'✅',title:'Pre-Trip Inspection — Pass',date:rd(-1),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
-          {icon:'✅',title:'Pre-Trip Inspection — Pass',date:rd(0),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
-          {icon:'🏅',title:'CVIP Certificate Renewed',date:rd(-180),color:'rgba(155,109,255,.1)',tc:'var(--purple)'},
-          {icon:'🔧',title:'Tire Replacement — Front Axle',date:rd(-65),color:'rgba(255,184,0,.1)',tc:'var(--warn)'},
+          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',title:'Scheduled Service — 275k km',date:rd(-18),color:'rgba(0,194,255,.1)',tc:'var(--accent)'},
+          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',title:'Pre-Trip Inspection — Pass',date:rd(-1),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
+          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',title:'Pre-Trip Inspection — Pass',date:rd(0),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
+          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>',title:'CVIP Certificate Renewed',date:rd(-180),color:'rgba(155,109,255,.1)',tc:'var(--purple)'},
+          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',title:'Tire Replacement — Front Axle',date:rd(-65),color:'rgba(255,184,0,.1)',tc:'var(--warn)'},
         ].map(h=>`
           <div class="tl-item">
             <div class="tl-dot" style="background:${h.color};color:${h.tc}">${h.icon}</div>
@@ -927,9 +932,9 @@ function openVehicleDetail(id){
   `;
 
   document.getElementById('drawerFooter').innerHTML=`
-    <button class="btn btn-g btn-sm" onclick="showToast('success','🖨 Vehicle record exported')">🖨 Export Record</button>
+    <button class="btn btn-g btn-sm" onclick="showToast('success','Vehicle record exported')">Export Record</button>
     ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="dispatchVehicle('${id}')">Dispatch →</button>`:''}
-    ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="showToast('success','Maintenance work order opened for '+v.unit)">🔧 Open Work Order</button>`:''}
+    ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="showToast('success','Maintenance work order opened for '+v.unit)">Open Work Order</button>`:''}
     <button class="btn btn-g" style="margin-left:auto" onclick="closeDrawer()">Close</button>
   `;
   openDrawerEl();
@@ -961,7 +966,7 @@ function renderMaintPanel(){
   `;
 
   el.innerHTML=`
-    ${overdue.length>0?`<div class="alert rd">🔧 ${overdue.length} maintenance item${overdue.length>1?'s are':' is'} overdue — schedule immediately to maintain roadworthiness.</div>`:''}
+    ${overdue.length>0?`<div class="alert rd">${overdue.length} maintenance item${overdue.length>1?'s are':' is'} overdue — schedule immediately to maintain roadworthiness.</div>`:''}
     <div class="card">
       <div class="ch"><div class="ct">Maintenance Work Orders</div><div class="ca" onclick="openAddMaintenance()">+ New Work Order</div></div>
       <div style="overflow-x:auto"><table class="tbl">
@@ -976,7 +981,7 @@ function renderMaintPanel(){
             <td>${m.estimatedHours}h</td>
             <td>${m.cost>0?'$'+m.cost.toLocaleString():'TBD'}</td>
             <td>${statusChip(m.status)}</td>
-            <td><button class="btn btn-gr btn-xs" onclick="completeMaint('${m.id}')">✅ Complete</button></td>
+            <td><button class="btn btn-gr btn-xs" onclick="completeMaint('${m.id}')">Complete</button></td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -987,11 +992,11 @@ function renderMaintPanel(){
 function completeMaint(id){
   const m=maintenance.find(x=>x.id===id);
   if(m){m.status='Complete';}
-  renderAll();showToast('success',`✅ ${id} marked complete — service record updated`);
+  renderAll();showToast('success',`${id} marked complete — service record updated`);
 }
 
 function scheduleMaintenance(id){
-  showToast('success','📅 Service scheduled — notifications sent to fleet manager');
+  showToast('success','Service scheduled — notifications sent to fleet manager');
 }
 
 function openAddMaintenance(vehId=''){
@@ -1017,7 +1022,7 @@ function saveNewMaint(){
   const id='MWO-'+String(maintenance.length+1).padStart(3,'0');
   maintenance.push({id,vehId:veh?.id||'',unit:veh?.unit||'Unknown',type,priority:document.getElementById('new-maint-pri')?.value||'Medium',dueDate:document.getElementById('new-maint-due')?.value||rd(7),status:'Upcoming',estimatedHours:3,cost:0,notes:document.getElementById('new-maint-notes')?.value||''});
   closeModal();renderAll();
-  showToast('success',`🔧 ${id} created — ${veh?.unit||''} ${type}`);
+  showToast('success',`${id} created — ${veh?.unit||''} ${type}`);
 }
 
 // ─── ROADS PANEL ──────────────────────────────────────────────
@@ -1027,12 +1032,12 @@ function renderRoadsPanel(){
   const advisory=ROAD_CONDITIONS.filter(r=>r.status==='advisory');
 
   el.innerHTML=`
-    ${advisory.length>0?`<div class="alert rd">🚨 <strong>${advisory.length} active road advisory${advisory.length>1?'s':''}</strong> — all affected drivers have been notified. Journey plans updated.</div>`:''}
+    ${advisory.length>0?`<div class="alert rd"><strong>${advisory.length} active road advisory${advisory.length>1?'s':''}</strong> — all affected drivers have been notified. Journey plans updated.</div>`:''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
       ${ROAD_CONDITIONS.map(r=>`
         <div class="card" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.25)':r.status==='caution'?'rgba(255,184,0,.2)':'var(--border)'}">
           <div class="ch" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.15)':'var(--border)'}">
-            <div class="ct">${roadStatusIcon(r.status)} ${r.route}</div>
+            <div class="ct">${r.route}</div>
             <span class="chip ${r.status==='advisory'?'rd':r.status==='caution'?'yw':'gr'}">${r.status}</span>
           </div>
           <div class="cb">
@@ -1047,7 +1052,7 @@ function renderRoadsPanel(){
               <div style="background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:11.5px">
                 <span style="color:var(--muted)">Drivers on this route:</span>
                 <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap">
-                  ${r.activeDrivers.map(d=>`<span class="chip bl">👤 ${d}</span>`).join('')}
+                  ${r.activeDrivers.map(d=>`<span class="chip bl">${d}</span>`).join('')}
                 </div>
               </div>
             `:'<div style="font-size:11px;color:var(--muted)">No active drivers on this route</div>'}
@@ -1059,10 +1064,10 @@ function renderRoadsPanel(){
       <div class="ch"><div class="ct">Journey Plan Check-in Requirements</div></div>
       <div class="cb">
         <div style="font-size:12px;color:var(--text2);line-height:1.8">
-          ✅ All drivers on <strong>advisory routes</strong> must check in every 2 hours via radio or phone<br>
-          ✅ Dispatchers must confirm check-in received — missed check-ins trigger supervisor notification<br>
-          ✅ Drivers may adjust speed or pull over if conditions deteriorate — no schedule pressure overrides safety<br>
-          ✅ Any driver may call stop and await conditions to improve without dispatcher override
+          All drivers on <strong>advisory routes</strong> must check in every 2 hours via radio or phone<br>
+          Dispatchers must confirm check-in received — missed check-ins trigger supervisor notification<br>
+          Drivers may adjust speed or pull over if conditions deteriorate — no schedule pressure overrides safety<br>
+          Any driver may call stop and await conditions to improve without dispatcher override
         </div>
       </div>
     </div>
@@ -1074,7 +1079,7 @@ function renderJourneyPanel(){
   const el=document.getElementById('journeyPanel');
   if(!el) return;
   el.innerHTML=`
-    <div class="alert bl">📍 <strong>Journey Plan Policy:</strong> All long-haul dispatches require an approved journey plan before departure. Plan must include route, check-in schedule, weather acknowledgement, and rest verification. Plans on advisory routes require HSE Manager approval.</div>
+    <div class="alert bl"><strong>Journey Plan Policy:</strong> All long-haul dispatches require an approved journey plan before departure. Plan must include route, check-in schedule, weather acknowledgement, and rest verification. Plans on advisory routes require HSE Manager approval.</div>
     <div class="card">
       <div class="ch"><div class="ct">Active Journey Plans — Today</div><div class="ca" onclick="openNewJourneyPlan()">+ New Plan</div></div>
       <div style="overflow-x:auto"><table class="tbl">
@@ -1089,7 +1094,7 @@ function renderJourneyPanel(){
             <td style="font-size:11px">${jp.eta}</td>
             <td><span class="chip ${jp.routeStatus==='clear'?'gr':jp.routeStatus==='advisory'?'rd':'yw'}">${jp.routeStatus}</span></td>
             <td><span class="chip ${jp.fatigue==='High'?'rd':jp.fatigue==='Medium'?'yw':'gr'}">${jp.fatigue}</span></td>
-            <td>${jp.approved?`<span class="chip gr">✅ ${jp.approvedBy}</span>`:'<span class="chip rd">⏳ Pending</span>'}</td>
+            <td>${jp.approved?`<span class="chip gr">${jp.approvedBy}</span>`:'<span class="chip rd">Pending</span>'}</td>
           </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1114,12 +1119,12 @@ function openNewJourneyPlan(){
     <div class="fg"><div class="fl">Check-in Schedule</div><input class="fi" placeholder="e.g. Every 2 hours: 10:00, 12:00, 14:00"></div>
     <div class="fg"><div class="fl">Driver acknowledges route conditions and confirms adequate rest</div>
       <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;cursor:pointer" onclick="this.style.background='rgba(0,229,160,.05)';this.style.borderColor='rgba(0,229,160,.3)'">
-        <div style="width:16px;height:16px;border-radius:3px;border:2px solid var(--border)">✓</div>
+        <div style="width:16px;height:16px;border-radius:3px;border:2px solid var(--border)"></div>
         Driver sign-off — I have reviewed conditions and confirm I am fit for duty
       </div>
     </div>
   `,[
-    {label:'Submit Journey Plan',cls:'btn-p',action:"closeModal();showToast('success','📍 Journey plan submitted — pending supervisor approval')"},
+    {label:'Submit Journey Plan',cls:'btn-p',action:"closeModal();showToast('success','Journey plan submitted — pending supervisor approval')"},
     {label:'Cancel',cls:'btn-g',action:'closeModal()'}
   ]);
 }
@@ -1138,7 +1143,7 @@ function openJourneyDetail(id){
       <strong style="color:var(--text)">Fatigue Level:</strong> <span style="color:${jp.fatigue==='High'?'var(--danger)':'var(--a3)'}">${jp.fatigue}</span><br>
       <strong style="color:var(--text)">Approved:</strong> ${jp.approved?jp.approvedBy:'PENDING APPROVAL'}
     </div>
-    ${!jp.approved?`<div class="alert rd" style="margin-top:10px">⚠️ This journey plan has not been approved. ${jp.fatigue==='High'?'Driver fatigue level is HIGH — approval required before dispatch.':'Supervisor approval required.'}</div>`:''}
+    ${!jp.approved?`<div class="alert rd" style="margin-top:10px">This journey plan has not been approved. ${jp.fatigue==='High'?'Driver fatigue level is HIGH — approval required before dispatch.':'Supervisor approval required.'}</div>`:''}
   `,[
     jp.approved?{label:'Close',cls:'btn-g',action:'closeModal()'}:{label:'Approve Plan',cls:'btn-p',action:`approveJP('${id}')`},
     jp.approved?null:{label:'Deny',cls:'btn-rd',action:'closeModal()'},
@@ -1149,7 +1154,7 @@ function approveJP(id){
   const jp=journeyPlans.find(x=>x.id===id);
   if(jp){jp.approved=true;jp.approvedBy='HSE Manager';}
   closeModal();renderAll();
-  showToast('success',`✅ Journey plan ${id} approved — driver notified`);
+  showToast('success',`Journey plan ${id} approved — driver notified`);
 }
 
 // ─── EQUIPMENT PANEL ─────────────────────────────────────────
@@ -1230,15 +1235,15 @@ function renderRestrictedPanel(){
     <div class="veh-card restricted">
       <div class="veh-top">
         <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
-          <div class="veh-icon" style="background:rgba(255,69,69,.1)">🚫</div>
-          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div></div>
+          <div class="veh-icon" style="background:rgba(255,69,69,.1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${v.site}</div></div>
         </div>
         ${statusChip(v.status)}
       </div>
-      <div style="margin-bottom:10px">${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:5px;padding:7px 10px">⚠️ ${d}</div>`).join('')}</div>
+      <div style="margin-bottom:10px">${v.deficiencies.map(d=>`<div class="alert rd" style="margin-bottom:5px;padding:7px 10px">${d}</div>`).join('')}</div>
       <div style="display:flex;gap:7px">
         <button class="btn btn-g btn-sm" onclick="openVehicleDetail('${v.id}')">View Details</button>
-        <button class="btn btn-yw btn-sm" onclick="openAddMaintenance('${v.id}')">🔧 Schedule Repair</button>
+        <button class="btn btn-yw btn-sm" onclick="openAddMaintenance('${v.id}')">Schedule Repair</button>
       </div>
     </div>
   `).join('');
@@ -1253,12 +1258,12 @@ function renderDispatchedPanel(){
     return`<div class="veh-card active" onclick="openVehicleDetail('${v.id}')">
       <div class="veh-top">
         <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
-          <div class="veh-icon" style="background:rgba(0,229,160,.08)">🚛</div>
-          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📍 ${v.site}</div></div>
+          <div class="veh-icon" style="background:rgba(0,229,160,.08)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></div>
+          <div><div class="veh-unit">${v.unit}</div><div class="veh-type">${v.year} ${v.make} ${v.model}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${v.site}</div></div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">${statusChip(v.status)}<span class="chip bl">👤 ${v.driver}</span></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">${statusChip(v.status)}<span class="chip bl">${v.driver}</span></div>
       </div>
-      ${route?`<div class="alert ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}" style="margin-bottom:8px;padding:7px 10px">${roadStatusIcon(route.status)} Route: ${route.route} — ${route.condition}</div>`:''}
+      ${route?`<div class="alert ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}" style="margin-bottom:8px;padding:7px 10px">Route: ${route.route} — ${route.condition}</div>`:''}
       <div style="display:flex;gap:7px"><button class="btn btn-g btn-sm">Check In Status</button><button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">Vehicle Details</button></div>
     </div>`;
   }).join('');
@@ -1274,7 +1279,7 @@ function renderCertPanel(){
     });
   });
   rows.sort((a,b)=>a.days-b.days);
-  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="showToast('success','📄 Certification report exported')">⬇ Export</div></div>
+  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="showToast('success','Certification report exported')">Export</div></div>
     <div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Unit</th><th>Certification</th><th>Expiry Date</th><th>Days Remaining</th><th>Status</th></tr></thead>
       <tbody>
@@ -1304,7 +1309,7 @@ function renderDeficPanel(){
           <td>${d.defic}</td>
           <td><span class="chip rd">High</span></td>
           <td><span class="chip rd">Open</span></td>
-          <td><button class="btn btn-gr btn-xs" onclick="resolveDefic('${d.vehId}','${d.defic}')">✅ Resolve</button></td>
+          <td><button class="btn btn-gr btn-xs" onclick="resolveDefic('${d.vehId}','${d.defic}')">Resolve</button></td>
         </tr>`).join('')}
       </tbody>
     </table></div></div>
@@ -1314,7 +1319,7 @@ function renderDeficPanel(){
 function resolveDefic(vehId, defic){
   const v=vehicles.find(x=>x.id===vehId);
   if(v){v.deficiencies=v.deficiencies.filter(d=>d!==defic);if(v.deficiencies.length===0&&v.status==='Restricted') v.status='Available';}
-  renderAll();showToast('success','✅ Deficiency resolved — vehicle status updated');
+  renderAll();showToast('success','Deficiency resolved — vehicle status updated');
 }
 
 function dispatchVehicle(id){
@@ -1333,11 +1338,11 @@ function doDispatch(id){
   const driver=document.getElementById('disp-driver')?.value||'Driver';
   if(v){v.status='Dispatched';v.driver=driver.split(' — ')[0];v.site='En Route';}
   closeModal();closeDrawer();renderAll();
-  showToast('success',`✅ ${v?.unit} dispatched — ${driver}`);
+  showToast('success',`${v?.unit} dispatched — ${driver}`);
 }
 
-function issueAdvisory(){showToast('warn','📢 Driver advisory issued — all active drivers notified of route conditions');}
-function openAddVehicle(){showModal('Add Vehicle',`<div class="fg"><div class="fl">Unit Number</div><input class="fi" placeholder="e.g. Unit 42"></div><div class="fgrid"><div class="fg"><div class="fl">Make</div><input class="fi" placeholder="e.g. Peterbilt"></div><div class="fg"><div class="fl">Model</div><input class="fi" placeholder="e.g. 579"></div></div><div class="fgrid"><div class="fg"><div class="fl">Year</div><input class="fi" type="number" placeholder="2024"></div><div class="fg"><div class="fl">Vehicle Type</div><select class="fi fi-sel"><option>Class 1 Semi</option><option>Class 3 Truck</option><option>Service Truck</option><option>Pickup 4x4</option><option>Van</option></select></div></div>`,[{label:'Add Vehicle',cls:'btn-p',action:"closeModal();showToast('success','✅ Vehicle added to fleet registry')"},{label:'Cancel',cls:'btn-g',action:'closeModal()'}]);}
+function issueAdvisory(){showToast('warn','Driver advisory issued — all active drivers notified of route conditions');}
+function openAddVehicle(){showModal('Add Vehicle',`<div class="fg"><div class="fl">Unit Number</div><input class="fi" placeholder="e.g. Unit 42"></div><div class="fgrid"><div class="fg"><div class="fl">Make</div><input class="fi" placeholder="e.g. Peterbilt"></div><div class="fg"><div class="fl">Model</div><input class="fi" placeholder="e.g. 579"></div></div><div class="fgrid"><div class="fg"><div class="fl">Year</div><input class="fi" type="number" placeholder="2024"></div><div class="fg"><div class="fl">Vehicle Type</div><select class="fi fi-sel"><option>Class 1 Semi</option><option>Class 3 Truck</option><option>Service Truck</option><option>Pickup 4x4</option><option>Van</option></select></div></div>`,[{label:'Add Vehicle',cls:'btn-p',action:"closeModal();showToast('success','Vehicle added to fleet registry')"},{label:'Cancel',cls:'btn-g',action:'closeModal()'}]);}
 
 function filterFleet(type){renderFleetRegistry(type);}
 
@@ -1445,7 +1450,7 @@ function updateFleetJurBanner() {
   banner.style.background = isUS ? 'rgba(0,194,255,.07)' : 'rgba(255,107,53,.07)';
   banner.style.border = isUS ? '1px solid rgba(0,194,255,.2)' : '1px solid rgba(255,107,53,.2)';
   banner.style.color = isUS ? '#00C2FF' : '#FF8C52';
-  banner.innerHTML = (isUS ? '🇺🇸' : '🍁') + ' <strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Vehicle Inspection: ' + t.inspectionFull + ' · Operating Authority: ' + t.operatingAuth + ' · Road Conditions: ' + t.roadFeed + ' · Regulator: ' + t.regulator;
+  banner.innerHTML = '<strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Vehicle Inspection: ' + t.inspectionFull + ' · Operating Authority: ' + t.operatingAuth + ' · Road Conditions: ' + t.roadFeed + ' · Regulator: ' + t.regulator;
 }
 </script>
 </body>

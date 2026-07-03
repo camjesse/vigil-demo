@@ -319,7 +319,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 /* ── SOON PANEL ──────────────────────────────────────────── */
 .soon-outer{position:absolute;inset:0;overflow-y:auto;display:none;background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(155,109,255,.04),transparent),var(--bg);touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .soon-inner{display:flex;flex-direction:column;align-items:center;padding:36px 32px;text-align:center;min-height:100%}
-.s-icon{font-size:44px;margin-bottom:12px;opacity:.8}
+.s-icon{margin-bottom:12px;opacity:.8}.s-icon svg{width:40px;height:40px;color:var(--text2)}.spin svg{width:26px;height:26px;color:var(--text2)}.notif-empty svg{width:22px;height:22px}
 .s-title{font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;margin-bottom:8px}
 .s-eta{display:inline-flex;align-items:center;gap:5px;background:rgba(155,109,255,.1);border:1px solid rgba(155,109,255,.25);border-radius:20px;padding:4px 13px;font-size:11px;color:var(--purple);margin-bottom:14px}
 .s-sub{font-size:12.5px;color:var(--muted);max-width:460px;line-height:1.7;margin-bottom:18px}
@@ -553,7 +553,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
       <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10.268 21a2 2 0 0 0 3.464 0" /> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /> </svg></span><span class="sb-label">Notification Settings</span>
     </div>
     <div class="sb-item" id="sbi-theme" onclick="toggleTheme()">
-      <span class="sb-icon" id="sb-theme-icon">☀️</span>
+      <span class="sb-icon" id="sb-theme-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /> </svg></span>
       <span class="sb-label" id="sb-theme-label">Light Mode</span>
     </div>
   </div>
@@ -563,7 +563,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 <!-- CONTENT AREA -->
 <div class="ca" id="ca">
   <div class="loading" id="loader">
-    <div class="spin">🛡️</div>
+    <div class="spin"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> </svg></div>
     <div class="lt">Loading Vigil HSE</div>
     <div class="ls">Connecting data sources...</div>
     <div class="lbar"><div class="lfill"></div></div>
@@ -870,12 +870,12 @@ const MODS = {
 };
 
 const SOON = {
-  investigations:{icon:'🔎',title:'Investigations',desc:'Investigation workflows with root cause analysis, corrective action linkage, and timeline tracking.',feats:[{i:'📬',n:'Investigation Inbox',d:'Assigned investigations with status tracking'},{i:'🌳',n:'Root Cause Analysis',d:'Fault tree and bow-tie diagrams'},{i:'✅',n:'CAPA Linkage',d:'Auto-link findings to corrective actions'},{i:'📊',n:'Trend Analysis',d:'Identify systemic causes across incidents'}]},
-  contractors:  {icon:'🤝',title:'Contractor Management',desc:'Full contractor lifecycle from prequalification through ongoing compliance monitoring. ISNetworld and Avetta integration.',feats:[{i:'✅',n:'Prequalification',d:'ISNetworld/Avetta status with compliance gating'},{i:'🎓',n:'Onboarding',d:'Site orientation required before access'},{i:'📋',n:'Document Management',d:'Insurance, WCB clearance, expiry alerts'},{i:'📊',n:'Performance Monitoring',d:'Incident history and inspection results'}]},
-  jhsc:         {icon:'👥',title:'JHSC Management',desc:'Joint Health & Safety Committee meeting management, minutes, action tracking, and legally-required postings.',feats:[{i:'📅',n:'Meeting Scheduling',d:'Auto-scheduling to meet provincial requirements'},{i:'📝',n:'Digital Minutes',d:'Structured minutes with agenda templates'},{i:'✅',n:'Action Tracking',d:'Actions tracked to completion with escalation'},{i:'🏆',n:'COR Element 13',d:'All JHSC records auto-compiled for audit'}]},
-  env:          {icon:'🌿',title:'Environmental Management',desc:'Environmental compliance monitoring covering emissions, waste manifests, water quality, spill reporting, and environmental permit management.',feats:[{i:'💨',n:'Air Emissions',d:'Monitor and report against EPEA permit conditions'},{i:'🗑️',n:'Waste Management',d:'Hazardous waste manifests and disposal records'},{i:'💧',n:'Water Quality',d:'Fisheries Act compliance and sampling records'},{i:'🌍',n:'ESG Reporting',d:'Environmental data for ESG stakeholder disclosure'}]},
-  settings:     {icon:'⚙️',title:'Settings',desc:'Configure your Vigil platform — notifications, integrations, user roles, and company preferences.',feats:[]},
-  profile:      {icon:'👤',title:'Profile',desc:'Manage your user profile, preferences, security settings, and notification preferences.',feats:[]},
+  investigations:{icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /> </svg>',title:'Investigations',desc:'Investigation workflows with root cause analysis, corrective action linkage, and timeline tracking.',feats:[{i:'',n:'Investigation Inbox',d:'Assigned investigations with status tracking'},{i:'',n:'Root Cause Analysis',d:'Fault tree and bow-tie diagrams'},{i:'',n:'CAPA Linkage',d:'Auto-link findings to corrective actions'},{i:'',n:'Trend Analysis',d:'Identify systemic causes across incidents'}]},
+  contractors:  {icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m11 17 2 2a1 1 0 1 0 3-3" /> <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" /> <path d="m21 3 1 11h-2" /> <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" /> <path d="M3 4h8" /> </svg>',title:'Contractor Management',desc:'Full contractor lifecycle from prequalification through ongoing compliance monitoring. ISNetworld and Avetta integration.',feats:[{i:'',n:'Prequalification',d:'ISNetworld/Avetta status with compliance gating'},{i:'',n:'Onboarding',d:'Site orientation required before access'},{i:'',n:'Document Management',d:'Insurance, WCB clearance, expiry alerts'},{i:'',n:'Performance Monitoring',d:'Incident history and inspection results'}]},
+  jhsc:         {icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /> </svg>',title:'JHSC Management',desc:'Joint Health & Safety Committee meeting management, minutes, action tracking, and legally-required postings.',feats:[{i:'',n:'Meeting Scheduling',d:'Auto-scheduling to meet provincial requirements'},{i:'',n:'Digital Minutes',d:'Structured minutes with agenda templates'},{i:'',n:'Action Tracking',d:'Actions tracked to completion with escalation'},{i:'',n:'COR Element 13',d:'All JHSC records auto-compiled for audit'}]},
+  env:          {icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /> <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /> </svg>',title:'Environmental Management',desc:'Environmental compliance monitoring covering emissions, waste manifests, water quality, spill reporting, and environmental permit management.',feats:[{i:'',n:'Air Emissions',d:'Monitor and report against EPEA permit conditions'},{i:'',n:'Waste Management',d:'Hazardous waste manifests and disposal records'},{i:'',n:'Water Quality',d:'Fisheries Act compliance and sampling records'},{i:'',n:'ESG Reporting',d:'Environmental data for ESG stakeholder disclosure'}]},
+  settings:     {icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /> <circle cx="12" cy="12" r="3" /> </svg>',title:'Settings',desc:'Configure your Vigil platform — notifications, integrations, user roles, and company preferences.',feats:[]},
+  profile:      {icon:'<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /> </svg>',title:'Profile',desc:'Manage your user profile, preferences, security settings, and notification preferences.',feats:[]},
 };
 
 let cur = null, loaded = {}, loadingMod = null;
@@ -943,7 +943,7 @@ function applyThemeUI(isLight) {
   const icon = document.getElementById('sb-theme-icon');
   const lbl  = document.getElementById('sb-theme-label');
   if (btn)  btn.textContent  = isLight ? 'Dark'  : 'Light';
-  if (icon) icon.textContent = isLight ? '☀️' : '🌙';
+  if (icon) icon.innerHTML = isLight ? '<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <circle cx="12" cy="12" r="4" /> <path d="M12 2v2" /> <path d="M12 20v2" /> <path d="m4.93 4.93 1.41 1.41" /> <path d="m17.66 17.66 1.41 1.41" /> <path d="M2 12h2" /> <path d="M20 12h2" /> <path d="m6.34 17.66-1.41 1.41" /> <path d="m19.07 4.93-1.41 1.41" /> </svg>' : '<svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /> </svg>';
   if (lbl)  lbl.textContent  = isLight ? 'Light Mode' : 'Dark Mode';
 }
 
@@ -1085,11 +1085,11 @@ function showSoon(id) {
   document.getElementById('soon-inner').innerHTML = `
     <div class="s-icon">${m.icon}</div>
     <div class="s-title">${m.title}</div>
-    <div class="s-eta">🗓️ Coming Soon</div>
+    <div class="s-eta">Coming Soon</div>
     <div class="s-sub">${m.desc}</div>
     ${m.feats.length ? `<div class="s-feats">${m.feats.map(f=>`<div class="sf"><div class="sf-i">${f.i}</div><div><div class="sf-n">${f.n}</div><div class="sf-d">${f.d}</div></div></div>`).join('')}</div>` : ''}
     <div style="margin-top:22px;display:flex;gap:9px;flex-wrap:wrap;justify-content:center">
-      <button class="btn btn-pu" onclick="toast('✅ Feature request logged — thank you!')">⭐ Request Early Access</button>
+      <button class="btn btn-pu" onclick="toast('Feature request logged — thank you!')">Request Early Access</button>
       <button class="btn btn-g" onclick="goHome()">← Dashboard</button>
     </div>
     <div style="margin-top:14px;font-size:10.5px;color:var(--muted)">All planned modules are included in your Vigil subscription — no additional cost.</div>
@@ -1134,7 +1134,7 @@ function showL(lbl) {
   const ca = document.getElementById('ca');
   lDiv = document.createElement('div');
   lDiv.style.cssText = 'position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20';
-  lDiv.innerHTML = `<div class="spin">🛡️</div><div class="lt">Loading ${lbl}</div><div class="ls">Connecting...</div><div class="lbar"><div class="lfill"></div></div>`;
+  lDiv.innerHTML = `<div class="spin"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> </svg></div><div class="lt">Loading ${lbl}</div><div class="ls">Connecting...</div><div class="lbar"><div class="lfill"></div></div>`;
   ca.appendChild(lDiv);
 }
 function hideL() { if (lDiv) { lDiv.remove(); lDiv = null; } }
@@ -1143,7 +1143,7 @@ function showErr(src) {
   const ca = document.getElementById('ca');
   const d = document.createElement('div');
   d.style.cssText = 'position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;text-align:center;padding:32px';
-  d.innerHTML = `<div style="font-size:32px;margin-bottom:12px">📁</div><div style="font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;margin-bottom:8px">Module file not found</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Place <strong style="color:var(--accent)">${src}</strong> in the same folder as vigil-demo.html</div><button class="btn btn-g" style="margin-top:12px" onclick="this.parentElement.remove()">Dismiss</button>`;
+  d.innerHTML = `<div style="margin-bottom:12px"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10.7 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v4.1" /> <path d="m21 21-1.9-1.9" /> <circle cx="17" cy="17" r="3" /> </svg></div><div style="font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;margin-bottom:8px">Module file not found</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Place <strong style="color:var(--accent)">${src}</strong> in the same folder as vigil-demo.html</div><button class="btn btn-g" style="margin-top:12px" onclick="this.parentElement.remove()">Dismiss</button>`;
   ca.appendChild(d);
 }
 
@@ -1185,11 +1185,11 @@ let JUR = 'ca';
 
 const JUR_CONFIG = {
   ca: {
-    flag:'🍁', label:'Canada', coTag:'Northern Express Transport',
+    label:'Canada', coTag:'Northern Express Transport',
     terms:{wcb:'WCB',whmis:'WHMIS',licence:'Class 1 / Class 3 Licence',licenceShort:'Class 1',hazcom:'WHMIS 2015',medCert:'TC Medical Certificate',regulator:'OHS Act',inspection:'CVIP',hos_drive:'13h',hos_weekly:'70h / 7-day cycle',hos_reset:'36h off-duty reset',hos_onduty:'14h on-duty limit',envRegulator:'AEP / Environment Canada',envPermit:'EPEA Operating Approval',envWaste:'Alberta Manifest',envSpillLine:'AEP Emergency Line: 1-800-222-6514',envInventory:'NPRI',safetyCommittee:'JHSC',workerComp:'WCB',operatingAuth:'Safety Fitness Certificate',roadConditions:'Alberta 511',corLabel:'COR (Alberta)',osha:'OHS Act'}
   },
   us: {
-    flag:'🇺🇸', label:'United States', coTag:'Northern Express Transport',
+    label:'United States', coTag:'Northern Express Transport',
     terms:{wcb:"Workers' Comp",whmis:'HazCom / GHS',licence:'CDL Class A / Class B',licenceShort:'CDL Class A',hazcom:'HazCom 2012 (GHS)',medCert:'DOT Physical (MCSA-5875)',regulator:'OSHA',inspection:'DOT Annual Inspection',hos_drive:'11h',hos_weekly:'60h/7-day or 70h/8-day cycle',hos_reset:'34h restart provision',hos_onduty:'14h on-duty limit',envRegulator:'EPA / State DEQ',envPermit:'Title V Air Permit / State Permit',envWaste:'EPA Uniform Hazardous Waste Manifest',envSpillLine:'EPA National Response Center: 1-800-424-8802',envInventory:'TRI (Toxic Release Inventory)',safetyCommittee:'Safety Committee',workerComp:"Workers' Compensation",operatingAuth:'FMCSA Operating Authority (MC #)',roadConditions:'State 511 / FHWA Road Conditions',corLabel:'OSHA VPP / Internal Audit',osha:'OSHA'}
   }
 };

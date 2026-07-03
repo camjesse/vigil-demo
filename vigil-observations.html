@@ -201,7 +201,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:24px 16px;color:var(--muted)}
-.empty-icon{font-size:26px;margin-bottom:6px}
+.empty-icon{font-size:26px;margin-bottom:6px}.empty-icon svg{width:26px;height:26px}
 
 /* SUCCESS */
 .success-banner{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:24px 20px;text-align:center;max-width:480px;margin:0 auto}
@@ -246,7 +246,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <!-- ALERT STRIP -->
 <div class="alert-strip">
-  <div class="alert-strip-label">👁 Signal</div>
+  <div class="alert-strip-label">Signal</div>
   <div class="alert-strip-body" id="astrip-content">
     <span style="color:var(--muted);font-size:10.5px">Loading…</span>
   </div>
@@ -286,7 +286,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="row3" style="margin-bottom:14px">
       <!-- TRUST INDICATORS -->
       <div class="card">
-        <div class="card-title">🤝 Worker Trust Indicators
+        <div class="card-title">Worker Trust Indicators
           <span>This is how you know if workers believe reporting matters</span>
         </div>
         <div class="trust-grid" id="trust-grid">
@@ -297,7 +297,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <!-- TREND CHART + SILENT ALERT -->
       <div style="display:flex;flex-direction:column;gap:12px">
         <div class="card" style="flex:1">
-          <div class="card-title">📈 Monthly Volume</div>
+          <div class="card-title">Monthly Volume</div>
           <div id="trend-chart">
             <div class="loading-wrap"><div class="spinner"></div></div>
           </div>
@@ -309,11 +309,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <!-- BY TYPE + BY SITE -->
     <div class="row2" style="margin-bottom:14px">
       <div class="card">
-        <div class="card-title">📊 By Type</div>
+        <div class="card-title">By Type</div>
         <div id="by-type-chart"></div>
       </div>
       <div class="card">
-        <div class="card-title">📍 By Site</div>
+        <div class="card-title">By Site</div>
         <div id="by-site-chart"></div>
       </div>
     </div>
@@ -369,13 +369,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="form-title">Report an Observation</div>
           <div class="form-sub">Northern Express Transport — Target: under 60 seconds</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
 
       <!-- SUCCESS SCREEN -->
       <div id="form-success" style="display:none;margin-top:20px">
         <div class="success-banner">
-          <div style="font-size:38px;margin-bottom:10px">✅</div>
+          <div style="margin-bottom:10px;color:var(--ok)"><svg style="width:38px;height:38px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
           <div style="font-family:var(--font-head);font-size:18px;font-weight:800;margin-bottom:6px">Observation Submitted</div>
           <div style="font-size:20px;font-family:var(--font-head);color:var(--ok);font-weight:800;margin-bottom:8px" id="success-obs-num"></div>
           <div style="font-size:11.5px;color:var(--text2);margin-bottom:4px">Estimated first response: <strong style="color:var(--text)">within 5 business days</strong></div>
@@ -469,7 +469,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
               <span class="toggle-slider"></span>
             </label>
             <div>
-              <div style="font-size:12.5px;font-weight:700;color:var(--text)">🚨 Immediate Action Needed</div>
+              <div style="font-size:12.5px;font-weight:700;color:var(--text)">Immediate Action Needed</div>
               <div style="font-size:10.5px;color:var(--muted)">The situation requires urgent intervention right now</div>
             </div>
           </div>
@@ -494,7 +494,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           ondragover="this.classList.add('dragover');event.preventDefault()"
           ondragleave="this.classList.remove('dragover')"
           ondrop="this.classList.remove('dragover');event.preventDefault()">
-          <div style="font-size:24px;margin-bottom:6px">📷</div>
           <div style="font-size:12.5px;font-weight:600;color:var(--text2)">Drag photos here or tap to add</div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Photos help supervisors understand the situation faster</div>
         </div>
@@ -513,7 +512,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
         <!-- SUBMIT -->
         <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border)">
-          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
           <button class="btn btn-primary" id="submit-btn" onclick="submitObservation()">Submit Observation →</button>
         </div>
       </div><!-- /form-body -->
@@ -626,7 +625,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('close-modal')">Cancel</button>
-      <button class="btn btn-ok btn-sm" onclick="submitClose()">✓ Close Observation</button>
+      <button class="btn btn-ok btn-sm" onclick="submitClose()">Close Observation</button>
     </div>
   </div>
 </div>
@@ -684,25 +683,25 @@ function toast(msg, type='ok', ms=4000) {
 
 // ── HELPERS ────────────────────────────────────────────────────
 const OBS_TYPES = {
-  unsafe_condition: {icon:'🚨', name:'Unsafe Condition',      chip:'danger',  selCls:'sel-danger'},
-  unsafe_act:       {icon:'⚠️', name:'Unsafe Act',            chip:'warn',    selCls:'sel-warn'},
-  positive:         {icon:'✅', name:'Safe Behaviour',        chip:'ok',      selCls:'sel-ok'},
-  near_miss:        {icon:'💡', name:'Near Miss',             chip:'orange',  selCls:'sel-warn'},
-  environmental:    {icon:'🌿', name:'Environmental',         chip:'cyan',    selCls:'sel-cyan'},
-  property:         {icon:'🏗️', name:'Property Concern',      chip:'purple',  selCls:'sel-purple'},
-  security:         {icon:'🔒', name:'Security',              chip:'blue',    selCls:'selected'},
-  other:            {icon:'📋', name:'Other',                 chip:'muted',   selCls:'selected'},
+  unsafe_condition: {name:'Unsafe Condition',      chip:'danger',  selCls:'sel-danger'},
+  unsafe_act:       {name:'Unsafe Act',            chip:'warn',    selCls:'sel-warn'},
+  positive:         {name:'Safe Behaviour',        chip:'ok',      selCls:'sel-ok'},
+  near_miss:        {name:'Near Miss',             chip:'orange',  selCls:'sel-warn'},
+  environmental:    {name:'Environmental',         chip:'cyan',    selCls:'sel-cyan'},
+  property:         {name:'Property Concern',      chip:'purple',  selCls:'sel-purple'},
+  security:         {name:'Security',              chip:'blue',    selCls:'selected'},
+  other:            {name:'Other',                 chip:'muted',   selCls:'selected'},
 };
 
 const FORM_EXTRA_TYPES = [
-  {key:'unsafe_condition', icon:'🚨', name:'Unsafe Condition',        selCls:'sel-danger'},
-  {key:'unsafe_act',       icon:'⚠️', name:'Unsafe Act',              selCls:'sel-warn'},
-  {key:'positive',         icon:'✅', name:'Safe Behaviour',          selCls:'sel-ok'},
-  {key:'near_miss',        icon:'💡', name:'Near Miss',               selCls:'sel-warn'},
-  {key:'environmental',    icon:'🌿', name:'Environmental',           selCls:'sel-cyan'},
-  {key:'property',         icon:'⚙️', name:'Equipment / Property',    selCls:'sel-purple'},
-  {key:'other',            icon:'📋', name:'Procedure Not Practical', selCls:'selected'},
-  {key:'security',         icon:'🔒', name:'Security Concern',        selCls:'selected'},
+  {key:'unsafe_condition', name:'Unsafe Condition',        selCls:'sel-danger'},
+  {key:'unsafe_act',       name:'Unsafe Act',              selCls:'sel-warn'},
+  {key:'positive',         name:'Safe Behaviour',          selCls:'sel-ok'},
+  {key:'near_miss',        name:'Near Miss',               selCls:'sel-warn'},
+  {key:'environmental',    name:'Environmental',           selCls:'sel-cyan'},
+  {key:'property',         name:'Equipment / Property',    selCls:'sel-purple'},
+  {key:'other',            name:'Procedure Not Practical', selCls:'selected'},
+  {key:'security',         name:'Security Concern',        selCls:'selected'},
 ];
 
 const STATUS_CFG = {
@@ -721,8 +720,8 @@ const PRIORITY_CFG = {
 };
 
 function typeChip(t) {
-  const cfg = OBS_TYPES[t] || {icon:'📋', chip:'muted', name:t||'—'};
-  return `<span class="chip ${cfg.chip}">${cfg.icon} ${cfg.name}</span>`;
+  const cfg = OBS_TYPES[t] || {chip:'muted', name:t||'—'};
+  return `<span class="chip ${cfg.chip}">${cfg.name}</span>`;
 }
 function statusChip(s) {
   const c = STATUS_CFG[s] || {cls:'muted', label:s||'—'};
@@ -934,7 +933,7 @@ function renderTrendChart() {
   const el = document.getElementById('trend-chart');
   const byMonth = (stats.by_month || []).slice().reverse();
   if (!byMonth.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:12px"><div class="empty-icon">📈</div>No data</div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:12px">No data</div>`;
     return;
   }
   const max = Math.max(...byMonth.map(m=>parseInt(m.count)));
@@ -962,15 +961,15 @@ function renderTrendChart() {
 function renderByTypeChart() {
   const el = document.getElementById('by-type-chart');
   const byType = stats.by_type || [];
-  if (!byType.length) { el.innerHTML=`<div class="empty-state"><div class="empty-icon">📊</div>No data</div>`; return; }
+  if (!byType.length) { el.innerHTML=`<div class="empty-state">No data</div>`; return; }
   const max = Math.max(...byType.map(t=>parseInt(t.count)));
   el.innerHTML = byType.map(t => {
-    const cfg = OBS_TYPES[t.observation_type] || {icon:'📋',chip:'muted'};
+    const cfg = OBS_TYPES[t.observation_type] || {chip:'muted'};
     const pct = Math.round(parseInt(t.count)/max*100);
     return `
     <div style="margin-bottom:8px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:11px;color:var(--text2)">${cfg.icon} ${fmt(t.observation_type)}</span>
+        <span style="font-size:11px;color:var(--text2)">${fmt(t.observation_type)}</span>
         <span style="font-size:10.5px;font-weight:700;color:var(--text)">${t.count}</span>
       </div>
       <div style="height:5px;background:var(--s4);border-radius:3px">
@@ -984,14 +983,14 @@ function renderByTypeChart() {
 function renderBySiteChart() {
   const el = document.getElementById('by-site-chart');
   const bySite = stats.by_site || [];
-  if (!bySite.length) { el.innerHTML=`<div class="empty-state"><div class="empty-icon">📍</div>No data</div>`; return; }
+  if (!bySite.length) { el.innerHTML=`<div class="empty-state">No data</div>`; return; }
   const max = Math.max(...bySite.map(s=>parseInt(s.count)));
   el.innerHTML = bySite.map(s => {
     const pct = Math.round(parseInt(s.count)/max*100);
     return `
     <div style="margin-bottom:8px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:11px;color:var(--text2)">📍 ${s.site||'Unknown'}</span>
+        <span style="font-size:11px;color:var(--text2)">${s.site||'Unknown'}</span>
         <span style="font-size:10.5px;font-weight:700;color:var(--text)">${s.count}</span>
       </div>
       <div style="height:5px;background:var(--s4);border-radius:3px">
@@ -1008,7 +1007,6 @@ function renderSilenceAlert() {
     el.innerHTML = `
       <div class="card" style="background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)">
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:18px">🟢</span>
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--ok)">No Silent Locations</div>
             <div style="font-size:10.5px;color:var(--muted)">All sites have recent activity</div>
@@ -1019,9 +1017,9 @@ function renderSilenceAlert() {
   }
   el.innerHTML = `
     <div class="card" style="background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.25)">
-      <div class="card-title" style="color:var(--danger)">⚠️ Silent Locations (${silenceRecords.length})</div>
+      <div class="card-title" style="color:var(--danger)">Silent Locations (${silenceRecords.length})</div>
       ${silenceRecords.map(r=>`
-        <div style="font-size:11.5px;color:var(--text2);padding:4px 0">📍 ${r.site} — ${r.days_since_last||'30'}+ days without a report</div>
+        <div style="font-size:11.5px;color:var(--text2);padding:4px 0">${r.site} — ${r.days_since_last||'30'}+ days without a report</div>
       `).join('')}
     </div>`;
 }
@@ -1057,7 +1055,7 @@ function renderTable() {
   });
 
   if (!rows.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">👁</div>No observations match filters</div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></div>No observations match filters</div>`;
     return;
   }
 
@@ -1068,7 +1066,7 @@ function renderTable() {
     </tr></thead>
     <tbody>${rows.map(o => {
       const desc = (o.title||o.description||'').slice(0,60) + ((o.title||o.description||'').length>60?'…':'');
-      const reporter = o.anonymous ? '🕵️ Anon' :
+      const reporter = o.anonymous ? 'Anon' :
         (o.observer_first_name ? `${o.observer_first_name} ${o.observer_last_name}` : '—');
       return `<tr>
         <td style="font-size:11px;font-family:monospace;color:var(--accent)">${o.observation_number}</td>
@@ -1092,7 +1090,6 @@ function renderTypeGrid() {
   el.innerHTML = FORM_EXTRA_TYPES.map(t => `
     <div class="type-btn ${selectedObsType===t.key?t.selCls:''}" id="obt-${t.key}"
       onclick="selectObsType('${t.key}')">
-      <div class="type-icon">${t.icon}</div>
       <div class="type-name">${t.name}</div>
     </div>
   `).join('');
@@ -1225,7 +1222,7 @@ async function viewObservation(id, focusActionId=null) {
   ]);
 
   if (!detailRes?.observation) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load observation</div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>Could not load observation</div>`;
     return;
   }
 
@@ -1235,7 +1232,7 @@ async function viewObservation(id, focusActionId=null) {
   const feedback= feedbackRes?.feedback || [];
   const updates = statusRes?.status_updates || [];
 
-  const reporter = o.anonymous ? '🕵️ Anonymous' :
+  const reporter = o.anonymous ? 'Anonymous' :
     (o.observer_first_name ? `${o.observer_first_name} ${o.observer_last_name}` : '—');
   const assignee = o.assignee_first_name
     ? `${o.assignee_first_name} ${o.assignee_last_name}` : null;
@@ -1260,7 +1257,7 @@ async function viewObservation(id, focusActionId=null) {
         <div class="action-tools">
           ${['open','in_progress'].includes(a.status) ? `<button class="btn btn-ok btn-sm" onclick="completeObservationAction('${a.id}')">Complete</button>` : ''}
           ${a.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyObservationAction('${a.id}')">Verify</button>` : ''}
-          ${a.status === 'verified' ? '<span style="font-size:16px;color:var(--ok)">✓</span>' : ''}
+          ${a.status === 'verified' ? '<span style="font-size:16px;color:var(--ok)">\u2713</span>' : ''}
         </div>
       </div>
     </div>`;
@@ -1273,7 +1270,7 @@ async function viewObservation(id, focusActionId=null) {
     const isUpdate = 'update_message' in item;
     return `
     <div class="tl-item">
-      <div class="tl-dot ${isUpdate?'blue':'muted'}">${isUpdate?'↑':'💬'}</div>
+      <div class="tl-dot ${isUpdate?'blue':'muted'}">${isUpdate?'↑':''}</div>
       <div class="tl-body">
         <div style="font-size:12.5px;color:var(--text)">${isUpdate?(item.update_message||''):(item.comment||'')}</div>
         ${isUpdate && item.status_to?`<div style="margin-top:3px">${statusChip(item.status_to)}</div>`:''}
@@ -1284,10 +1281,10 @@ async function viewObservation(id, focusActionId=null) {
 
   // Feedback HTML
   const FEEDBACK_LABELS = {
-    action_taken:'✅ Action Taken', improvement_made:'🔧 Improvement Made',
-    lesson_shared:'📚 Lesson Shared', procedure_updated:'📋 Procedure Updated',
-    equipment_fixed:'⚙️ Equipment Fixed', training_updated:'🎓 Training Updated',
-    no_action_required:'➡️ No Action Required', deferred:'⏳ Deferred', duplicate:'🔁 Duplicate',
+    action_taken:'Action Taken', improvement_made:'Improvement Made',
+    lesson_shared:'Lesson Shared', procedure_updated:'Procedure Updated',
+    equipment_fixed:'Equipment Fixed', training_updated:'Training Updated',
+    no_action_required:'No Action Required', deferred:'Deferred', duplicate:'Duplicate',
   };
   const feedbackHtml = feedback.map(f=>`
     <div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 12px;margin-bottom:7px">
@@ -1296,7 +1293,7 @@ async function viewObservation(id, focusActionId=null) {
         <span style="font-size:10px;color:var(--muted)">${fmtDate(f.created_at)}</span>
       </div>
       <div style="font-size:12.5px;color:var(--text2)">${f.feedback_message||''}</div>
-      ${f.improvement_verified?`<div style="font-size:10.5px;color:var(--ok);margin-top:5px">✓ Improvement verified</div>`:''}
+      ${f.improvement_verified?`<div style="font-size:10.5px;color:var(--ok);margin-top:5px">Improvement verified</div>`:''}
     </div>`).join('');
 
   // Action buttons
@@ -1314,16 +1311,16 @@ async function viewObservation(id, focusActionId=null) {
             ${typeChip(o.observation_type)}
             ${statusChip(o.status)}
             ${priorityChip(o.priority)}
-            ${o.immediate_action_taken?'<span class="chip danger">⚡ Immediate Action</span>':''}
-            ${o.anonymous?'<span class="chip purple">🕵️ Anonymous</span>':''}
+            ${o.immediate_action_taken?'<span class="chip danger">Immediate Action</span>':''}
+            ${o.anonymous?'<span class="chip purple">Anonymous</span>':''}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
           <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-            ${canAssign?`<button class="btn btn-ghost btn-sm" onclick="openAssignModal()">👤 Assign</button>`:''}
+            ${canAssign?`<button class="btn btn-ghost btn-sm" onclick="openAssignModal()">Assign</button>`:''}
             <button class="btn btn-ghost btn-sm" onclick="openActionModal()">+ Action</button>
-            <button class="btn btn-ghost btn-sm" onclick="openFeedbackModal()">💬 Feedback</button>
-            ${canClose?`<button class="btn btn-ok btn-sm" onclick="openCloseModal()">✓ Close</button>`:''}
+            <button class="btn btn-ghost btn-sm" onclick="openFeedbackModal()">Feedback</button>
+            ${canClose?`<button class="btn btn-ok btn-sm" onclick="openCloseModal()">Close</button>`:''}
           </div>
         </div>
       </div>
@@ -1337,7 +1334,7 @@ async function viewObservation(id, focusActionId=null) {
       </div>
       <div class="detail-field">
         <div class="detail-field-label">Site</div>
-        <div class="detail-field-val">📍 ${o.site||'—'}${o.location?` · ${o.location}`:''}</div>
+        <div class="detail-field-val">${o.site||'—'}${o.location?` · ${o.location}`:''}</div>
       </div>
       <div class="detail-field">
         <div class="detail-field-label">Observed Date</div>
@@ -1364,7 +1361,7 @@ async function viewObservation(id, focusActionId=null) {
       <div style="font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${o.description}</div>
       ${o.immediate_action_description?`
       <div style="margin-top:10px;padding:10px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:7px">
-        <div style="font-size:10.5px;font-weight:700;color:var(--danger);margin-bottom:3px">⚡ Immediate Action Taken</div>
+        <div style="font-size:10.5px;font-weight:700;color:var(--danger);margin-bottom:3px">Immediate Action Taken</div>
         <div style="font-size:12px;color:var(--text2)">${o.immediate_action_description}</div>
       </div>`:''}
     </div>` : ''}

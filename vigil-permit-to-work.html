@@ -204,7 +204,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:28px 16px;color:var(--muted)}
-.empty-icon{font-size:28px;margin-bottom:8px}
+.empty-icon{font-size:28px;margin-bottom:8px}.empty-icon svg{width:28px;height:28px}
 .empty-sub{font-size:11px;margin-top:4px}
 
 /* SUCCESS */
@@ -260,7 +260,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <!-- ALERT STRIP -->
 <div class="alert-strip">
-  <div class="alert-strip-label">⚡ Live</div>
+  <div class="alert-strip-label">Live</div>
   <div class="alert-strip-body" id="astrip-content">
     <span style="color:var(--muted);font-size:10.5px">Loading…</span>
   </div>
@@ -299,7 +299,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <!-- LIVE PERMIT BOARD + SIMOPS -->
     <div class="row3">
       <div class="card" style="overflow:hidden">
-        <div class="card-title">🔴 Active Permit Board <span id="active-count-label"></span></div>
+        <div class="card-title">Active Permit Board <span id="active-count-label"></span></div>
         <div id="permit-board">
           <div class="loading-wrap"><div class="spinner"></div><span>Loading permits…</span></div>
         </div>
@@ -307,14 +307,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div>
         <!-- SIMOPS CONFLICTS -->
         <div class="card" style="margin-bottom:12px">
-          <div class="card-title">⚡ SIMOPS Analysis</div>
+          <div class="card-title">SIMOPS Analysis</div>
           <div id="simops-panel">
             <div class="loading-wrap"><div class="spinner"></div></div>
           </div>
         </div>
         <!-- QUICK STATS -->
         <div class="card">
-          <div class="card-title">📊 By Type</div>
+          <div class="card-title">By Type</div>
           <div id="type-breakdown" style="display:flex;flex-direction:column;gap:5px"></div>
         </div>
       </div>
@@ -378,7 +378,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="form-title">New Permit to Work</div>
           <div class="form-sub">Northern Express Transport — Vigil HSE</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+        <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
 
       <!-- STEP BAR -->
@@ -397,7 +397,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <!-- SUCCESS SCREEN -->
       <div id="form-success" style="display:none">
         <div class="success-banner">
-          <div style="font-size:40px;margin-bottom:10px">✅</div>
+          <div style="margin-bottom:10px;color:var(--ok)"><svg style="width:40px;height:40px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
           <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:6px">Permit Issued</div>
           <div style="font-size:22px;font-family:var(--font-head);color:var(--ok);font-weight:800;margin-bottom:12px" id="success-permit-num"></div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:16px">The permit is now active. Workers may begin once signed on.</div>
@@ -413,7 +413,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div style="font-size:12.5px;color:var(--text2);margin-bottom:14px">Select the permit type that best describes the work being performed.</div>
         <div class="type-grid" id="type-grid"></div>
         <div class="form-nav">
-          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+          <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
           <button class="btn btn-primary" onclick="goStep(2)">Next: Work Details →</button>
         </div>
       </div>
@@ -479,7 +479,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(3)">Next: Control Verification →</button>
@@ -492,7 +492,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div id="step3-controls"></div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(4)">Next: Field Verification →</button>
@@ -503,7 +503,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div class="form-section" id="step-4">
         <div class="verify-box" id="verify-box">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <span style="font-size:26px">🦺</span>
+            <span style="display:inline-flex;color:var(--warn)"><svg style="width:26px;height:26px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M14 6a6 6 0 0 1 6 6v3"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><rect x="2" y="15" width="20" height="4" rx="1"/></svg></span>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--warn);margin-bottom:2px">Field Walk-Down Required</div>
               <div style="font-size:11.5px;color:var(--text2)">The permit issuer must physically walk down the job site before this permit can be issued. This cannot be skipped.</div>
@@ -528,7 +528,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
           </div>
           <button class="btn btn-primary" onclick="goStep(5)">Next: Review &amp; Issue →</button>
@@ -538,23 +538,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <!-- STEP 5: REVIEW & ISSUE -->
       <div class="form-section" id="step-5">
         <div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:14px 16px;margin-bottom:16px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">📋 Permit Summary — Review Before Issuing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Permit Summary — Review Before Issuing</div>
           <div id="review-summary"></div>
         </div>
         <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px;margin-bottom:16px">
-          <div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:4px">✓ Field Verification Confirmed</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:4px">Field Verification Confirmed</div>
           <div style="font-size:11px;color:var(--text2)" id="review-verify-note"></div>
         </div>
         <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;margin-bottom:20px">
-          <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:3px">⚠️ Issuing this permit confirms you have authority to authorize this work</div>
+          <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:3px">Issuing this permit confirms you have authority to authorize this work</div>
           <div style="font-size:10.5px;color:var(--text2)">All control verifications above are your responsibility. This action is logged and timestamped.</div>
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">✕ Cancel</button>
+            <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
           </div>
-          <button class="btn btn-ok" id="issue-btn" onclick="submitAndIssuePermit()">✓ Issue Permit</button>
+          <button class="btn btn-ok" id="issue-btn" onclick="submitAndIssuePermit()">Issue Permit</button>
         </div>
       </div>
 
@@ -636,14 +636,14 @@ function toast(msg, type='ok', ms=4000) {
 
 // ── HELPERS ────────────────────────────────────────────────────
 const PERMIT_TYPES = {
-  hot_work:           {icon:'🔥', name:'Hot Work',           desc:'Welding, cutting, grinding, open flame',  risk:'high'},
-  confined_space:     {icon:'🕳️', name:'Confined Space',     desc:'Entry into tanks, vessels, manholes',     risk:'critical'},
-  energy_isolation:   {icon:'⚡', name:'Energy Isolation',   desc:'LOTO — electrical, hydraulic, mechanical', risk:'high'},
-  excavation:         {icon:'⛏️', name:'Excavation',         desc:'Trenching, digging, ground disturbance',  risk:'high'},
-  working_at_heights: {icon:'🏗️', name:'Working at Heights', desc:'Work above 3m or near unprotected edges', risk:'high'},
-  critical_lift:      {icon:'🏋️', name:'Critical Lift',      desc:'Crane lifts >75% capacity or complex',    risk:'critical'},
-  line_breaking:      {icon:'🔧', name:'Line Breaking',      desc:'Opening pressurized piping/vessels',       risk:'high'},
-  cold_work:          {icon:'❄️', name:'Cold Work',          desc:'Non-sparking work in hazardous areas',     risk:'medium'},
+  hot_work:           {name:'Hot Work',           desc:'Welding, cutting, grinding, open flame',  risk:'high'},
+  confined_space:     {name:'Confined Space',     desc:'Entry into tanks, vessels, manholes',     risk:'critical'},
+  energy_isolation:   {name:'Energy Isolation',   desc:'LOTO — electrical, hydraulic, mechanical', risk:'high'},
+  excavation:         {name:'Excavation',         desc:'Trenching, digging, ground disturbance',  risk:'high'},
+  working_at_heights: {name:'Working at Heights', desc:'Work above 3m or near unprotected edges', risk:'high'},
+  critical_lift:      {name:'Critical Lift',      desc:'Crane lifts >75% capacity or complex',    risk:'critical'},
+  line_breaking:      {name:'Line Breaking',      desc:'Opening pressurized piping/vessels',       risk:'high'},
+  cold_work:          {name:'Cold Work',          desc:'Non-sparking work in hazardous areas',     risk:'medium'},
 };
 
 const STATUS_CFG = {
@@ -675,7 +675,7 @@ function riskChip(r) {
 }
 function typeChip(t) {
   const cfg = PERMIT_TYPES[t];
-  return cfg ? `<span class="chip blue">${cfg.icon} ${cfg.name}</span>` : `<span class="chip muted">${t||'—'}</span>`;
+  return cfg ? `<span class="chip blue">${cfg.name}</span>` : `<span class="chip muted">${t||'—'}</span>`;
 }
 function fmt(s) {
   if (!s) return '—';
@@ -825,13 +825,13 @@ function renderPermitBoard() {
   const el = document.getElementById('permit-board');
   const label = document.getElementById('active-count-label');
   if (!activePermits.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🟢</div>No active permits right now<div class="empty-sub">All clear</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>No active permits right now<div class="empty-sub">All clear</div></div>`;
     label.textContent = '';
     return;
   }
   label.textContent = `(${activePermits.length})`;
   el.innerHTML = `<div class="permit-board">${activePermits.map(p => {
-    const cfg = PERMIT_TYPES[p.permit_type] || {icon:'📋', name:p.permit_type};
+    const cfg = PERMIT_TYPES[p.permit_type] || {name:p.permit_type};
     const cd = countdown(p.permit_expires_at);
     const lead = p.lead_first_name ? `${p.lead_first_name} ${p.lead_last_name}` :
                  (p.worker_lead_first_name ? `${p.worker_lead_first_name} ${p.worker_lead_last_name}` : '—');
@@ -839,16 +839,15 @@ function renderPermitBoard() {
     <div class="permit-card" onclick="viewPermit('${p.id}')">
       <div class="pc-head">
         <span class="pc-num">${p.permit_number}</span>
-        <span class="pc-icon">${cfg.icon}</span>
       </div>
       <div class="pc-title">${p.title}</div>
-      <div class="pc-site">📍 ${p.site||'—'}${p.location_detail?` · ${p.location_detail}`:''}</div>
+      <div class="pc-site">${p.site||'—'}${p.location_detail?` · ${p.location_detail}`:''}</div>
       <div class="pc-meta">
         ${statusChip(p.status)}
         ${riskChip(p.risk_tier)}
         ${cd ? `<span class="pc-expiry${cd.critical?' critical':''}">${cd.label}</span>` : ''}
       </div>
-      <div class="pc-lead">👷 ${lead}</div>
+      <div class="pc-lead">${lead}</div>
       <div class="pc-foot">
         <span style="font-size:10px;color:var(--muted)">Issued ${fmtShort(p.permit_issued_at)}</span>
         <span class="chip blue btn-sm" style="cursor:pointer">View →</span>
@@ -873,17 +872,17 @@ function renderSimops() {
   });
 
   if (!conflicts.length) {
-    el.innerHTML = `<div class="simops-empty">✓ No SIMOPS conflicts detected — no concurrent permits at the same site</div>`;
+    el.innerHTML = `<div class="simops-empty">No SIMOPS conflicts detected — no concurrent permits at the same site</div>`;
     document.getElementById('kpi-simops').textContent = '0';
     return;
   }
 
   el.innerHTML = conflicts.map(c => `
     <div class="simops-card" style="margin-bottom:8px">
-      <div style="font-size:11.5px;font-weight:700;color:var(--warn);margin-bottom:6px">⚠️ ${c.site} — ${c.permits.length} concurrent permits</div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--warn);margin-bottom:6px">${c.site} — ${c.permits.length} concurrent permits</div>
       ${c.permits.map(p => {
-        const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋'};
-        return `<div style="font-size:11px;color:var(--text2);padding:3px 0">${cfg.icon} ${p.permit_number} · ${p.title}</div>`;
+        const cfg = PERMIT_TYPES[p.permit_type]||{};
+        return `<div style="font-size:11px;color:var(--text2);padding:3px 0">${p.permit_number} · ${p.title}</div>`;
       }).join('')}
     </div>
   `).join('');
@@ -901,12 +900,12 @@ function renderTypeBreakdown() {
   }
   const max = sorted[0][1];
   el.innerHTML = sorted.map(([type, count]) => {
-    const cfg = PERMIT_TYPES[type]||{icon:'📋', name:fmt(type)};
+    const cfg = PERMIT_TYPES[type]||{name:fmt(type)};
     const pct = Math.round(count/max*100);
     return `
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:11px;color:var(--text2)">${cfg.icon} ${cfg.name}</span>
+        <span style="font-size:11px;color:var(--text2)">${cfg.name}</span>
         <span style="font-size:10.5px;font-weight:700;color:var(--text)">${count}</span>
       </div>
       <div style="height:4px;background:var(--s4);border-radius:2px">
@@ -957,7 +956,7 @@ function renderPermitsTable() {
   });
 
   if (!rows.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📋</div>No permits match filters</div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></div>No permits match filters</div>`;
     return;
   }
 
@@ -967,10 +966,10 @@ function renderPermitsTable() {
       <th>Issued</th><th>Expires</th><th>Status</th><th>Risk</th><th></th>
     </tr></thead>
     <tbody>${rows.map(p => {
-      const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋', name:fmt(p.permit_type)};
+      const cfg = PERMIT_TYPES[p.permit_type]||{name:fmt(p.permit_type)};
       return `<tr>
         <td style="font-size:11px;font-family:monospace;color:var(--accent)">${p.permit_number}</td>
-        <td>${cfg.icon} <span style="font-size:11px">${cfg.name}</span></td>
+        <td><span style="font-size:11px">${cfg.name}</span></td>
         <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</td>
         <td style="font-size:11.5px;color:var(--text2)">${p.site||'—'}</td>
         <td style="font-size:11px;color:var(--text2)">${fmtShort(p.permit_issued_at)}</td>
@@ -1002,7 +1001,6 @@ function renderTypeGrid() {
   const el = document.getElementById('type-grid');
   el.innerHTML = Object.entries(PERMIT_TYPES).map(([type, cfg]) => `
     <div class="type-card ${selectedType===type?'selected':''}" id="tc-${type}" onclick="selectType('${type}')">
-      <div class="type-icon">${cfg.icon}</div>
       <div class="type-name">${cfg.name}</div>
       <div class="type-desc">${cfg.desc}</div>
       <div class="type-risk">${riskChip(cfg.risk)}</div>
@@ -1042,7 +1040,7 @@ function selectWorker(id, name, title, field) {
     document.getElementById('f-lead-search').value = name;
     const sel = document.getElementById('lead-selected');
     sel.style.display = 'flex';
-    sel.innerHTML = `<span>👷 <strong>${name}</strong> — ${title}</span><button class="btn btn-ghost btn-sm" onclick="clearLead()" style="padding:2px 6px">✕</button>`;
+    sel.innerHTML = `<span><strong>${name}</strong> — ${title}</span><button class="btn btn-ghost btn-sm" onclick="clearLead()" style="padding:2px 6px">&times;</button>`;
   }
   document.getElementById(`${field}-ac`).style.display = 'none';
 }
@@ -1168,7 +1166,7 @@ function renderStep3Controls() {
 
   hdr.innerHTML = `
     <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 13px">
-      <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:2px">${cfg.icon||''} ${cfg.name||''} — Control Verification</div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:2px">${cfg.name||''} — Control Verification</div>
       <div style="font-size:11px;color:var(--text2)">Verify all applicable controls before proceeding. These are recorded on the permit.</div>
     </div>`;
 
@@ -1240,7 +1238,7 @@ function toggleVerify(checked) {
   box.className = 'verify-box' + (checked ? ' done' : '');
   notes.disabled = !checked;
   lbl.textContent = checked
-    ? '✓ I confirm I have physically walked down the job site'
+    ? 'I confirm I have physically walked down the job site'
     : 'I have NOT walked down the job site';
   lbl.style.color = checked ? 'var(--ok)' : 'var(--text2)';
 }
@@ -1254,7 +1252,7 @@ function renderReviewSummary() {
   const leadName = lead ? `${lead.first_name} ${lead.last_name}` : '—';
 
   const rows = [
-    ['Permit Type', `${cfg.icon||''} ${cfg.name||'—'}`],
+    ['Permit Type', `${cfg.name||'—'}`],
     ['Title', formData.title||'—'],
     ['Site', formData.site||'—'],
     ['Location', formData.location||'—'],
@@ -1319,7 +1317,7 @@ function updateStepIndicator() {
     const lbl = document.getElementById('slbl-'+i);
     if (!dot||!lbl) continue;
     dot.className = 'step-dot'+(i<formStep?' done':i===formStep?' active':'');
-    dot.textContent = i<formStep ? '✓' : String(i);
+    dot.textContent = i<formStep ? '\u2713' : String(i);
     lbl.className = 'step-lbl'+(i<formStep?' done':i===formStep?' active':'');
   }
 }
@@ -1360,7 +1358,7 @@ async function submitAndIssuePermit() {
   if (!createRes.ok || !createRes.data?.permit) {
     const err = createRes.data?.error || createRes.data?.message || `HTTP ${createRes.status}`;
     toast(`Failed to create permit: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    btn.disabled = false; btn.textContent = 'Issue Permit';
     return;
   }
   const pid = createRes.data.permit.id;
@@ -1371,7 +1369,7 @@ async function submitAndIssuePermit() {
   if (!controlsRes.ok) {
     const err = controlsRes.data?.error || `HTTP ${controlsRes.status}`;
     toast(`Control verification failed to save: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    btn.disabled = false; btn.textContent = 'Issue Permit';
     return;
   }
 
@@ -1380,7 +1378,7 @@ async function submitAndIssuePermit() {
   if (!submitRes.ok) {
     const err = submitRes.data?.error || `HTTP ${submitRes.status}`;
     toast(`Submit failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    btn.disabled = false; btn.textContent = 'Issue Permit';
     return;
   }
 
@@ -1394,7 +1392,7 @@ async function submitAndIssuePermit() {
   if (!fvRes.ok) {
     const err = fvRes.data?.error || `HTTP ${fvRes.status}`;
     toast(`Field verify failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    btn.disabled = false; btn.textContent = 'Issue Permit';
     return;
   }
 
@@ -1403,7 +1401,7 @@ async function submitAndIssuePermit() {
   if (!issueRes.ok) {
     const err = issueRes.data?.error || issueRes.data?.message || `HTTP ${issueRes.status}`;
     toast(`Issue failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = '✓ Issue Permit';
+    btn.disabled = false; btn.textContent = 'Issue Permit';
     return;
   }
 
@@ -1470,7 +1468,7 @@ function resetForm() {
   if (vl) { vl.textContent = 'I have NOT walked down the job site'; vl.style.color=''; }
 
   const ib = document.getElementById('issue-btn');
-  if (ib) { ib.disabled=false; ib.textContent='✓ Issue Permit'; }
+  if (ib) { ib.disabled=false; ib.textContent='Issue Permit'; }
 
   renderTypeGrid();
   goStep(1, true);
@@ -1484,11 +1482,11 @@ async function viewPermit(id) {
 
   const res = await apiGet(`/api/permits/${id}`);
   if (!res || !res.permit) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load permit</div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>Could not load permit</div>`;
     return;
   }
   const p = res.permit;
-  const cfg = PERMIT_TYPES[p.permit_type]||{icon:'📋',name:fmt(p.permit_type)};
+  const cfg = PERMIT_TYPES[p.permit_type]||{name:fmt(p.permit_type)};
 
   const WORKFLOW = ['draft','submitted','reviewed','issued','active','closed'];
   const wfIdx = WORKFLOW.indexOf(p.status);
@@ -1508,7 +1506,7 @@ async function viewPermit(id) {
       const val = ptc[d.key];
       let display = '—';
       if (d.type==='toggle') display = val===true || val==='true'
-        ? '<span class="chip ok">✓ Yes</span>'
+        ? '<span class="chip ok">Yes</span>'
         : (val===false||val==='false'?'<span class="chip muted">No / N/A</span>':'<span class="chip muted">Not set</span>');
       else display = `<span style="font-size:12px;color:var(--text)">${val||'—'}</span>`;
       return `
@@ -1532,7 +1530,7 @@ async function viewPermit(id) {
         return `
           ${i>0?`<div class="wf-connector${isDone||isActive?' done':''}"></div>`:''}
           <div class="wf-node">
-            <div class="wf-dot${dotCls?' '+dotCls:''}">${isDone?'✓':String(i+1)}</div>
+            <div class="wf-dot${dotCls?' '+dotCls:''}">${isDone?'\u2713':String(i+1)}</div>
             <div class="wf-label${lblCls?' '+lblCls:''}">${lbl}</div>
           </div>`;
       }).join('')}
@@ -1544,7 +1542,7 @@ async function viewPermit(id) {
     <div class="section-title">Signatories</div>
     ${sigs.map(s=>`
     <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;font-size:12px">
-      <span style="color:var(--ok)">✓</span>
+      <span style="color:var(--ok)">\u2713</span>
       <span>${s.first_name||''} ${s.last_name||''} — <span style="color:var(--muted)">${s.role||'Signatory'}</span></span>
       <span style="margin-left:auto;font-size:10.5px;color:var(--muted)">${fmtShort(s.signed_at)}</span>
     </div>`).join('')}` : '';
@@ -1554,7 +1552,7 @@ async function viewPermit(id) {
   const crewHtml = crew.length ? `
     <div class="section-title">Signed-On Workers (${crew.length})</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">${crew.map(w=>`
-      <span class="chip blue">👷 ${w.first_name||''} ${w.last_name||''}</span>
+      <span class="chip blue">${w.first_name||''} ${w.last_name||''}</span>
     `).join('')}</div>` : '';
 
   // Revalidations
@@ -1572,9 +1570,9 @@ async function viewPermit(id) {
   const closeoutHtml = closeout ? `
     <div class="section-title">Closeout</div>
     <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:7px;padding:12px 14px">
-      <div style="font-size:12px;font-weight:600;color:var(--ok);margin-bottom:5px">✓ Permit Closed ${fmtShort(p.closeout_at)}</div>
+      <div style="font-size:12px;font-weight:600;color:var(--ok);margin-bottom:5px">Permit Closed ${fmtShort(p.closeout_at)}</div>
       ${p.closeout_notes?`<div style="font-size:12px;color:var(--text2)">${p.closeout_notes}</div>`:''}
-      ${p.deficiencies_found?`<div style="font-size:12px;color:var(--danger);margin-top:5px">⚠️ Deficiencies found: ${p.deficiency_notes||''}</div>`:''}
+      ${p.deficiencies_found?`<div style="font-size:12px;color:var(--danger);margin-top:5px">Deficiencies found: ${p.deficiency_notes||''}</div>`:''}
     </div>` : '';
 
   // SIMOPS
@@ -1582,7 +1580,7 @@ async function viewPermit(id) {
   const simopsHtml = simops.length ? `
     <div class="section-title">SIMOPS Conflicts</div>
     <div class="simops-card">${simops.map(s=>
-      `<div style="font-size:11.5px;color:var(--warn);padding:2px 0">⚠️ ${s}</div>`
+      `<div style="font-size:11.5px;color:var(--warn);padding:2px 0">${s}</div>`
     ).join('')}</div>` : '';
 
   // Action buttons
@@ -1591,14 +1589,14 @@ async function viewPermit(id) {
   const actionHtml = isActive_ ? `
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-warn btn-sm" onclick="suspendPermit('${p.id}')">⏸ Suspend</button>
-      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">✓ Close Permit</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">Close Permit</button>
     </div>` :
     isSuspended_ ? `
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="padding:8px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:7px;font-size:11.5px;color:var(--warn)">
         ⏸ Suspended: ${p.suspension_reason||'No reason given'}
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">✓ Close Permit</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">Close Permit</button>
     </div>` : '';
 
   el.innerHTML = `
@@ -1607,10 +1605,10 @@ async function viewPermit(id) {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
           <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${p.permit_number}</div>
-          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px">${cfg.icon} ${p.title}</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px">${p.title}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
             ${statusChip(p.status)}${riskChip(p.risk_tier)}${typeChip(p.permit_type)}
-            <span class="chip muted">📍 ${p.site||'—'}</span>
+            <span class="chip muted">${p.site||'—'}</span>
             ${p.location_detail?`<span class="chip muted">${p.location_detail}</span>`:''}
           </div>
         </div>
@@ -1625,7 +1623,7 @@ async function viewPermit(id) {
     <div class="detail-grid" style="margin-bottom:12px">
       <div class="detail-field">
         <div class="detail-field-label">Worker Lead</div>
-        <div class="detail-field-val">👷 ${leadName}</div>
+        <div class="detail-field-val">${leadName}</div>
       </div>
       <div class="detail-field">
         <div class="detail-field-label">Permit Issuer</div>
@@ -1654,7 +1652,7 @@ async function viewPermit(id) {
       <div class="detail-field">
         <div class="detail-field-label">Field Verified</div>
         <div class="detail-field-val">${p.issuer_verified_field
-          ? `<span style="color:var(--ok)">✓ ${fmtShort(p.issuer_field_verification_at)}</span>`
+          ? `<span style="color:var(--ok)">\u2713 ${fmtShort(p.issuer_field_verification_at)}</span>`
           : '<span style="color:var(--muted)">Not verified</span>'}</div>
       </div>
       <div class="detail-field">

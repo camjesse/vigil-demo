@@ -33,7 +33,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 /* TOPBAR */
 .topbar{
-  background:linear-gradient(90deg,#090E18,#0C1520);
+  background:var(--s1);
   border-bottom:1px solid var(--border);
   padding:0 24px;
   height:56px;
@@ -47,15 +47,15 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   background:linear-gradient(135deg,#00C2FF,#00E5A0);
   display:flex;align-items:center;justify-content:center;font-size:15px;
 }
-.logo-name{font-variant-numeric:tabular-nums;font-size:17px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#00C2FF,#00E5A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-name{font-variant-numeric:tabular-nums;font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--text)}
 .logo-module{font-size:11px;color:var(--muted);margin-left:4px;letter-spacing:.5px}
 .topbar-right{display:flex;align-items:center;gap:16px}
 .company-badge{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2)}
-.user-dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;cursor:pointer}
+.user-dot{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;cursor:pointer}
 
 /* ALERT BANNER */
 .alert-banner{
-  background:linear-gradient(90deg,rgba(255,69,69,.12),rgba(255,184,0,.08));
+  background:rgba(255,69,69,.1);
   border-bottom:1px solid rgba(255,69,69,.2);
   padding:8px 24px;
   display:flex;align-items:center;gap:16px;
@@ -344,6 +344,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   animation:spin .8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+.logo-shield svg{width:15px;height:15px;color:#04141B}.nav-icon svg{width:14px;height:14px;display:block;margin:0 auto}.empty-icon svg{width:36px;height:36px}.drawer-close svg{width:14px;height:14px}#toastIcon svg{width:15px;height:15px;display:block;color:var(--a3)}.cred-icon svg{width:16px;height:16px}
 </style>
 <link rel="stylesheet" href="vigil-module.css?v=20260607-3">
 </head>
@@ -354,21 +355,21 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-shield">🛡️</div>
+    <div class="logo-shield"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/> </svg></div>
     <div>
       <span class="logo-name">VIGIL</span>
       <span class="logo-module">/ Employee & Credential Registry</span>
     </div>
   </div>
   <div class="topbar-right">
-    <div class="company-badge">🚛 Northern Express Transport Ltd.</div>
+    <div class="company-badge">Northern Express Transport Ltd.</div>
     <div class="user-dot" id="signed-in-user-dot" title="Signed-in user">?</div>
   </div>
 </div>
 
 <!-- ALERT BANNER -->
 <div class="alert-banner" id="alertBanner">
-  <span style="color:var(--danger);font-weight:600;font-size:12px">⚠️ Action Required:</span>
+  <span style="color:var(--danger);font-weight:600;font-size:12px">Action Required:</span>
   <div class="alert-item" style="color:var(--danger)" onclick="setFilter('expired')">
     <div class="alert-dot" style="background:var(--danger)"></div>
     <span id="expiredCount">0</span> expired credentials
@@ -384,8 +385,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <span id="noncompliantCount">0</span> workers non-compliant
   </div>
   <div style="margin-left:auto;display:flex;gap:8px">
-    <button class="btn btn-warn btn-sm" onclick="notifyAll()">📧 Notify All</button>
-    <button class="btn btn-ghost btn-sm" onclick="exportReport()">⬇ Export Report</button>
+    <button class="btn btn-warn btn-sm" onclick="notifyAll()">Notify All</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportReport()">Export Report</button>
   </div>
 </div>
 
@@ -397,47 +398,47 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <div class="nav-section">
     <div class="nav-label">Registry</div>
     <div class="nav-item active" onclick="showPanel('roster')">
-      <span class="nav-icon">👷</span> All Employees
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/> <path d="M16 3.128a4 4 0 0 1 0 7.744"/> <path d="M22 21v-2a4 4 0 0 0-3-3.87"/> <circle cx="9" cy="7" r="4"/> </svg></span> All Employees
       <span class="nav-badge nb-blue" id="navTotal">0</span>
     </div>
     <div class="nav-item" onclick="showPanel('alerts')">
-      <span class="nav-icon">⚠️</span> Compliance Alerts
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/> <path d="M12 9v4"/> <path d="M12 17h.01"/> </svg></span> Compliance Alerts
       <span class="nav-badge nb-red" id="navAlerts">0</span>
     </div>
     <div class="nav-item" onclick="showPanel('expiring')">
-      <span class="nav-icon">📅</span> Expiring Soon
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 6v6l4 2"/> <circle cx="12" cy="12" r="10"/> </svg></span> Expiring Soon
       <span class="nav-badge nb-warn" id="navExpiring">0</span>
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">By Role</div>
     <div class="nav-item" onclick="filterByRole('Driver')">
-      <span class="nav-icon">🚛</span> Drivers
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/> <path d="M15 18H9"/> <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/> <circle cx="17" cy="18" r="2"/> <circle cx="7" cy="18" r="2"/> </svg></span> Drivers
       <span class="nav-badge nb-blue" id="navDrivers">0</span>
     </div>
     <div class="nav-item" onclick="filterByRole('Dispatcher')">
-      <span class="nav-icon">📡</span> Dispatchers
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/> <path d="m9 14 2 2 4-4"/> </svg></span> Dispatchers
     </div>
     <div class="nav-item" onclick="filterByRole('Mechanic')">
-      <span class="nav-icon">🔧</span> Mechanics
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/> <circle cx="12" cy="12" r="3"/> </svg></span> Mechanics
     </div>
     <div class="nav-item" onclick="filterByRole('Supervisor')">
-      <span class="nav-icon">👔</span> Supervisors
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/> <path d="M14 6a6 6 0 0 1 6 6v3"/> <path d="M4 15v-3a6 6 0 0 1 6-6"/> <rect x="2" y="15" width="20" height="4" rx="1"/> </svg></span> Supervisors
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Credentials</div>
     <div class="nav-item" onclick="showPanel('credlibrary')">
-      <span class="nav-icon">📋</span> Credential Types
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/> <path d="M14 2v4a2 2 0 0 0 2 2h4"/> <path d="m9 15 2 2 4-4"/> </svg></span> Credential Types
     </div>
     <div class="nav-item" onclick="showPanel('dashboard')">
-      <span class="nav-icon">📊</span> Compliance Dashboard
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect width="7" height="9" x="3" y="3" rx="1"/> <rect width="7" height="5" x="14" y="3" rx="1"/> <rect width="7" height="9" x="14" y="12" rx="1"/> <rect width="7" height="5" x="3" y="16" rx="1"/> </svg></span> Compliance Dashboard
     </div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Settings</div>
     <div class="nav-item" onclick="showPanel('settings')">
-      <span class="nav-icon">⚙️</span> Notifications
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M10.268 21a2 2 0 0 0 3.464 0"/> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/> </svg></span> Notifications
     </div>
   </div>
 </div>
@@ -454,7 +455,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     </div>
     <div class="page-actions">
       <div class="search-bar">
-        <span style="color:var(--muted);font-size:14px">🔍</span>
+        <span style="color:var(--muted);display:flex"><svg style="width:14px;height:14px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21 21-4.34-4.34"/> <circle cx="11" cy="11" r="8"/> </svg></span>
         <input type="text" placeholder="Search by name, ID, or role..." id="searchInput" oninput="filterRoster()">
       </div>
       <button class="btn btn-primary" onclick="openDrawer('add')">+ Add Employee</button>
@@ -465,9 +466,9 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
   <div class="filter-row">
     <button class="filter-chip active" onclick="setFilter('all')" id="filter-all">All Workers</button>
-    <button class="filter-chip danger" onclick="setFilter('expired')" id="filter-expired">🔴 Expired</button>
-    <button class="filter-chip warn" onclick="setFilter('expiring')" id="filter-expiring">🟡 Expiring Soon</button>
-    <button class="filter-chip" onclick="setFilter('compliant')" id="filter-compliant">🟢 Fully Compliant</button>
+    <button class="filter-chip danger" onclick="setFilter('expired')" id="filter-expired">Expired</button>
+    <button class="filter-chip warn" onclick="setFilter('expiring')" id="filter-expiring">Expiring Soon</button>
+    <button class="filter-chip" onclick="setFilter('compliant')" id="filter-compliant">Fully Compliant</button>
     <button class="filter-chip" onclick="setFilter('noncompliant')" id="filter-noncompliant">Non-Compliant</button>
     <div style="margin-left:auto;display:flex;gap:6px">
       <select class="form-input form-select btn-sm" style="width:auto;padding:5px 28px 5px 10px" onchange="filterByRoleSelect(this.value)">
@@ -485,8 +486,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <div class="card-hdr">
       <div class="card-title">Workers — <span id="rosterCount">0</span> shown</div>
       <div style="display:flex;gap:8px">
-        <div class="card-action" onclick="exportReport()">⬇ Export CSV</div>
-        <div class="card-action" onclick="notifyAll()" style="color:var(--warn)">📧 Notify Non-Compliant</div>
+        <div class="card-action" onclick="exportReport()">Export CSV</div>
+        <div class="card-action" onclick="notifyAll()" style="color:var(--warn)">Notify Non-Compliant</div>
       </div>
     </div>
     <div style="overflow-x:auto">
@@ -509,7 +510,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       </table>
     </div>
     <div id="emptyState" class="empty" style="display:none">
-      <div class="empty-icon">👷</div>
+      <div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/> <path d="M16 3.128a4 4 0 0 1 0 7.744"/> <path d="M22 21v-2a4 4 0 0 0-3-3.87"/> <circle cx="9" cy="7" r="4"/> </svg></div>
       <div class="empty-title">No employees found</div>
       <div class="empty-sub">Try adjusting your search or filters</div>
       <button class="btn btn-primary btn-sm" onclick="openDrawer('add')">+ Add First Employee</button>
@@ -524,7 +525,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Compliance Alerts</div>
       <div class="page-sub">Expired credentials requiring immediate action</div>
     </div>
-    <button class="btn btn-warn" onclick="notifyAll()">📧 Send All Notifications</button>
+    <button class="btn btn-warn" onclick="notifyAll()">Send All Notifications</button>
   </div>
   <div id="alertsList"></div>
 </div>
@@ -536,7 +537,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Expiring Within 30 Days</div>
       <div class="page-sub">Proactive credential management — act before expiry</div>
     </div>
-    <button class="btn btn-warn" onclick="notifyAll()">📧 Notify All</button>
+    <button class="btn btn-warn" onclick="notifyAll()">Notify All</button>
   </div>
   <div id="expiringList"></div>
 </div>
@@ -548,7 +549,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Compliance Dashboard</div>
       <div class="page-sub">Overall credential health across your workforce</div>
     </div>
-    <button class="btn btn-ghost" onclick="exportReport()">⬇ Export Report</button>
+    <button class="btn btn-ghost" onclick="exportReport()">Export Report</button>
   </div>
   <div id="dashboardContent"></div>
 </div>
@@ -638,7 +639,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <div class="card">
     <div class="card-hdr"><div class="card-title">Compliance Rules</div></div>
     <div class="card-body">
-      <div class="alert blue">⚙️ These rules determine when a worker is flagged as non-compliant and restricted from safety-critical tasks.</div>
+      <div class="alert blue">These rules determine when a worker is flagged as non-compliant and restricted from safety-critical tasks.</div>
       <div class="form-grid">
         <div class="form-group">
           <div class="form-label">Driver License — Must Be Valid To</div>
@@ -662,7 +663,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <div class="drawer" id="drawer">
   <div class="drawer-hdr">
     <div class="drawer-title" id="drawerTitle">Add Employee</div>
-    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+    <div class="drawer-close" onclick="closeDrawer()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M18 6 6 18"/> <path d="m6 6 12 12"/> </svg></div>
   </div>
   <div class="drawer-body" id="drawerBody"></div>
   <div class="drawer-footer" id="drawerFooter"></div>
@@ -679,7 +680,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <span id="toastIcon">✅</span>
+  <span id="toastIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></span>
   <span id="toastMsg"></span>
 </div>
 
@@ -692,7 +693,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 <!-- API ERROR BANNER -->
 <div id="apiErrorBanner" style="display:none;position:fixed;top:56px;left:0;right:0;z-index:400;background:rgba(255,69,69,.1);border-bottom:1px solid rgba(255,69,69,.3);padding:10px 24px;align-items:center;gap:12px;font-size:12.5px;color:#FF8888">
-  <span>⚠️</span>
+  <svg style="width:15px;height:15px;flex-shrink:0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/> <path d="M12 9v4"/> <path d="M12 17h.01"/> </svg>
   <span id="apiErrorMsg">API connection failed</span>
   <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="init()">↺ Retry</button>
 </div>
@@ -859,16 +860,16 @@ async function init() {
 // DATA STORE
 // ============================================================
 const CRED_TYPES = [
-  {key:'license',       label:"Driver's License",    icon:'🪪', required:['Driver']},
-  {key:'whmis',         label:'WHMIS 2015',           icon:'☢️', required:['Driver','Mechanic','Dispatcher','Supervisor','HSE Coordinator']},
-  {key:'tdg',           label:'TDG (Dangerous Goods)',icon:'⚠️', required:['Driver']},
-  {key:'h2s',           label:'H2S Alive',            icon:'⚗️', required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
-  {key:'fallprotection',label:'Fall Protection',      icon:'🪢', required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
-  {key:'abstract',      label:'Driver Abstract',      icon:'📄', required:[]},
-  {key:'medical',       label:'Medical Certificate',  icon:'🏥', required:[]},
-  {key:'da',            label:'Drug & Alcohol Test',  icon:'🧪', required:[]},
-  {key:'firstaid',      label:'First Aid / CPR',      icon:'🩺', required:[]},
-  {key:'defensive',     label:'Defensive Driving',    icon:'🚗', required:[]},
+  {key:'license',       label:"Driver's License",    required:['Driver']},
+  {key:'whmis',         label:'WHMIS 2015',           required:['Driver','Mechanic','Dispatcher','Supervisor','HSE Coordinator']},
+  {key:'tdg',           label:'TDG (Dangerous Goods)',required:['Driver']},
+  {key:'h2s',           label:'H2S Alive',            required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
+  {key:'fallprotection',label:'Fall Protection',      required:['Driver','Mechanic','Supervisor','HSE Coordinator']},
+  {key:'abstract',      label:'Driver Abstract',      required:[]},
+  {key:'medical',       label:'Medical Certificate',  required:[]},
+  {key:'da',            label:'Drug & Alcohol Test',  required:[]},
+  {key:'firstaid',      label:'First Aid / CPR',      required:[]},
+  {key:'defensive',     label:'Defensive Driving',    required:[]},
 ];
 
 let employees = [];
@@ -968,7 +969,7 @@ function renderRoster() {
     return `<tr onclick="openEmployeeDetail('${emp.id}')" ${selectedEmpId === emp.id ? 'class="selected"' : ''}>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0">${emp.name.charAt(0)}</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:${roleColor(emp.role)};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0">${emp.name.charAt(0)}</div>
           <div>
             <div style="font-weight:600;font-size:12.5px">${emp.name}</div>
             <div style="font-size:10px;color:var(--muted)">${emp.id} · ${emp.site}</div>
@@ -994,8 +995,8 @@ function renderRoster() {
 }
 
 function roleColor(role) {
-  const colors = {Driver:'#00C2FF,#0080AA',Supervisor:'#9B6DFF,#6040AA',Mechanic:'#FF6B35,#AA4020',Dispatcher:'#00E5A0,#00A070','HSE Coordinator':'#FFB800,#AA8000'};
-  return colors[role] || '#4A6880,#2A4860';
+  const colors = {Driver:'#00C2FF',Supervisor:'#9B6DFF',Mechanic:'#FF6B35',Dispatcher:'#00E5A0','HSE Coordinator':'#FFB800'};
+  return colors[role] || '#4A6880';
 }
 
 // ============================================================
@@ -1098,7 +1099,7 @@ function openEmployeeDetail(empId) {
     const expiryText = expiry ? `${new Date(expiry).toLocaleDateString('en-CA')} (${days < 0 ? Math.abs(days) + 'd overdue' : days + 'd remaining'})` : 'Not recorded';
     return `
       <div class="cred-card" style="background:${bgColor};border-color:${borderColor}">
-        <div class="cred-icon" style="background:${bgColor}">${ct.icon}</div>
+        <div class="cred-icon" style="background:${bgColor}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/> <circle cx="12" cy="8" r="6"/> </svg></div>
         <div class="cred-body">
           <div class="cred-name">${ct.label}</div>
           <div class="cred-detail">${expiryText}${cred?.issuer ? ' · ' + cred.issuer : ''}</div>
@@ -1110,7 +1111,7 @@ function openEmployeeDetail(empId) {
 
   document.getElementById('drawerBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
+      <div style="width:48px;height:48px;border-radius:50%;background:${roleColor(emp.role)};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
       <div>
         <div style="font-variant-numeric:tabular-nums;font-size:16px;font-weight:700">${emp.name}</div>
         <div style="font-size:12px;color:var(--muted)">${emp.id} · ${emp.role} · ${emp.site}</div>
@@ -1145,17 +1146,17 @@ function openEmployeeDetail(empId) {
     <div id="dt-history" style="display:none">
       <div class="section-label">Activity Log</div>
       <div style="font-size:12px;color:var(--muted);line-height:2">
-        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--a3)">✓</span> Employee record created — ${emp.startDate}</div>
-        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--accent)">📧</span> Last compliance notification sent — <em>Auto-generated</em></div>
-        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px"><span style="color:var(--warn)">⚠️</span> Compliance flag raised — credential expiry detected</div>
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px">Employee record created — ${emp.startDate}</div>
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px">Last compliance notification sent — <em>Auto-generated</em></div>
+        <div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px">Compliance flag raised — credential expiry detected</div>
       </div>
     </div>
   `;
 
   document.getElementById('drawerFooter').innerHTML = `
-    <button class="btn btn-primary" onclick="openDrawer('edit','${emp.id}')">✏️ Edit Record</button>
-    <button class="btn btn-warn" onclick="sendNotification('${emp.id}')">📧 Send Notification</button>
-    <button class="btn btn-ghost" style="margin-left:auto" onclick="deleteEmployee('${emp.id}')">🗑 Remove</button>
+    <button class="btn btn-primary" onclick="openDrawer('edit','${emp.id}')">Edit Record</button>
+    <button class="btn btn-warn" onclick="sendNotification('${emp.id}')">Send Notification</button>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="deleteEmployee('${emp.id}')">Remove</button>
   `;
 
   openDrawerEl();
@@ -1230,12 +1231,12 @@ function openDrawer(mode, empId) {
     </div>
 
     <div class="section-label" style="margin-top:6px">Credential Expiry Dates</div>
-    <div class="alert blue" style="margin-bottom:12px">📋 Enter expiry dates for credentials this worker currently holds. Leave blank if not yet obtained — the system will flag as "Not on file."</div>
+    <div class="alert blue" style="margin-bottom:12px">Enter expiry dates for credentials this worker currently holds. Leave blank if not yet obtained — the system will flag as "Not on file."</div>
     <div id="credFields">
       ${CRED_TYPES.map(ct => `
         <div class="form-grid" style="margin-bottom:8px">
           <div class="form-group">
-            <div class="form-label">${ct.icon} ${ct.label}</div>
+            <div class="form-label">${ct.label}</div>
             <input class="form-input" id="f-cred-${ct.key}" type="date" value="${emp?.creds[ct.key]?.expiry || ''}">
           </div>
           <div class="form-group">
@@ -1248,7 +1249,7 @@ function openDrawer(mode, empId) {
   `;
 
   document.getElementById('drawerFooter').innerHTML = `
-    <button class="btn btn-primary" onclick="saveEmployee('${emp?.id || ''}')">${emp ? '💾 Save Changes' : '✅ Add Employee'}</button>
+    <button class="btn btn-primary" onclick="saveEmployee('${emp?.id || ''}')">${emp ? 'Save Changes' : 'Add Employee'}</button>
     <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
   `;
 
@@ -1302,7 +1303,7 @@ function saveEmployee(existingId) {
       email: document.getElementById('f-email').value,
       creds,
     };
-    showToast('success', '✅ ' + name + "'s record updated successfully");
+    showToast('success', name + "'s record updated successfully");
   } else {
     const newId = 'EMP-' + String(employees.length + 1).padStart(3, '0');
     employees.push({
@@ -1316,7 +1317,7 @@ function saveEmployee(existingId) {
       status: 'active',
       creds,
     });
-    showToast('success', '✅ ' + name + ' added to registry');
+    showToast('success', name + ' added to registry');
   }
 
   closeDrawer();
@@ -1341,7 +1342,7 @@ function confirmDelete(empId) {
   closeDrawer();
   closeModal();
   renderAll();
-  showToast('success', '🗑 ' + emp.name + ' removed from registry');
+  showToast('success', emp.name + ' removed from registry');
 }
 
 // ============================================================
@@ -1354,7 +1355,7 @@ function renderAlertsPanel() {
   });
 
   if (nonCompliant.length === 0) {
-    document.getElementById('alertsList').innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">No compliance alerts</div><div class="empty-sub">All credentials are current</div></div>`;
+    document.getElementById('alertsList').innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div><div class="empty-title">No compliance alerts</div><div class="empty-sub">All credentials are current</div></div>`;
     return;
   }
 
@@ -1367,7 +1368,7 @@ function renderAlertsPanel() {
       <div class="card" style="border-color:rgba(255,69,69,.25);margin-bottom:12px">
         <div class="card-hdr" style="background:rgba(255,69,69,.05)">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${roleColor(emp.role)});display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
+            <div style="width:32px;height:32px;border-radius:50%;background:${roleColor(emp.role)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000">${emp.name.charAt(0)}</div>
             <div>
               <div style="font-size:13px;font-weight:600">${emp.name}</div>
               <div style="font-size:11px;color:var(--muted)">${emp.id} · ${emp.role} · ${emp.site}</div>
@@ -1375,7 +1376,7 @@ function renderAlertsPanel() {
             <span class="chip red" style="margin-left:8px">Non-Compliant</span>
           </div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-warn btn-sm" onclick="sendNotification('${emp.id}')">📧 Notify</button>
+            <button class="btn btn-warn btn-sm" onclick="sendNotification('${emp.id}')">Notify</button>
             <button class="btn btn-ghost btn-sm" onclick="openEmployeeDetail('${emp.id}');showPanel('roster')">View Record</button>
           </div>
         </div>
@@ -1383,10 +1384,10 @@ function renderAlertsPanel() {
           ${expiredCreds.map(ct => {
             const cred = emp.creds[ct.key];
             const days = cred ? Math.abs(daysUntil(cred.expiry)) : 0;
-            return `<div class="alert red" style="margin-bottom:6px">🔴 <strong>${ct.label}</strong> — Expired ${days} day${days !== 1 ? 's' : ''} ago${cred?.issuer ? ' · Issued by: ' + cred.issuer : ''}</div>`;
+            return `<div class="alert red" style="margin-bottom:6px"><strong>${ct.label}</strong> — Expired ${days} day${days !== 1 ? 's' : ''} ago${cred?.issuer ? ' · Issued by: ' + cred.issuer : ''}</div>`;
           }).join('')}
           <div style="display:flex;gap:6px;margin-top:8px">
-            <button class="btn btn-primary btn-sm" onclick="openDrawer('edit','${emp.id}')">✏️ Update Credentials</button>
+            <button class="btn btn-primary btn-sm" onclick="openDrawer('edit','${emp.id}')">Update Credentials</button>
           </div>
         </div>
       </div>`;
@@ -1413,7 +1414,7 @@ function renderExpiringPanel() {
   rows.sort((a,b) => a.days - b.days);
 
   if (rows.length === 0) {
-    document.getElementById('expiringList').innerHTML = `<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-title">No upcoming expiries</div><div class="empty-sub">All credentials are valid for more than 30 days</div></div>`;
+    document.getElementById('expiringList').innerHTML = `<div class="empty"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M12 6v6l4 2"/> <circle cx="12" cy="12" r="10"/> </svg></div><div class="empty-title">No upcoming expiries</div><div class="empty-sub">All credentials are valid for more than 30 days</div></div>`;
     return;
   }
 
@@ -1428,11 +1429,11 @@ function renderExpiringPanel() {
               <tr>
                 <td><strong>${r.emp.name}</strong><br><span style="font-size:10px;color:var(--muted)">${r.emp.id} · ${r.emp.site}</span></td>
                 <td><span class="chip gray">${r.emp.role}</span></td>
-                <td>${r.ct.icon} ${r.ct.label}</td>
+                <td>${r.ct.label}</td>
                 <td>${new Date(r.cred.expiry).toLocaleDateString('en-CA')}</td>
                 <td>${r.status === 'critical' ? `<span class="chip warn">${r.days}d left</span>` : `<span class="chip blue">${r.days}d left</span>`}</td>
                 <td><div style="display:flex;gap:5px">
-                  <button class="btn btn-warn btn-xs" onclick="sendNotification('${r.emp.id}')">📧 Notify</button>
+                  <button class="btn btn-warn btn-xs" onclick="sendNotification('${r.emp.id}')">Notify</button>
                   <button class="btn btn-ghost btn-xs" onclick="openDrawer('edit','${r.emp.id}');showPanel('roster')">Update</button>
                 </div></td>
               </tr>
@@ -1479,7 +1480,7 @@ function renderDashboard() {
         ${credHealth.map(ch => `
           <div style="margin-bottom:12px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <div style="font-size:12px;font-weight:600">${ch.ct.icon} ${ch.ct.label}</div>
+              <div style="font-size:12px;font-weight:600">${ch.ct.label}</div>
               <div style="display:flex;gap:6px;align-items:center">
                 ${ch.expired > 0 ? `<span class="chip red">${ch.expired} expired</span>` : ''}
                 ${ch.expiring > 0 ? `<span class="chip warn">${ch.expiring} expiring</span>` : ''}
@@ -1530,20 +1531,20 @@ function showPanel(id) {
 
 function sendNotification(empId) {
   const emp = employees.find(e => e.id === empId);
-  showToast('success', '📧 Notification sent to ' + emp.name + ' and their supervisor');
+  showToast('success', 'Notification sent to ' + emp.name + ' and their supervisor');
 }
 
 function notifyAll() {
   const count = employees.filter(e => overallCompliance(e).status !== 'compliant').length;
-  showToast('success', `📧 Notifications sent to ${count} non-compliant workers and supervisors`);
+  showToast('success', `Notifications sent to ${count} non-compliant workers and supervisors`);
 }
 
 function exportReport() {
-  showToast('success', '⬇ Compliance report exported — check your downloads');
+  showToast('success', 'Compliance report exported — check your downloads');
 }
 
 function saveSettings() {
-  showToast('success', '✅ Notification settings saved');
+  showToast('success', 'Notification settings saved');
 }
 
 function showToast(type, msg) {
@@ -1641,7 +1642,6 @@ const EMP_TERMS = {
     workerComp: 'WCB', hazcom: 'WHMIS',
     credTypes: ['H2S Alive', 'WHMIS 2015', 'First Aid CPR-C', 'Class 1 Licence', 'TC Medical Certificate', 'Confined Space Entry', 'Fall Protection', 'TDG', 'JHSC Part 1'],
     osha: 'OHS Act', regulator: 'Alberta OHS',
-    flag: '🍁',
   },
   us: {
     whmis: 'HazCom / GHS', licence: 'CDL Class A / Class B',
@@ -1649,7 +1649,6 @@ const EMP_TERMS = {
     workerComp: "Workers' Compensation", hazcom: 'HazCom 2012',
     credTypes: ['OSHA 10', 'OSHA 30', 'HazCom / GHS', 'CDL Class A', 'DOT Physical', 'Confined Space (OSHA 1910.146)', 'Fall Protection (OSHA 1926.502)', 'HazMat', 'Safety Committee Member'],
     osha: 'OSHA', regulator: 'Federal OSHA / State OSHA',
-    flag: '🇺🇸',
   }
 };
 
@@ -1681,7 +1680,7 @@ function updateEmpJurBanner() {
   banner.style.background = isUS ? 'rgba(0,194,255,.07)' : 'rgba(255,107,53,.07)';
   banner.style.border = isUS ? '1px solid rgba(0,194,255,.2)' : '1px solid rgba(255,107,53,.2)';
   banner.style.color = isUS ? '#00C2FF' : '#FF8C52';
-  banner.innerHTML = t.flag + ' <strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Licence: ' + t.licence + ' · Hazard Comm: ' + t.whmis + ' · Medical: ' + t.medCert + ' · Compensation: ' + t.workerComp + ' · Regulator: ' + t.regulator;
+  banner.innerHTML = '<strong>' + (isUS ? 'US Mode' : 'Canada Mode') + '</strong> — Licence: ' + t.licence + ' · Hazard Comm: ' + t.whmis + ' · Medical: ' + t.medCert + ' · Compensation: ' + t.workerComp + ' · Regulator: ' + t.regulator;
 }
 </script>
 </body>
