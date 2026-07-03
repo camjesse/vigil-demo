@@ -18,11 +18,11 @@
     style.id = 'vigil-auth-styles';
     style.textContent = `
       .vigil-auth-backdrop{position:fixed;inset:0;background:#070B12;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:auto}
-      .vigil-auth-card{box-sizing:border-box;width:min(400px,100%);max-width:100%;max-height:calc(100vh - 40px);overflow:auto;background:#0D121B;border:1px solid #263648;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:24px;color:#D7E3EE;font-family:'DM Sans',system-ui,sans-serif}
+      .vigil-auth-card{box-sizing:border-box;width:min(400px,100%);max-width:100%;max-height:calc(100vh - 40px);overflow:auto;background:#0D121B;border:1px solid #263648;border-radius:8px;box-shadow:0 24px 80px rgba(0,0,0,.45);padding:24px;color:#D7E3EE;font-family:'Inter',system-ui,sans-serif}
       .vigil-auth-brand{display:flex;align-items:center;gap:9px;margin-bottom:20px}
       .vigil-auth-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#21B8E6,#19C995);display:flex;align-items:center;justify-content:center;font-size:14px}
-      .vigil-auth-brand-name{font-family:'Syne',system-ui,sans-serif;font-size:16px;font-weight:800;color:#D7E3EE}
-      .vigil-auth-title{font-family:'Syne',system-ui,sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+      .vigil-auth-brand-name{font-variant-numeric:tabular-nums;font-size:16px;font-weight:800;color:#D7E3EE}
+      .vigil-auth-title{font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;margin-bottom:6px}
       .vigil-auth-copy{font-size:12.5px;line-height:1.55;color:#93A9BC;margin-bottom:18px}
       .vigil-auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
       .vigil-auth-field label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#93A9BC;font-weight:700}
@@ -48,7 +48,7 @@
       html.light-mode .topbar,html.light-mode .hdr{background:var(--s1)!important}
       html.light-mode input,html.light-mode select,html.light-mode textarea{color:var(--text)!important;background:var(--s1)!important}
       html.light-mode .vigil-mobile-dashboard{background:#FFFFFF;color:#102033}
-      @media(max-width:900px){.vigil-mobile-dashboard{position:fixed;left:12px;bottom:12px;z-index:2147483000;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;border:1px solid rgba(33,184,230,.45);background:#0D121B;color:#D7E3EE;padding:0 13px;font:700 11px 'DM Sans',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45);cursor:pointer}}
+      @media(max-width:900px){.vigil-mobile-dashboard{position:fixed;left:12px;bottom:12px;z-index:2147483000;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;border:1px solid rgba(33,184,230,.45);background:#0D121B;color:#D7E3EE;padding:0 13px;font:700 11px 'Inter',system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.45);cursor:pointer}}
       @media(max-width:700px){.vigil-session-user{display:none}.vigil-auth-card{padding:20px}}
     `;
     document.head.appendChild(style);

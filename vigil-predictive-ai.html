@@ -6,7 +6,7 @@
 <title>Vigil — Predictive AI Risk Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,7 +15,7 @@
   --text:#E2E8F0;--text2:#8BA0B8;--muted:#4A6880;
   --accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;--orange:#F97316;
   --cyan:#06B6D4;--purple:#8B5CF6;
-  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --font-head:'Inter',sans-serif;--font-body:'Inter',sans-serif;
   --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.45);
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5}
@@ -532,9 +532,9 @@ function gauge(score, big) {
       stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
       stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
     <text x="${cx}" y="${cy-4}" text-anchor="middle"
-      font-family="'Syne',sans-serif" font-size="${fs}" font-weight="800" fill="${color}">${Math.round(pct)}%</text>
+      font-family="'Inter',sans-serif" font-size="${fs}" font-weight="800" fill="${color}">${Math.round(pct)}%</text>
     <text x="${cx}" y="${cy+(big?14:10)}" text-anchor="middle"
-      font-family="'DM Sans',sans-serif" font-size="${big?10:8}" fill="var(--muted)">Risk Score</text>
+      font-family="'Inter',sans-serif" font-size="${big?10:8}" fill="var(--muted)">Risk Score</text>
   </svg>`;
 }
 

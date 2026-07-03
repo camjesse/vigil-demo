@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vigil — Hazard Assessment</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07090F;--s1:#0C1018;--s2:#101520;--s3:#151C28;--s4:#1A2232;--border:#1E2D40;--b2:#263648;--accent:#3B82F6;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;--purple:#8B5CF6;--cyan:#06B6D4;--orange:#F97316;--text:#C8DCF0;--text2:#8AAAC4;--muted:#4A6880}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* TOP BAR */
 .topbar{background:linear-gradient(90deg,#060A14,#091220);border-bottom:1px solid var(--border);height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100}
 .logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
 .logo-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:14px}
-.logo-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.logo-title{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;color:var(--text)}
 .logo-sub{font-size:9.5px;color:var(--muted);letter-spacing:.5px}
 .topbar-center{flex:1;display:flex;align-items:center;padding:0 16px}
 .breadcrumb{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
@@ -27,7 +27,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .12s;white-space:nowrap}
 .btn-primary{background:var(--warn);color:#000}
 .btn-primary:hover{background:#D97706}
 .btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(59,130,246,.3)}
@@ -60,7 +60,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .kpi-card.danger::before{background:linear-gradient(90deg,var(--danger),transparent)}
 .kpi-card.pu::before{background:linear-gradient(90deg,var(--purple),transparent)}
 .kpi-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
-.kpi-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1}
+.kpi-val{font-variant-numeric:tabular-nums;font-size:26px;font-weight:800;line-height:1}
 .kpi-card.bl .kpi-val{color:var(--accent)}
 .kpi-card.ok .kpi-val{color:var(--ok)}
 .kpi-card.warn .kpi-val{color:var(--warn)}
@@ -103,7 +103,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .live-row{display:flex;gap:0}
 .live-stat{flex:1;padding:12px 16px;border-right:1px solid var(--border);text-align:center}
 .live-stat:last-child{border-right:none}
-.live-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
+.live-val{font-variant-numeric:tabular-nums;font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}
 .live-lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 
 /* TEMPLATE GRID */
@@ -117,7 +117,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* FORM PANEL */
 .form-wrap{max-width:700px;margin:0 auto;padding:24px 18px}
-.form-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
+.form-title{font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;margin-bottom:4px}
 .form-sub{font-size:12px;color:var(--muted)}
 
 /* STEP BAR */
@@ -138,7 +138,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .form-label{font-size:10.5px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:5px}
 .form-label .req{color:var(--danger)}
-.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .14s;width:100%}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--text);font-family:'Inter',sans-serif;transition:border-color .14s;width:100%}
 .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--warn)}
 .form-select option{background:var(--s3)}
 .form-textarea{resize:vertical;min-height:70px;line-height:1.5}
@@ -153,7 +153,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .haz-desc{font-size:12px;font-weight:500;line-height:1.4;flex:1}
 .haz-meta{font-size:9.5px;color:var(--muted);margin-top:2px}
 .haz-actions{display:flex;gap:6px;margin-bottom:8px}
-.haz-btn{padding:4px 10px;border-radius:4px;font-size:10.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s3);color:var(--muted);transition:all .14s;font-family:'DM Sans',sans-serif}
+.haz-btn{padding:4px 10px;border-radius:4px;font-size:10.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s3);color:var(--muted);transition:all .14s;font-family:'Inter',sans-serif}
 .haz-btn:hover{border-color:var(--b2)}
 .haz-btn.sel-present{background:rgba(16,185,129,.15);border-color:var(--ok);color:var(--ok)}
 .haz-btn.sel-not_present{background:rgba(239,68,68,.15);border-color:var(--danger);color:var(--danger)}
@@ -186,7 +186,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* QUALITY RING */
 .q-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
-.q-ring-val{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1}
+.q-ring-val{font-variant-numeric:tabular-nums;font-size:36px;font-weight:800;line-height:1}
 .q-ring-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 
 /* CREW */
@@ -198,8 +198,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 /* DETAIL PANEL */
 .detail-wrap{max-width:760px;margin:0 auto;padding:24px 18px}
-.detail-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
-.detail-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.detail-num{font-variant-numeric:tabular-nums;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:4px}
+.detail-title{font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;line-height:1.25;margin-bottom:8px}
 .detail-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .detail-fact{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
@@ -212,9 +212,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 /* SUCCESS */
 .success-card{background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(16,185,129,.04));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:28px;text-align:center}
 .success-icon{font-size:44px;margin-bottom:12px}
-.success-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--warn);margin-bottom:4px}
+.success-num{font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;color:var(--warn);margin-bottom:4px}
 .success-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
-.success-score{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;margin:12px 0}
+.success-score{font-variant-numeric:tabular-nums;font-size:48px;font-weight:800;margin:12px 0}
 
 /* TIMELINE */
 .timeline{display:flex;align-items:center;gap:0;margin-bottom:18px;overflow-x:auto;padding-bottom:4px}
@@ -903,7 +903,7 @@ function renderKPIs() {
 function renderChart() {
   const el = document.getElementById('quality-chart');
   if (!el || !assessments.length) {
-    if (el) el.innerHTML = '<text x="200" y="60" text-anchor="middle" fill="#4A6880" font-size="12" font-family="DM Sans">No data yet</text>';
+    if (el) el.innerHTML = '<text x="200" y="60" text-anchor="middle" fill="#4A6880" font-size="12" font-family="Inter">No data yet</text>';
     return;
   }
 
@@ -935,9 +935,9 @@ function renderChart() {
     const y = H - 20 - barH;
     if (barH > 0) {
       svg += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="${b.hex}" opacity=".8"/>`;
-      svg += `<text x="${x+barW/2}" y="${y-4}" text-anchor="middle" fill="#8AAAC4" font-size="10" font-family="DM Sans">${b.count}</text>`;
+      svg += `<text x="${x+barW/2}" y="${y-4}" text-anchor="middle" fill="#8AAAC4" font-size="10" font-family="Inter">${b.count}</text>`;
     }
-    svg += `<text x="${x+barW/2}" y="${H-3}" text-anchor="middle" fill="#4A6880" font-size="9" font-family="DM Sans">${b.label}</text>`;
+    svg += `<text x="${x+barW/2}" y="${H-3}" text-anchor="middle" fill="#4A6880" font-size="9" font-family="Inter">${b.label}</text>`;
   });
   el.innerHTML = svg;
 }
@@ -960,7 +960,7 @@ function renderAssessmentsTable(list) {
         ? `${a.submitted_by_first_name} ${a.submitted_by_last_name}`
         : '—';
       return `<tr class="clickable" onclick="showDetail('${a.id}')">
-        <td><b style="color:var(--warn);font-family:'Syne',sans-serif;font-size:11px">${a.assessment_number}</b></td>
+        <td><b style="color:var(--warn);font-variant-numeric:tabular-nums;font-size:11px">${a.assessment_number}</b></td>
         <td style="max-width:200px"><div style="font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div>
           <div style="font-size:9.5px;color:var(--muted)">${a.template_title || ''}</div></td>
         <td>${typeChip(a.assessment_type)}</td>
@@ -1718,7 +1718,7 @@ function renderDetail(a) {
       </div>
       <div style="flex-shrink:0;text-align:center">
         <div style="font-size:9px;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Quality</div>
-        <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--${qsCls});line-height:1">${qs!=null?qs:'—'}</div>
+        <div style="font-variant-numeric:tabular-nums;font-size:32px;font-weight:800;color:var(--${qsCls});line-height:1">${qs!=null?qs:'—'}</div>
         <div style="font-size:9px;color:var(--muted)">/100</div>
       </div>
     </div>
