@@ -770,6 +770,27 @@ function escHtml(str) {
 }
 
 // ── FILE UPLOADS ──────────────────────────────────────────────
+const ICON_CLIP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-2px"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg>';
+// Attach a file to an EXISTING incident — uploads then appends to document_urls.
+async function addIncidentAttachment(id, input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  const btn = document.getElementById('inc-attach-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Uploading…'; }
+  try {
+    const file = await vigilUploadFile(f, 'incident');
+    const current = await apiGet('/api/incidents/' + id);
+    const existing = ((current && current.incident && current.incident.document_urls) || []).filter(Boolean);
+    const r = await fetch(API + '/api/incidents/' + id, {method:'PUT', headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}, body: JSON.stringify({document_urls: [...existing, file.url]})});
+    if (!r.ok) { const b = await r.json().catch(()=>({})); throw new Error(b.error || 'Could not attach file'); }
+    toast('File attached');
+    await showDetail(id);
+  } catch (e) {
+    toast(e.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = ICON_CLIP + ' Add file'; }
+  }
+}
 async function vigilUploadFile(file, entityType) {
   const fd = new FormData();
   fd.append('file', file);
@@ -1297,13 +1318,18 @@ function renderDetail(inc, detail = {}) {
         </div>`;
       }).join('');
   const docUrls = ((detail.incident && detail.incident.document_urls) || inc.document_urls || []).filter(Boolean);
-  const attachmentsHtml = docUrls.length ? `
-    <div class="section-title">Attachments (${docUrls.length})</div>
+  const attachmentsHtml = `
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Attachments (${docUrls.length})</span>
+      <button class="btn btn-sm" onclick="document.getElementById('inc-attach-input').click()" id="inc-attach-btn">${ICON_CLIP} Add file</button>
+      <input id="inc-attach-input" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,application/pdf,.doc,.docx,.xls,.xlsx,video/mp4,video/quicktime" style="display:none" onchange="addIncidentAttachment('${inc.id}',this)">
+    </div>
     <div class="desc-box" style="display:flex;flex-direction:column;gap:6px">
-      ${docUrls.map((u,i) => u.startsWith('/api/files/')
+      ${docUrls.length ? docUrls.map((u,i) => u.startsWith('/api/files/')
         ? `<a href="#" data-url="${escHtml(u)}" onclick="openIncidentAttachment(event,this)" style="font-size:11.5px;color:var(--accent)">Attachment ${i+1}</a>`
-        : `<a href="${escHtml(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);word-break:break-all">${escHtml(u)}</a>`).join('')}
-    </div>` : '';
+        : `<a href="${escHtml(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);word-break:break-all">${escHtml(u)}</a>`).join('')
+        : '<span style="font-size:11px;color:var(--muted)">No files attached yet.</span>'}
+    </div>`;
   const acknowledgementsHtml = acknowledgements.length
     ? acknowledgements.map(a => `<div class="capa-item"><div class="capa-dot" style="background:var(--ok)"></div><div class="capa-info"><div class="capa-title">${escHtml(a.first_name)} ${escHtml(a.last_name)}</div><div class="capa-meta">${escHtml(a.job_title || 'Responder')} · ${new Date(a.acknowledged_at).toLocaleString()}</div>${a.response_notes ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px">${escHtml(a.response_notes)}</div>` : ''}</div><span class="chip ok">Acknowledged</span></div>`).join('')
     : '<div class="desc-box">No responder has acknowledged this incident yet.</div>';
