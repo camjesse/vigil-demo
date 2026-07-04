@@ -28,7 +28,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <section class="panel" id="panel-dash">
       <div class="page-head">
         <div><div class="page-title">Inspections Workflow</div><div class="page-sub">A place to work the links from inspection action emails: open, complete, verify, and close the loop.</div></div>
-        <div class="actions"><button class="btn" onclick="refreshAll()">Refresh</button></div>
+        <div class="actions"><button class="btn" onclick="openTemplates()">Templates</button><button class="btn" onclick="refreshAll()">Refresh</button></div>
       </div>
 
       <div class="kpis">
@@ -77,6 +77,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
     <section class="panel hidden" id="panel-detail">
       <div id="detail-root"></div>
+    </section>
+
+    <section class="panel hidden" id="panel-templates">
+      <div class="page-head">
+        <div><div class="page-title">Inspection Templates</div><div class="page-sub">Build reusable checklists — sections and items with pass/fail, numeric, or photo responses. New inspections start from a template.</div></div>
+        <div class="actions"><button class="btn" onclick="showPanel('dash')">← Dashboard</button><button class="btn btn-primary" onclick="openCreateTemplate()">＋ New template</button></div>
+      </div>
+      <div class="card"><div class="card-body tbl-wrap" id="templates-table"></div></div>
+    </section>
+
+    <section class="panel hidden" id="panel-tmpl">
+      <div id="tmpl-root"></div>
     </section>
   </main>
 </div>
@@ -245,6 +257,130 @@ async function verifyAction(id){try{await api(`/api/actions/inspection_action/${
 async function mutate(path,method,body){try{await api(path,{method,body:JSON.stringify(body||{})});closeModal();toast('Saved');await refreshAll();if(current)await openDetail(current.id)}catch(e){toast(e.message)}}
 function modal(title,body,action,label='Save'){$('modal-title').textContent=title;$('modal-body').innerHTML=body;$('modal-foot').innerHTML=`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="modal-save">${label}</button>`;$('modal-save').onclick=action;$('modal').classList.add('show')}
 function closeModal(){$('modal').classList.remove('show')}
+
+// ── Template builder ───────────────────────────────────────────
+let templates=[], curTemplate=null;
+const INSPECTION_TYPES=['workplace','equipment','vehicle','fire_safety','environmental','housekeeping','regulatory','pre_use','audit','other'];
+const FREQUENCIES=['daily','weekly','monthly','quarterly','annual','ad_hoc','pre_use'];
+const RESPONSE_TYPES=['pass_fail','yes_no','numeric','text','multiple_choice','photo_required'];
+const opts=(arr,v)=>arr.map(o=>`<option value="${o}" ${o===v?'selected':''}>${esc(fmt(o))}</option>`).join('');
+const val=id=>$(id)?.value?.trim()||'';
+const checked=id=>!!$(id)?.checked;
+
+async function openTemplates(){await loadTemplates();showPanel('templates');renderTemplatesTable()}
+async function loadTemplates(){try{const r=await api('/api/inspections/templates');templates=r.templates||[]}catch(e){toast(e.message)}}
+function renderTemplatesTable(){
+  const el=$('templates-table');
+  if(!templates.length){el.innerHTML=`<div class="empty">No templates yet. <button class="btn btn-primary btn-sm" style="margin-left:8px" onclick="openCreateTemplate()">Create the first one</button></div>`;return}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Template</th><th>Type</th><th>Frequency</th><th>Items</th><th></th></tr></thead><tbody>${
+    templates.map(t=>`<tr class="clickable" onclick="openTemplate('${t.id}')"><td><div class="name">${esc(t.title)}</div><div class="meta">${esc(t.description||'')}</div></td><td>${chip(t.inspection_type)}</td><td>${esc(fmt(t.frequency))}</td><td>${t.item_count??'--'}</td><td><button class="btn btn-sm">Edit</button></td></tr>`).join('')
+  }</tbody></table>`;
+}
+function templateFormBody(t){return `
+  <div class="field"><label>Title</label><input class="input" id="t-title" style="width:100%" value="${esc(t?.title||'')}" placeholder="e.g. Daily Vehicle Pre-Use Inspection"></div>
+  <div class="field"><label>Description</label><input class="input" id="t-desc" style="width:100%" value="${esc(t?.description||'')}"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="field"><label>Type</label><select class="select" id="t-type" style="width:100%">${opts(INSPECTION_TYPES,t?.inspection_type||'workplace')}</select></div>
+    <div class="field"><label>Frequency</label><select class="select" id="t-freq" style="width:100%">${opts(FREQUENCIES,t?.frequency||'ad_hoc')}</select></div>
+  </div>
+  <div class="field"><label>Estimated duration (minutes)</label><input class="input" id="t-dur" type="number" min="1" style="width:100%" value="${t?.estimated_duration_minutes||''}"></div>
+  <div class="field"><label style="display:inline">Requirements</label>
+    <div style="display:flex;gap:16px;margin-top:4px">
+      <label style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);display:flex;gap:6px;align-items:center"><input type="checkbox" id="t-sig" ${t?t.requires_signature?'checked':'':'checked'}> Requires signature</label>
+      <label style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);display:flex;gap:6px;align-items:center"><input type="checkbox" id="t-photo" ${t?.requires_photos?'checked':''}> Requires photos</label>
+    </div>
+  </div>`;
+}
+function templatePayload(){
+  const dur=val('t-dur');
+  return {title:val('t-title'),description:val('t-desc')||null,inspection_type:$('t-type').value,frequency:$('t-freq').value,estimated_duration_minutes:dur?parseInt(dur):null,requires_signature:checked('t-sig'),requires_photos:checked('t-photo')};
+}
+function openCreateTemplate(){
+  modal('New template',templateFormBody(null),async()=>{
+    const p=templatePayload();if(!p.title)return toast('Title is required');
+    try{const r=await api('/api/inspections/templates',{method:'POST',body:JSON.stringify(p)});closeModal();await loadTemplates();openTemplate(r.template.id)}catch(e){toast(e.message)}
+  },'Create template');
+}
+function openEditTemplate(){
+  const t=curTemplate;
+  modal('Edit template',templateFormBody(t),async()=>{
+    const p=templatePayload();if(!p.title)return toast('Title is required');
+    try{await api('/api/inspections/templates/'+t.id,{method:'PUT',body:JSON.stringify(p)});closeModal();openTemplate(t.id)}catch(e){toast(e.message)}
+  },'Save');
+}
+async function openTemplate(id){
+  showPanel('tmpl');$('tmpl-root').innerHTML='<div class="empty">Loading…</div>';
+  try{const r=await api('/api/inspections/templates/'+id);curTemplate=r.template;renderTemplate()}
+  catch(e){$('tmpl-root').innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+function renderTemplate(){
+  const t=curTemplate;
+  const sections=t.sections||[];
+  const ungrouped=t.ungrouped_items||[];
+  const itemCount=sections.reduce((n,s)=>n+(s.items?.length||0),0)+ungrouped.length;
+  $('tmpl-root').innerHTML=`
+    <div class="detail-head">
+      <button class="btn btn-sm" onclick="openTemplates()">← Templates</button>
+      <div style="flex:1"><div class="detail-title">${esc(t.title)}</div><div class="detail-meta">${chip(t.inspection_type)} · ${esc(fmt(t.frequency))} · ${itemCount} item${itemCount===1?'':'s'}${t.estimated_duration_minutes?` · ~${t.estimated_duration_minutes} min`:''}</div></div>
+      <div class="actions"><button class="btn btn-sm" onclick="openEditTemplate()">Edit details</button><button class="btn btn-sm" onclick="openAddSection()">＋ Section</button><button class="btn btn-sm btn-primary" onclick="openAddItem(null)">＋ Item</button></div>
+    </div>
+    ${sections.map(s=>sectionBlock(s)).join('')}
+    ${ungrouped.length?`<div class="card"><div class="card-head"><div class="card-title">Ungrouped items</div></div><div class="card-body">${ungrouped.map(itemRow).join('')}</div></div>`:''}
+    ${!sections.length&&!ungrouped.length?`<div class="empty">No sections or items yet. Add a section, then add items to it — or add items directly.</div>`:''}
+  `;
+}
+function sectionBlock(s){
+  return `<div class="card"><div class="card-head"><div class="card-title">${esc(s.title)}</div><div class="card-sub">${(s.items?.length||0)} items</div>
+    <button class="btn btn-sm" style="margin-left:8px" onclick="openAddItem('${s.id}')">＋ Item</button>
+    <button class="btn btn-sm" onclick="openEditSection('${s.id}')">Edit</button>
+    <button class="btn btn-sm" onclick="deleteSection('${s.id}')">Delete</button></div>
+    <div class="card-body">${(s.items||[]).length?s.items.map(itemRow).join(''):`<div class="empty">No items in this section yet.</div>`}</div></div>`;
+}
+function itemRow(it){
+  return `<div class="item ${it.is_critical?'fail':''}"><div class="item-top"><div class="item-title">${esc(it.question)}${it.is_critical?' <span class="chip danger">Critical</span>':''}</div>
+    <div class="actions"><button class="btn btn-sm" onclick="openEditItem('${it.id}')">Edit</button><button class="btn btn-sm" onclick="deleteItem('${it.id}')">Delete</button></div></div>
+    <div class="item-copy">${esc(fmt(it.response_type))}${it.requires_action_if_fail?' · action required on fail':''}${(it.options&&it.options.length)?` · ${it.options.map(esc).join(', ')}`:''}</div></div>`;
+}
+function openAddSection(){
+  modal('Add section',`<div class="field"><label>Section title</label><input class="input" id="s-title" style="width:100%" placeholder="e.g. Engine Compartment"></div><div class="field"><label>Description</label><input class="input" id="s-desc" style="width:100%"></div>`,
+    async()=>{const title=val('s-title');if(!title)return toast('Title required');try{await api(`/api/inspections/templates/${curTemplate.id}/sections`,{method:'POST',body:JSON.stringify({title,description:val('s-desc')||null})});closeModal();openTemplate(curTemplate.id)}catch(e){toast(e.message)}},'Add section');
+}
+function openEditSection(id){
+  const s=(curTemplate.sections||[]).find(x=>x.id===id);
+  modal('Edit section',`<div class="field"><label>Section title</label><input class="input" id="s-title" style="width:100%" value="${esc(s.title)}"></div><div class="field"><label>Description</label><input class="input" id="s-desc" style="width:100%" value="${esc(s.description||'')}"></div>`,
+    async()=>{const title=val('s-title');if(!title)return toast('Title required');try{await api(`/api/inspections/templates/${curTemplate.id}/sections/${id}`,{method:'PUT',body:JSON.stringify({title,description:val('s-desc')||null})});closeModal();openTemplate(curTemplate.id)}catch(e){toast(e.message)}},'Save');
+}
+async function deleteSection(id){if(!confirm('Delete this section? Items in it are removed too.'))return;try{await api(`/api/inspections/templates/${curTemplate.id}/sections/${id}`,{method:'DELETE'});toast('Section deleted');openTemplate(curTemplate.id)}catch(e){toast(e.message)}}
+function itemFormBody(it,sectionId){
+  const sections=curTemplate.sections||[];
+  return `
+    <div class="field"><label>Question / checkpoint</label><input class="input" id="i-q" style="width:100%" value="${esc(it?.question||'')}" placeholder="e.g. Are all fire extinguishers charged and accessible?"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>Response type</label><select class="select" id="i-type" style="width:100%" onchange="itemTypeChanged()">${opts(RESPONSE_TYPES,it?.response_type||'pass_fail')}</select></div>
+      <div class="field"><label>Section</label><select class="select" id="i-section" style="width:100%"><option value="">Ungrouped</option>${sections.map(s=>`<option value="${s.id}" ${(it?.section_id||sectionId)===s.id?'selected':''}>${esc(s.title)}</option>`).join('')}</select></div>
+    </div>
+    <div class="field" id="i-options-wrap" style="display:${it?.response_type==='multiple_choice'?'block':'none'}"><label>Choices (comma-separated)</label><input class="input" id="i-options" style="width:100%" value="${esc((it?.options||[]).join(', '))}" placeholder="Good, Fair, Poor"></div>
+    <div class="field"><div style="display:flex;gap:16px">
+      <label style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);display:flex;gap:6px;align-items:center"><input type="checkbox" id="i-critical" ${it?.is_critical?'checked':''}> Critical item</label>
+      <label style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);display:flex;gap:6px;align-items:center"><input type="checkbox" id="i-action" ${it?(it.requires_action_if_fail?'checked':''):'checked'}> Requires action if failed</label>
+    </div></div>`;
+}
+function itemTypeChanged(){$('i-options-wrap').style.display=$('i-type').value==='multiple_choice'?'block':'none'}
+function itemPayload(){
+  const type=$('i-type').value;
+  const options=type==='multiple_choice'?val('i-options').split(',').map(s=>s.trim()).filter(Boolean):[];
+  return {question:val('i-q'),response_type:type,section_id:$('i-section').value||null,options,is_critical:checked('i-critical'),requires_action_if_fail:checked('i-action')};
+}
+function openAddItem(sectionId){
+  modal('Add item',itemFormBody(null,sectionId),async()=>{const p=itemPayload();if(!p.question)return toast('Question is required');try{await api(`/api/inspections/templates/${curTemplate.id}/items`,{method:'POST',body:JSON.stringify(p)});closeModal();openTemplate(curTemplate.id)}catch(e){toast(e.message)}},'Add item');
+}
+function openEditItem(id){
+  let it=null;(curTemplate.sections||[]).forEach(s=>(s.items||[]).forEach(x=>{if(x.id===id)it=x}));(curTemplate.ungrouped_items||[]).forEach(x=>{if(x.id===id)it=x});
+  if(!it)return toast('Item not found');
+  modal('Edit item',itemFormBody(it,it.section_id),async()=>{const p=itemPayload();if(!p.question)return toast('Question is required');try{await api(`/api/inspections/templates/${curTemplate.id}/items/${id}`,{method:'PUT',body:JSON.stringify(p)});closeModal();openTemplate(curTemplate.id)}catch(e){toast(e.message)}},'Save');
+}
+async function deleteItem(id){if(!confirm('Delete this item?'))return;try{await api(`/api/inspections/templates/${curTemplate.id}/items/${id}`,{method:'DELETE'});toast('Item deleted');openTemplate(curTemplate.id)}catch(e){toast(e.message)}}
+
 init().catch(e=>toast(e.message));
 </script>
 </body>
