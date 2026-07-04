@@ -1616,14 +1616,42 @@ async function viewPermit(id) {
       `<div style="font-size:11.5px;color:var(--warn);padding:2px 0">${s}</div>`
     ).join('')}</div>` : '';
 
+  // Extension (one-time, up to 4h, requires separate-person approval)
+  const isLive_ = p.status==='active'||p.status==='issued'||p.status==='revalidated';
+  let extensionHtml = '';
+  if (p.extension_status==='requested') {
+    extensionHtml = `
+    <div style="margin-top:8px;padding:10px 12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px">
+      <div style="font-size:11.5px;color:var(--warn);font-weight:600;margin-bottom:4px">Extension requested: +${p.extension_hours}h</div>
+      <div style="font-size:11.5px;color:var(--text2);margin-bottom:8px">${p.extension_reason||''}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ok btn-sm" onclick="approveExtension('${p.id}')">Approve extension</button>
+        <button class="btn btn-ghost btn-sm" onclick="denyExtension('${p.id}')">Deny</button>
+      </div>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:6px">Must be approved by someone other than the requester.</div>
+    </div>`;
+  } else if (p.extension_status==='approved') {
+    extensionHtml = `
+    <div style="margin-top:8px;padding:8px 12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:7px;font-size:11.5px;color:var(--ok)">
+      Extended +${p.extension_hours}h · approved ${fmtShort(p.extension_approved_at)}
+    </div>`;
+  } else if (p.extension_status==='denied') {
+    extensionHtml = `
+    <div style="margin-top:8px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:7px;font-size:11.5px;color:var(--danger)">
+      Extension denied${p.extension_decision_note?` · ${p.extension_decision_note}`:''}
+    </div>`;
+  }
+
   // Action buttons
   const isActive_ = p.status==='active'||p.status==='issued';
   const isSuspended_ = p.status==='suspended';
+  const canExtend_ = isLive_ && p.extension_status==='none';
   const actionHtml = isActive_ ? `
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-warn btn-sm" onclick="suspendPermit('${p.id}')">⏸ Suspend</button>
+      ${canExtend_?`<button class="btn btn-ghost btn-sm" onclick="requestExtension('${p.id}')">Request 4h extension</button>`:''}
       <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">Close Permit</button>
-    </div>` :
+    </div>${extensionHtml}` :
     isSuspended_ ? `
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="padding:8px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:7px;font-size:11.5px;color:var(--warn)">
@@ -1729,6 +1757,41 @@ async function suspendPermit(id) {
   } else {
     toast(res.data?.error||'Suspend failed','danger');
   }
+}
+
+async function refreshPermitLists() {
+  const [pData,aData] = await Promise.all([
+    apiGet('/api/permits?limit=100'), apiGet('/api/permits/dashboard')
+  ]);
+  permits=pData?.permits||[]; activePermits=aData?.active_permits||[];
+  renderKPIs(); renderPermitBoard(); buildAlertStrip();
+}
+
+async function requestExtension(id) {
+  const hoursStr = prompt('Extension length in hours (max 4):', '4');
+  if (hoursStr === null) return;
+  const hours = parseFloat(hoursStr);
+  if (!(hours > 0) || hours > 4) { toast('Enter between 0.5 and 4 hours','danger'); return; }
+  const reason = prompt('Reason for the extension:');
+  if (!reason || !reason.trim()) { toast('A reason is required','danger'); return; }
+  const res = await apiPost(`/api/permits/${id}/extension`, {hours, reason:reason.trim()});
+  if (res.ok) { toast('Extension requested — awaiting approval','ok'); viewPermit(id); refreshPermitLists(); }
+  else toast(res.data?.error||'Extension request failed','danger');
+}
+
+async function approveExtension(id) {
+  const note = prompt('Approval note (optional):') || '';
+  const res = await apiPost(`/api/permits/${id}/extension/approve`, {note});
+  if (res.ok) { toast('Extension approved','ok'); viewPermit(id); refreshPermitLists(); }
+  else toast(res.data?.error||'Approval failed','danger');
+}
+
+async function denyExtension(id) {
+  const note = prompt('Reason for denying the extension:');
+  if (note === null) return;
+  const res = await apiPost(`/api/permits/${id}/extension/deny`, {note});
+  if (res.ok) { toast('Extension denied','warn'); viewPermit(id); refreshPermitLists(); }
+  else toast(res.data?.error||'Denial failed','danger');
 }
 
 async function closePermit(id) {
