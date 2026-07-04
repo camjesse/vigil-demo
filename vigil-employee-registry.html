@@ -1188,7 +1188,8 @@ function openEmployeeDetail(empId) {
   document.getElementById('drawerFooter').innerHTML = `
     <button class="btn btn-primary" onclick="openDrawer('edit','${emp.id}')">Edit Record</button>
     <button class="btn btn-warn" onclick="sendNotification('${emp.id}')">Send Notification</button>
-    <button class="btn btn-ghost" style="margin-left:auto" onclick="deleteEmployee('${emp.id}')">Remove</button>
+    <button class="btn btn-ghost" onclick="exportEmployeeData('${emp._uuid}')">Export data</button>
+    <button class="btn btn-ghost" style="margin-left:auto;color:var(--danger)" onclick="eraseEmployeeData('${emp._uuid}','${emp.name.replace(/'/g, "\\'")}')">Erase personal data</button>
   `;
 
   openDrawerEl();
@@ -1375,6 +1376,61 @@ function confirmDelete(empId) {
   closeModal();
   renderAll();
   showToast('success', emp.name + ' removed from registry');
+}
+
+// ============================================================
+// DATA SUBJECT ACCESS REQUEST (export + right to erasure)
+// ============================================================
+async function exportEmployeeData(workerUuid) {
+  try {
+    const res = await fetch(`${API_BASE}/api/workers/${workerUuid}/export`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Export failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `vigil-data-export-${workerUuid}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('success', 'Data export downloaded');
+  } catch (e) {
+    showToast('error', e.message);
+  }
+}
+
+function eraseEmployeeData(workerUuid, name) {
+  showModal(
+    'Erase personal data',
+    `<div style="margin-bottom:10px">This permanently removes <strong>${name}</strong>'s personal identifiers (name, email, phone, date of birth, emergency contacts, medical alerts) and deactivates their login.</div>
+     <div style="padding:10px;background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.25);border-radius:6px;font-size:12px;line-height:1.5">Safety records they appear in — incidents, training, permits — are kept without personal identifiers, since deleting them would violate regulatory retention requirements. This cannot be undone.</div>`,
+    [
+      {label:'Cancel', cls:'btn-ghost', action:'closeModal()'},
+      {label:'Erase personal data', cls:'btn-danger', action:`confirmErase('${workerUuid}')`}
+    ]
+  );
+}
+
+async function confirmErase(workerUuid) {
+  try {
+    const res = await fetch(`${API_BASE}/api/workers/${workerUuid}/erasure-request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+      body: JSON.stringify({ confirm: workerUuid }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || `Erasure failed (${res.status})`);
+    closeModal();
+    closeDrawer();
+    showToast('success', 'Personal data erased');
+    await loadData();
+    renderAll();
+  } catch (e) {
+    showToast('error', e.message);
+  }
 }
 
 // ============================================================
