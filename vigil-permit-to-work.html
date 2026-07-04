@@ -589,7 +589,8 @@ let refSites = [];
 let refDepartments = [];
 let formStep = 1;
 let formData = {};
-let selectedType = null;
+let selectedModules = [];
+let permitTypePresets = [];
 let formControls = {};
 let fieldVerified = false;
 let selectedLeadId = null;
@@ -719,13 +720,14 @@ async function init() {
   LOGGED_IN = {id:session.worker.id, name:session.worker.name};
   document.getElementById('f-issuer-name').value = LOGGED_IN.name;
 
-  const [pData, aData, wData, haData, sData, dData] = await Promise.all([
+  const [pData, aData, wData, haData, sData, dData, tData] = await Promise.all([
     apiGet('/api/permits?limit=100'),
     apiGet('/api/permits/dashboard'),
     apiGet('/api/workers?limit=100'),
     apiGet('/api/hazard/assessments?limit=50'),
     apiGet('/api/sites'),
     apiGet('/api/sites/departments'),
+    apiGet('/api/permits/types'),
   ]);
 
   permits      = (pData&&pData.permits)   || [];
@@ -734,6 +736,7 @@ async function init() {
   assessments  = (haData&&haData.assessments) || [];
   refSites     = (sData&&sData.sites)     || [];
   refDepartments = (dData&&dData.departments) || [];
+  permitTypePresets = (tData&&tData.permit_types) || [];
   populateSiteDeptDropdowns();
 
   document.getElementById('worker-pill').textContent =
@@ -1003,21 +1006,40 @@ function cancelForm() {
 // ── FORM: TYPE GRID ────────────────────────────────────────────
 function renderTypeGrid() {
   const el = document.getElementById('type-grid');
-  el.innerHTML = Object.entries(PERMIT_TYPES).map(([type, cfg]) => `
-    <div class="type-card ${selectedType===type?'selected':''}" id="tc-${type}" onclick="selectType('${type}')">
-      <div class="type-name">${cfg.name}</div>
+  // Optional preset dropdown (company-defined permit types) above the grid.
+  const presetOpts = permitTypePresets.length
+    ? `<div class="preset-row" style="grid-column:1/-1;margin-bottom:6px">
+         <label class="form-label" style="margin-bottom:5px">Start from a saved permit type (optional)</label>
+         <select class="form-select" id="f-preset" onchange="applyPreset()">
+           <option value="">— Choose modules manually —</option>
+           ${permitTypePresets.map(p=>`<option value="${p.id}">${esc(p.name)} (${(p.hazard_modules||[]).length} module${(p.hazard_modules||[]).length===1?'':'s'})</option>`).join('')}
+         </select>
+       </div>` : '';
+  el.innerHTML = presetOpts + Object.entries(PERMIT_TYPES).map(([type, cfg]) => {
+    const on = selectedModules.includes(type);
+    return `
+    <div class="type-card ${on?'selected':''}" id="tc-${type}" onclick="toggleModule('${type}')">
+      <div class="type-name">${on?'✓ ':''}${cfg.name}</div>
       <div class="type-desc">${cfg.desc}</div>
       <div class="type-risk">${riskChip(cfg.risk)}</div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
-function selectType(type) {
-  selectedType = type;
-  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
-  const el = document.getElementById('tc-'+type);
-  if (el) el.classList.add('selected');
+function toggleModule(type) {
+  const i = selectedModules.indexOf(type);
+  if (i >= 0) selectedModules.splice(i, 1); else selectedModules.push(type);
+  renderTypeGrid();
 }
+function applyPreset() {
+  const id = document.getElementById('f-preset')?.value;
+  const preset = permitTypePresets.find(p=>p.id===id);
+  if (!preset) return;
+  // Only apply modules that exist in the wizard's catalog.
+  selectedModules = (preset.hazard_modules||[]).filter(m=>PERMIT_TYPES[m]);
+  renderTypeGrid();
+}
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // ── FORM: WORKER AUTOCOMPLETE ──────────────────────────────────
 function workerSearch(val, field) {
@@ -1194,72 +1216,45 @@ const CONTROLS_DEF = {
 function renderStep3Controls() {
   const el = document.getElementById('step3-controls');
   const hdr = document.getElementById('step3-header');
-  const defs = CONTROLS_DEF[selectedType] || [];
-  const cfg = PERMIT_TYPES[selectedType] || {};
+  const modLabels = selectedModules.map(m=>PERMIT_TYPES[m]?.name||m).join(', ');
 
   hdr.innerHTML = `
     <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:10px 13px">
-      <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:2px">${cfg.name||''} — Control Verification</div>
-      <div style="font-size:11px;color:var(--text2)">Verify all applicable controls before proceeding. These are recorded on the permit.</div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:2px">Control Verification — ${esc(modLabels)}</div>
+      <div style="font-size:11px;color:var(--text2)">One Safe Work Permit covering ${selectedModules.length} hazard module${selectedModules.length===1?'':'s'}. Verify each module's controls; they are recorded on the permit.</div>
     </div>`;
 
-  if (!defs.length) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--text2);padding:16px 0">No specific controls defined for this permit type.</div>`;
-    return;
-  }
-
-  el.innerHTML = defs.map(d => {
-    const val = formControls[d.key];
-    if (d.type === 'toggle') {
-      const checked = val === true || val === 'true';
-      return `
-      <div class="ctrl-item${checked?' ok':''}" id="ci-${d.key}">
-        <div class="ctrl-label">${d.label}</div>
-        <label class="toggle">
-          <input type="checkbox" ${checked?'checked':''} onchange="setControl('${d.key}',this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>`;
-    } else if (d.type === 'text') {
-      return `
-      <div class="ctrl-item" id="ci-${d.key}">
-        <div class="ctrl-label">${d.label}</div>
-        <div class="ctrl-input-wrap">
-          <input type="text" class="form-input" style="font-size:12px;padding:6px 8px"
-            value="${val||''}" placeholder="${d.placeholder||''}"
-            oninput="setControl('${d.key}',this.value)">
+  el.innerHTML = selectedModules.map(mod => {
+    const defs = CONTROLS_DEF[mod] || [];
+    const cfg = PERMIT_TYPES[mod] || {};
+    const body = defs.length ? defs.map(d => ctrlRow(mod, d)).join('')
+      : `<div style="font-size:12px;color:var(--text2);padding:10px 0">No specific controls for this module.</div>`;
+    return `
+      <div class="module-controls" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0 9px">
+          <span style="font-size:12.5px;font-weight:700">${esc(cfg.name||mod)}</span>${riskChip(cfg.risk)}
         </div>
+        ${body}
       </div>`;
-    } else if (d.type === 'number') {
-      return `
-      <div class="ctrl-item" id="ci-${d.key}">
-        <div class="ctrl-label">${d.label}</div>
-        <div class="ctrl-input-wrap">
-          <input type="number" class="form-input" style="font-size:12px;padding:6px 8px"
-            value="${val||''}" placeholder="${d.placeholder||''}"
-            oninput="setControl('${d.key}',this.value)">
-        </div>
-      </div>`;
-    } else if (d.type === 'datetime') {
-      return `
-      <div class="ctrl-item" id="ci-${d.key}">
-        <div class="ctrl-label">${d.label}</div>
-        <div class="ctrl-input-wrap">
-          <input type="datetime-local" class="form-input" style="font-size:12px;padding:6px 8px"
-            value="${val||''}" onchange="setControl('${d.key}',this.value)">
-        </div>
-      </div>`;
-    }
-    return '';
   }).join('');
 }
-
-function setControl(key, val) {
-  formControls[key] = val;
-  const row = document.getElementById('ci-'+key);
-  if (row && typeof val === 'boolean') {
-    row.classList.toggle('ok', val);
+function ctrlRow(mod, d) {
+  const val = (formControls[mod]||{})[d.key];
+  const set = `setControl('${mod}','${d.key}',`;
+  if (d.type === 'toggle') {
+    const checked = val === true || val === 'true';
+    return `<div class="ctrl-item${checked?' ok':''}" id="ci-${mod}-${d.key}"><div class="ctrl-label">${d.label}</div><label class="toggle"><input type="checkbox" ${checked?'checked':''} onchange="${set}this.checked)"><span class="toggle-slider"></span></label></div>`;
   }
+  const inputType = d.type === 'number' ? 'number' : d.type === 'datetime' ? 'datetime-local' : 'text';
+  const evt = d.type === 'datetime' ? 'onchange' : 'oninput';
+  return `<div class="ctrl-item" id="ci-${mod}-${d.key}"><div class="ctrl-label">${d.label}</div><div class="ctrl-input-wrap"><input type="${inputType}" class="form-input" style="font-size:12px;padding:6px 8px" value="${esc(val||'')}" placeholder="${esc(d.placeholder||'')}" ${evt}="${set}this.value)"></div></div>`;
+}
+
+function setControl(mod, key, val) {
+  if (!formControls[mod]) formControls[mod] = {};
+  formControls[mod][key] = val;
+  const row = document.getElementById('ci-'+mod+'-'+key);
+  if (row && typeof val === 'boolean') row.classList.toggle('ok', val);
 }
 
 // ── FIELD VERIFY ───────────────────────────────────────────────
@@ -1278,14 +1273,14 @@ function toggleVerify(checked) {
 
 // ── REVIEW SUMMARY ─────────────────────────────────────────────
 function renderReviewSummary() {
-  const cfg = PERMIT_TYPES[selectedType]||{};
   const lead = selectedLeadId
     ? workers.find(w=>w.id===selectedLeadId)
     : null;
   const leadName = lead ? `${lead.first_name} ${lead.last_name}` : '—';
+  const modNames = selectedModules.map(m=>PERMIT_TYPES[m]?.name||m).join(', ');
 
   const rows = [
-    ['Permit Type', `${cfg.name||'—'}`],
+    ['Hazard Modules', `${modNames||'—'}`],
     ['Title', formData.title||'—'],
     ['Site', formData.site||'—'],
     ['Location', formData.location||'—'],
@@ -1293,12 +1288,14 @@ function renderReviewSummary() {
     ['Planned End',   formData.end   ? fmtDate(formData.end)   : '—'],
     ['Worker Lead', leadName],
     ['Department', formData.dept||'—'],
-    ['Risk Tier', fmt(cfg.risk||'—')],
   ];
 
-  const defs = CONTROLS_DEF[selectedType]||[];
-  const confirmedCount = defs.filter(d=>d.type==='toggle' && formControls[d.key]).length;
-  const toggleCount = defs.filter(d=>d.type==='toggle').length;
+  let confirmedCount = 0, toggleCount = 0;
+  selectedModules.forEach(mod => {
+    (CONTROLS_DEF[mod]||[]).forEach(d => {
+      if (d.type==='toggle') { toggleCount++; if ((formControls[mod]||{})[d.key]) confirmedCount++; }
+    });
+  });
   rows.push(['Controls Confirmed', `${confirmedCount} / ${toggleCount}`]);
 
   document.getElementById('review-summary').innerHTML = rows.map(([k,v])=>`
@@ -1317,7 +1314,7 @@ function goStep(n, silent) {
 
   if (!silent && n > formStep) {
     if (formStep === 1) {
-      if (!selectedType) { toast('Select a permit type','danger'); return; }
+      if (!selectedModules.length) { toast('Select at least one hazard module','danger'); return; }
     }
     if (formStep === 2) {
       if (!formData.title) { toast('Enter a permit title','danger'); return; }
@@ -1375,7 +1372,7 @@ async function submitAndIssuePermit() {
   btn.textContent = 'Creating permit…';
 
   const payload = {
-    permit_type:        selectedType,
+    hazard_modules:     selectedModules,
     title:              formData.title,
     description:        formData.desc || undefined,
     site:               formData.site,
@@ -1398,7 +1395,7 @@ async function submitAndIssuePermit() {
   const pnum = createRes.data.permit.permit_number;
 
   btn.textContent = 'Saving controls…';
-  const controlsRes = await apiPut(`/api/permits/${pid}/controls`, {controls:formControls});
+  const controlsRes = await apiPut(`/api/permits/${pid}/controls`, {module_controls:formControls});
   if (!controlsRes.ok) {
     const err = controlsRes.data?.error || `HTTP ${controlsRes.status}`;
     toast(`Control verification failed to save: ${err}`, 'danger');
@@ -1466,7 +1463,7 @@ async function submitAndIssuePermit() {
 function resetForm() {
   formStep = 1;
   formData = {};
-  selectedType = null;
+  selectedModules = [];
   formControls = {};
   fieldVerified = false;
   selectedLeadId = null;
@@ -1530,24 +1527,31 @@ async function viewPermit(id) {
   const issuerName = p.issuer_first_name
     ? `${p.issuer_first_name} ${p.issuer_last_name}` : '—';
 
-  // Control summary
-  const ptc = p.permit_type_controls || {};
-  const defs = CONTROLS_DEF[p.permit_type]||[];
-  const ctrlHtml = defs.length ? `
-    <div class="section-title">Control Verification (${p.permit_type})</div>
+  // Control summary — one section per hazard module.
+  const modules = (p.hazard_modules && p.hazard_modules.length) ? p.hazard_modules : [p.permit_type];
+  const moduleControls = p.module_controls || {};
+  const ctrlHtml = modules.map(mod => {
+    const defs = CONTROLS_DEF[mod] || [];
+    if (!defs.length) return '';
+    // Primary module falls back to legacy permit_type_controls if module_controls is empty.
+    const mc = moduleControls[mod] || (mod === p.permit_type ? (p.permit_type_controls || {}) : {});
+    const modName = PERMIT_TYPES[mod]?.name || fmt(mod);
+    return `
+    <div class="section-title">Control Verification — ${esc(modName)}</div>
     <div>${defs.map(d => {
-      const val = ptc[d.key];
-      let display = '—';
+      const val = mc[d.key];
+      let display;
       if (d.type==='toggle') display = val===true || val==='true'
         ? '<span class="chip ok">Yes</span>'
         : (val===false||val==='false'?'<span class="chip muted">No / N/A</span>':'<span class="chip muted">Not set</span>');
-      else display = `<span style="font-size:12px;color:var(--text)">${val||'—'}</span>`;
+      else display = `<span style="font-size:12px;color:var(--text)">${esc(val||'—')}</span>`;
       return `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px">
         <span style="font-size:12px;color:var(--text2)">${d.label}</span>
         ${display}
       </div>`;
-    }).join('')}</div>` : '';
+    }).join('')}</div>`;
+  }).join('');
 
   // Workflow timeline
   const wfNodes = ['Draft','Submitted','Reviewed','Issued','Active','Closed'];
@@ -1668,7 +1672,7 @@ async function viewPermit(id) {
           <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">${p.permit_number}</div>
           <div style="font-family:var(--font-head);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px">${p.title}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-            ${statusChip(p.status)}${riskChip(p.risk_tier)}${typeChip(p.permit_type)}
+            ${statusChip(p.status)}${riskChip(p.risk_tier)}${((p.hazard_modules&&p.hazard_modules.length)?p.hazard_modules:[p.permit_type]).map(typeChip).join('')}
             <span class="chip muted">${p.site||'—'}</span>
             ${p.location_detail?`<span class="chip muted">${p.location_detail}</span>`:''}
           </div>
