@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Control - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select,textarea{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}.stat-val{font-variant-numeric:tabular-nums;font-size:23px;font-weight:800;margin-top:5px}.stat-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.search,.select{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}.search:focus,.select:focus{border-color:var(--accent)}
+.table-wrap{overflow:auto}.tbl{width:100%;min-width:820px;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.tbl tr.clickable{cursor:pointer}.tbl tr.clickable:hover td{background:var(--s2)}.identity{color:var(--text);font-weight:700}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700;white-space:nowrap}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.chip.accent{color:var(--accent);background:rgba(33,184,230,.09)}.chip.danger{color:#FCA5A5;background:rgba(239,90,103,.09)}.chip.muted{color:var(--muted)}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.fact{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:11px}.fact-label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;margin-bottom:5px}.fact-val{font-size:12px}
+.ack-bar{height:8px;border-radius:4px;background:var(--s3);overflow:hidden;margin-top:6px}.ack-bar>i{display:block;height:100%;background:var(--ok)}
+.item{padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;font-size:11px}.item-title{color:var(--text);font-weight:700;font-size:12px}
+.section-title{font-size:12px;font-weight:700;margin:16px 0 8px}
+.doc-content{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:14px;font-size:12px;line-height:1.6;color:var(--text2);white-space:pre-wrap;max-height:360px;overflow:auto}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-size:17px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:8px 10px;outline:none}.field input,.field select{height:38px}.field textarea{min-height:90px;resize:vertical;line-height:1.5}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.page-hdr{flex-direction:column}.detail-grid{grid-template-columns:1fr}.frow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Document Control</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Documents</div>
+      <button class="nav-item active" data-view="library" onclick="showView('library')">Library</button>
+      <button class="nav-item" data-view="review" onclick="showView('review')">Due for review</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-library">
+        <div class="page-hdr">
+          <div><h1>Document Control</h1><div class="page-sub">Policies, procedures, SOPs, and forms — with versioning, targeted distribution, and acknowledgement tracking.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreate()">＋ New document</button></div>
+        </div>
+        <div class="stats" id="lib-stats"></div>
+        <div class="panel">
+          <div class="panel-hd">
+            <span class="panel-title">Library</span>
+            <span class="spacer"></span>
+            <input class="search" id="f-search" placeholder="Search title or number…" oninput="renderLibrary()">
+            <select class="select" id="f-status" onchange="renderLibrary()"><option value="">All statuses</option><option>draft</option><option>under_review</option><option>approved</option><option>archived</option></select>
+            <select class="select" id="f-type" onchange="renderLibrary()"><option value="">All types</option><option>policy</option><option>procedure</option><option>sop</option><option>work_instruction</option><option>form</option><option>other</option></select>
+          </div>
+          <div class="table-wrap" id="lib-table"></div>
+        </div>
+      </section>
+
+      <section id="view-review" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Due for Review</h1><div class="page-sub">Documents whose next review date has arrived or passed. Keeping these current is a core audit expectation.</div></div>
+        </div>
+        <div class="panel"><div class="table-wrap" id="review-table"></div></div>
+      </section>
+
+      <section id="view-detail" class="hidden"></section>
+
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
+let token=null,session=null,documents=[],workers=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=s=>String(s||'—').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+const date=s=>s?new Date(s).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'—';
+const isElevated=()=>['supervisor','manager','admin','superadmin'].includes(session?.user?.role||session?.role);
+
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||`Request failed (${r.status})`);return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2800)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='review')loadReview()}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+const STATUS_CHIP={draft:'muted',under_review:'warn',approved:'ok',archived:'muted'};
+function statusChip(s){return `<span class="chip ${STATUS_CHIP[s]||''}">${fmt(s)}</span>`}
+
+function modal(title,copy,fields,onSubmit,reload){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;
+  document.querySelector('.modal').onsubmit=async e=>{
+    e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;
+    try{await onSubmit(new FormData(e.target));closeModal();if(reload)await reload()}
+    catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}
+  };
+}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+function typeOptions(v){return ['policy','procedure','sop','work_instruction','form','other'].map(t=>`<option value="${t}" ${t===v?'selected':''}>${fmt(t)}</option>`).join('')}
+function statusOptions(v){return ['draft','under_review','approved','archived'].map(t=>`<option value="${t}" ${t===v?'selected':''}>${fmt(t)}</option>`).join('')}
+function jurOptions(v){return ['canada','us','both'].map(t=>`<option value="${t}" ${t===v?'selected':''}>${t==='us'?'United States':fmt(t)}</option>`).join('')}
+
+// ── Library ────────────────────────────────────────────────────
+async function loadLibrary(){
+  const r=await api('/api/documents?limit=250');
+  documents=r.documents||r.data||[];
+  renderStats();renderLibrary();
+}
+function renderStats(){
+  const total=documents.length;
+  const approved=documents.filter(d=>d.status==='approved').length;
+  const review=documents.filter(d=>d.status==='under_review').length;
+  const draft=documents.filter(d=>d.status==='draft').length;
+  document.getElementById('lib-stats').innerHTML=`
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-val">${total}</div><div class="stat-sub">controlled documents</div></div>
+    <div class="stat"><div class="stat-label">Approved</div><div class="stat-val" style="color:var(--ok)">${approved}</div><div class="stat-sub">in force</div></div>
+    <div class="stat"><div class="stat-label">Under review</div><div class="stat-val" style="color:var(--warn)">${review}</div><div class="stat-sub">pending approval</div></div>
+    <div class="stat"><div class="stat-label">Draft</div><div class="stat-val">${draft}</div><div class="stat-sub">not yet published</div></div>`;
+}
+function renderLibrary(){
+  const q=document.getElementById('f-search').value.toLowerCase();
+  const st=document.getElementById('f-status').value, ty=document.getElementById('f-type').value;
+  const rows=documents.filter(d=>
+    (!q||`${d.document_number||''} ${d.title}`.toLowerCase().includes(q))&&
+    (!st||d.status===st)&&(!ty||d.document_type===ty));
+  const el=document.getElementById('lib-table');
+  if(!rows.length){el.innerHTML=`<div class="empty">No documents match. <button class="btn primary small" style="margin-left:8px" onclick="openCreate()">Create the first one</button></div>`;return}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Document</th><th>Type</th><th>Version</th><th>Jurisdiction</th><th>Next review</th><th>Status</th></tr></thead><tbody>${
+    rows.map(d=>`<tr class="clickable" onclick="openDetail('${d.id}')"><td><div class="identity">${esc(d.title)}</div><div class="meta">${esc(d.document_number||'No number')}</div></td><td>${fmt(d.document_type)}</td><td>v${esc(d.version||'1.0')}</td><td>${d.jurisdiction==='us'?'US':fmt(d.jurisdiction)}</td><td>${d.next_review_date?date(d.next_review_date):'—'}</td><td>${statusChip(d.status)}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+
+async function loadReview(){
+  const el=document.getElementById('review-table');
+  el.innerHTML=`<div class="empty">Loading…</div>`;
+  try{
+    const r=await api('/api/documents/due-for-review');
+    const rows=r.documents||r.data||[];
+    if(!rows.length){el.innerHTML=`<div class="empty">Nothing is due for review. 🎉</div>`;return}
+    el.innerHTML=`<table class="tbl"><thead><tr><th>Document</th><th>Type</th><th>Review was due</th><th>Status</th></tr></thead><tbody>${
+      rows.map(d=>`<tr class="clickable" onclick="openDetail('${d.id}')"><td><div class="identity">${esc(d.title)}</div><div class="meta">${esc(d.document_number||'')}</div></td><td>${fmt(d.document_type)}</td><td><span class="chip danger">${date(d.next_review_date)}</span></td><td>${statusChip(d.status)}</td></tr>`).join('')
+    }</tbody></table>`;
+  }catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+
+// ── Detail ─────────────────────────────────────────────────────
+async function openDetail(id){
+  const el=document.getElementById('view-detail');
+  showView('detail');
+  el.innerHTML=`<div class="empty">Loading…</div>`;
+  try{
+    const [core,acks] = await Promise.all([
+      api('/api/documents/'+id),
+      isElevated()?api('/api/documents/'+id+'/acknowledgements').catch(()=>({acknowledged:[],pending:[]})):Promise.resolve({acknowledged:[],pending:[]}),
+    ]);
+    const d=core.document, stats=core.acknowledgement_stats||{}, assignments=core.assignments||[], versions=core.versions||[];
+    const ackList=acks.acknowledged||[], pendingList=acks.pending||[];
+    const rate=stats.acknowledgement_rate;
+    const wname=w=>esc(((w.first_name||'')+' '+(w.last_name||'')).trim()||w.email||w.worker_id||w.id);
+    el.innerHTML=`
+      <div class="page-hdr">
+        <div><h1>${esc(d.title)}</h1><div class="page-sub">${esc(d.document_number||'No number')} · v${esc(d.version||'1.0')} · ${statusChip(d.status)}</div></div>
+        <div class="actions">
+          <button class="btn small" onclick="showView('library')">← Library</button>
+          ${isElevated()?`<button class="btn small" onclick="openEdit('${d.id}')">Edit</button>`:''}
+          ${isElevated()?`<button class="btn small" onclick="openAssign('${d.id}')">Assign</button>`:''}
+          <button class="btn small primary" onclick="acknowledge('${d.id}')">Acknowledge</button>
+          ${isElevated()&&d.status!=='archived'?`<button class="btn small danger" onclick="archiveDoc('${d.id}')">Archive</button>`:''}
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="fact"><div class="fact-label">Type</div><div class="fact-val">${fmt(d.document_type)}</div></div>
+        <div class="fact"><div class="fact-label">Jurisdiction</div><div class="fact-val">${d.jurisdiction==='us'?'United States':fmt(d.jurisdiction)}</div></div>
+        <div class="fact"><div class="fact-label">Next review</div><div class="fact-val">${date(d.next_review_date)}</div></div>
+        <div class="fact"><div class="fact-label">Regulatory reference</div><div class="fact-val">${esc(d.regulatory_reference||'—')}</div></div>
+        <div class="fact"><div class="fact-label">Last updated</div><div class="fact-val">${date(d.updated_at)}</div></div>
+        <div class="fact"><div class="fact-label">Acknowledgement</div><div class="fact-val">${rate==null?'No assignments':`${stats.acknowledged||0}/${stats.total||0} · ${rate}%`}</div>${rate==null?'':`<div class="ack-bar"><i style="width:${rate}%"></i></div>`}</div>
+      </div>
+      ${d.file_url?`<div style="margin-bottom:16px"><button class="btn small" onclick="openFile('${esc(d.file_url)}')">📎 View attached file</button></div>`:''}
+      ${d.content?`<div class="section-title">Content</div><div class="doc-content">${esc(d.content)}</div>`:''}
+      <div class="section-title">Distribution</div>
+      ${assignments.length?assignments.map(a=>`<div class="item"><span class="chip accent">${fmt(a.assignment_type)}</span> ${esc(a.assignment_value||'Everyone')}</div>`).join(''):`<div class="empty">Not assigned to anyone yet.${isElevated()?` <button class="btn small" style="margin-left:8px" onclick="openAssign('${d.id}')">Assign now</button>`:''}</div>`}
+      ${isElevated()?`<div class="section-title">Acknowledged (${ackList.length})</div>${ackList.length?ackList.map(a=>`<div class="item"><span class="item-title">${wname(a)}</span> · ${date(a.acknowledged_at)}</div>`).join(''):`<div class="empty">No acknowledgements recorded yet.</div>`}`:''}
+      ${isElevated()&&pendingList.length?`<div class="section-title">Awaiting acknowledgement (${pendingList.length})</div>${pendingList.map(w=>`<div class="item"><span class="item-title">${wname(w)}</span> <span class="chip warn" style="margin-left:6px">Pending</span></div>`).join('')}`:''}
+      ${versions.length?`<div class="section-title">Version history</div>${versions.map(v=>`<div class="item">v${esc(v.version||'')} · ${date(v.created_at)}${v.change_summary?` — ${esc(v.change_summary)}`:''}</div>`).join('')}`:''}
+    `;
+  }catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+
+async function openFile(url){
+  try{
+    const full=url.startsWith('/api/')?API+url:url;
+    if(!url.startsWith('/api/')){window.open(url,'_blank');return}
+    const r=await fetch(full,{headers:{Authorization:`Bearer ${token}`}});
+    if(!r.ok)throw new Error('File unavailable');
+    window.open(URL.createObjectURL(await r.blob()),'_blank');
+  }catch(e){toast(e.message)}
+}
+
+// ── Create / Edit ──────────────────────────────────────────────
+function docFields(d){return `
+  <div class="field"><label>Title</label><input name="title" required maxlength="300" value="${esc(d?.title||'')}"></div>
+  <div class="frow">
+    <div class="field"><label>Type</label><select name="document_type">${typeOptions(d?.document_type||'procedure')}</select></div>
+    <div class="field"><label>Version</label><input name="version" maxlength="20" value="${esc(d?.version||'1.0')}"></div>
+  </div>
+  <div class="frow">
+    <div class="field"><label>Status</label><select name="status">${statusOptions(d?.status||'draft')}</select></div>
+    <div class="field"><label>Jurisdiction</label><select name="jurisdiction">${jurOptions(d?.jurisdiction||'canada')}</select></div>
+  </div>
+  <div class="frow">
+    <div class="field"><label>Document number</label><input name="document_number" maxlength="100" value="${esc(d?.document_number||'')}" placeholder="Optional"></div>
+    <div class="field"><label>Next review date</label><input name="next_review_date" type="date" value="${d?.next_review_date?d.next_review_date.slice(0,10):''}"></div>
+  </div>
+  <div class="field"><label>Regulatory reference</label><input name="regulatory_reference" maxlength="300" value="${esc(d?.regulatory_reference||'')}" placeholder="e.g. OHS Code Part 35"></div>
+  <div class="field"><label>Content</label><textarea name="content" placeholder="Paste or write the document text…">${esc(d?.content||'')}</textarea></div>
+  <div class="field"><label>Attached file</label>
+    <input name="file_url" id="m-file" type="text" value="${esc(d?.file_url||'')}" placeholder="Upload a file or paste a URL">
+    <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><button type="button" class="btn small" onclick="document.getElementById('m-file-input').click()">📎 Upload file</button><span id="m-file-status" style="font-size:10.5px;color:var(--muted)"></span></div>
+    <input id="m-file-input" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,application/pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="docFileUpload(this)">
+  </div>`;
+}
+function cleanDoc(o){
+  ['document_number','regulatory_reference','next_review_date','content','file_url'].forEach(k=>{if(!o[k])o[k]=null});
+  return o;
+}
+function openCreate(){
+  if(!isElevated())return toast('Only supervisors and admins can create documents');
+  modal('New document','Create a controlled document. It starts as a draft until you approve it.',docFields(null),
+    async f=>{const o=cleanDoc(Object.fromEntries(f));await api('/api/documents',{method:'POST',body:JSON.stringify(o)});toast('Document created')},loadLibrary);
+}
+function openEdit(id){
+  const d=documents.find(x=>x.id===id);
+  modal('Edit document','Saving a new version preserves the prior one in history.',docFields(d),
+    async f=>{const o=cleanDoc(Object.fromEntries(f));await api('/api/documents/'+id,{method:'PUT',body:JSON.stringify(o)});toast('Document updated');await loadLibrary()},()=>openDetail(id));
+}
+async function docFileUpload(input){
+  const f=input.files&&input.files[0];if(!f)return;input.value='';
+  const status=document.getElementById('m-file-status');status.textContent='Uploading '+f.name+'…';
+  try{
+    const fd=new FormData();fd.append('file',f);fd.append('entity_type','document');
+    const r=await fetch(API+'/api/files',{method:'POST',headers:{Authorization:`Bearer ${token}`},body:fd});
+    const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.error||'Upload failed');
+    document.getElementById('m-file').value=b.file.url;status.textContent=f.name+' attached';
+  }catch(e){status.textContent='';toast(e.message)}
+}
+
+// ── Assign / Acknowledge / Archive ─────────────────────────────
+function openAssign(id){
+  modal('Assign document','Choose who must read and acknowledge this document.',
+    `<div class="field"><label>Assign to</label><select name="assignment_type" id="asg-type" onchange="asgToggle()"><option value="all">Everyone in the company</option><option value="site">A site</option><option value="department">A department</option><option value="worker">A specific worker</option></select></div>
+     <div class="field" id="asg-value-wrap" style="display:none"><label id="asg-value-label">Value</label><input name="assignment_value" id="asg-value" placeholder=""></div>`,
+    async f=>{const o=Object.fromEntries(f);if(o.assignment_type==='all')o.assignment_value=null;await api('/api/documents/'+id+'/assign',{method:'POST',body:JSON.stringify(o)});toast('Document assigned')},()=>openDetail(id));
+}
+function asgToggle(){
+  const t=document.getElementById('asg-type').value;
+  const wrap=document.getElementById('asg-value-wrap');
+  wrap.style.display=t==='all'?'none':'flex';
+  document.getElementById('asg-value-label').textContent=t==='site'?'Site name':t==='department'?'Department name':t==='worker'?'Worker ID':'Value';
+}
+async function acknowledge(id){
+  const wid=session?.worker?.id;
+  if(!wid){toast('Your account is not linked to a worker profile');return}
+  try{await api('/api/documents/'+id+'/acknowledge',{method:'POST',body:JSON.stringify({worker_id:wid})});toast('Acknowledged — thank you');openDetail(id)}
+  catch(e){toast(e.message)}
+}
+async function archiveDoc(id){
+  if(!confirm('Archive this document? It stays in history but is retired from active use.'))return;
+  try{await api('/api/documents/'+id,{method:'DELETE'});toast('Document archived');await loadLibrary();showView('library')}
+  catch(e){toast(e.message)}
+}
+
+async function init(){
+  session=await getVigilSession();token=session.token;
+  await loadLibrary();
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${e.message}</div>`);
+</script>
+</body>
+</html>
