@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contractor Management - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B;--purple:#8B5CF6}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select,textarea{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}h2{font-size:15px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.ok{background:var(--ok);border-color:var(--ok);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}.stat-val{font-variant-numeric:tabular-nums;font-size:23px;font-weight:800;margin-top:5px}.stat-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:46px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.search,.select{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}.search:focus,.select:focus{border-color:var(--accent)}.panel-body{padding:13px}
+.table-wrap{overflow:auto}.tbl{width:100%;border-collapse:collapse;min-width:720px}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);white-space:nowrap}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.tbl tr.clickable{cursor:pointer}.tbl tr.clickable:hover td{background:var(--s2)}.identity{color:var(--text);font-weight:700}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700;white-space:nowrap}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.chip.accent{color:var(--accent);background:rgba(33,184,230,.09)}.chip.danger{color:#FCA5A5;background:rgba(239,90,103,.09)}.chip.purple{color:#C4B5FD;background:rgba(139,92,246,.1)}.chip.muted{color:var(--muted)}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.fact{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:11px}.fact-label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;margin-bottom:5px}.fact-val{font-size:12px}
+.prequal{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.pq-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px}.pq-name{font-size:11.5px}.pq-name b{display:block;color:var(--text);font-size:12px;margin-bottom:2px}
+.item{padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;font-size:11px;display:flex;align-items:center;gap:10px}.item .spacer{flex:1}.item-title{color:var(--text);font-weight:700;font-size:12px}.item-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.section-title{font-size:12px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;gap:8px}.section-title .spacer{flex:1}
+.gauge{display:inline-flex;align-items:center;gap:8px}.gauge-bar{width:80px;height:7px;border-radius:4px;background:var(--s3);overflow:hidden}.gauge-bar>i{display:block;height:100%}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(540px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-size:16px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:8px 10px;outline:none}.field input,.field select{height:36px}.field textarea{min-height:70px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}.check{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--text);margin-bottom:9px}.check input{width:16px;height:16px;accent-color:var(--accent)}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000;max-width:340px}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.grid2,.detail-grid,.prequal,.frow{grid-template-columns:1fr}.page-hdr{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Contractor Management</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Contractors</div>
+      <button class="nav-item active" data-view="dash" onclick="showView('dash')">Dashboard</button>
+      <button class="nav-item" data-view="list" onclick="showView('list')">All contractors</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-dash">
+        <div class="page-hdr"><div><h1>Contractor Management</h1><div class="page-sub">Prequalification, site access control, credential tracking, live presence, and performance monitoring.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreateContractor()">＋ New contractor</button></div></div>
+        <div class="stats" id="dash-stats"></div>
+        <div class="grid2">
+          <div class="panel"><div class="panel-hd"><span class="panel-title">On site now</span><span class="spacer"></span><span class="meta" id="onsite-count"></span></div><div class="table-wrap" id="onsite-table"></div></div>
+          <div class="panel"><div class="panel-hd"><span class="panel-title">Pending access requests</span></div><div class="panel-body" id="pending-access"></div></div>
+        </div>
+        <div class="panel"><div class="panel-hd"><span class="panel-title">Alerts</span></div><div class="panel-body" id="dash-alerts"></div></div>
+      </section>
+
+      <section id="view-list" class="hidden">
+        <div class="page-hdr"><div><h1>All Contractors</h1><div class="page-sub">Every contractor company and its prequalification and risk status.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreateContractor()">＋ New contractor</button></div></div>
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Contractors</span><span class="spacer"></span>
+            <input class="search" id="f-search" placeholder="Search name or trade…" oninput="renderList()">
+            <select class="select" id="f-status" onchange="renderList()"><option value="">All statuses</option><option>pending</option><option>under_review</option><option>approved</option><option>conditional</option><option>suspended</option><option>revoked</option></select>
+          </div>
+          <div class="table-wrap" id="list-table"></div>
+        </div>
+      </section>
+
+      <section id="view-contractor" class="hidden"></section>
+      <section id="view-worker" class="hidden"></section>
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
+let token=null,session=null,contractors=[],curContractor=null,curWorker=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=s=>String(s??'—').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+const date=s=>s?new Date(s).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'—';
+const dt=s=>s?new Date(s).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'—';
+const wname=w=>esc(((w.first_name||'')+' '+(w.last_name||'')).trim()||w.worker_number||'Worker');
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(body.error||`Request failed (${r.status})`);e.reason=body.reason;e.body=body;throw e}return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),3400)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='dash')loadDash();if(name==='list')renderList()}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+const STATUS_CHIP={approved:'ok',conditional:'accent',pending:'warn',under_review:'warn',suspended:'danger',revoked:'danger'};
+const RISK_CHIP={low:'ok',medium:'accent',high:'warn',critical:'danger'};
+const CRED_CHIP={valid:'ok',expiring_soon:'warn',expired:'danger',no_expiry:'muted'};
+const ACCESS_CHIP={approved:'ok',pending:'warn',suspended:'danger',revoked:'danger'};
+function statusChip(s){return `<span class="chip ${STATUS_CHIP[s]||''}">${fmt(s)}</span>`}
+function riskChip(s){return s?`<span class="chip ${RISK_CHIP[s]||''}">${fmt(s)} risk</span>`:''}
+function scoreGauge(v){const n=v==null?0:Number(v);const c=n>=80?'var(--ok)':n>=60?'var(--accent)':n>=40?'var(--warn)':'var(--danger)';return `<span class="gauge"><span class="gauge-bar"><i style="width:${n}%;background:${c}"></i></span><b style="color:${c};font-size:11px">${v==null?'—':Math.round(n)}</b></span>`}
+function expiryChip(d){if(!d)return '<span class="chip muted">Not set</span>';const days=Math.floor((new Date(d)-new Date())/86400000);if(days<0)return `<span class="chip danger">Expired ${date(d)}</span>`;if(days<=30)return `<span class="chip warn">Expires ${date(d)}</span>`;return `<span class="chip ok">Valid to ${date(d)}</span>`}
+
+// ── Modal helper (shared convention; .modal is the form) ───────
+function modal(title,copy,fields,onSubmit,reload){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2>${copy?`<div class="modal-copy">${copy}</div>`:''}<div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;
+  document.querySelector('.modal').onsubmit=async e=>{e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;try{await onSubmit(new FormData(e.target));closeModal();if(reload)await reload()}catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}};
+}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+const clean=(o,keys)=>{keys.forEach(k=>{if(o[k]===''||o[k]==null)delete o[k]});return o};
+
+// ── Dashboard ──────────────────────────────────────────────────
+async function loadDash(){
+  try{
+    const [stats,dash]=await Promise.all([api('/api/contractors/stats'),api('/api/contractors/dashboard')]);
+    const c=stats.contractors||{},w=stats.workers||{},p=stats.presence_today||{};
+    document.getElementById('dash-stats').innerHTML=`
+      <div class="stat"><div class="stat-label">Contractors</div><div class="stat-val">${c.total||0}</div><div class="stat-sub">${c.approved||0} approved</div></div>
+      <div class="stat"><div class="stat-label">Active workers</div><div class="stat-val">${w.active||w.total||0}</div><div class="stat-sub">across all contractors</div></div>
+      <div class="stat"><div class="stat-label">On site now</div><div class="stat-val" style="color:var(--accent)">${(dash.live_presence||[]).length}</div><div class="stat-sub">signed in</div></div>
+      <div class="stat"><div class="stat-label">Pending access</div><div class="stat-val" style="color:var(--warn)">${(dash.pending_access_requests||[]).length}</div><div class="stat-sub">awaiting approval</div></div>`;
+    const live=dash.live_presence||[];
+    document.getElementById('onsite-count').textContent=`${live.length} on site`;
+    document.getElementById('onsite-table').innerHTML=live.length?`<table class="tbl"><thead><tr><th>Worker</th><th>Site</th><th>Since</th></tr></thead><tbody>${live.map(x=>`<tr class="clickable" onclick="openWorker('${x.contractor_worker_id}')"><td><div class="identity">${wname(x)}</div><div class="meta">${esc(x.job_title||x.trade||'')}</div></td><td>${esc(x.site||'—')}</td><td>${dt(x.signed_in_at)}</td></tr>`).join('')}</tbody></table>`:`<div class="empty">No contractors on site right now.</div>`;
+    const pend=dash.pending_access_requests||[];
+    document.getElementById('pending-access').innerHTML=pend.length?pend.map(a=>`<div class="item"><div><div class="item-title">${wname(a)}</div><div class="item-meta">${esc(a.site||'')} · requested ${date(a.created_at)}</div></div><div class="spacer"></div><button class="btn small" onclick="openWorker('${a.contractor_worker_id}')">Review</button></div>`).join(''):`<div class="empty">No pending access requests.</div>`;
+    const alerts=[];
+    (dash.stop_work_orders_7d||[]).forEach(x=>alerts.push(`<div class="item"><span class="chip danger">Stop work</span><div class="spacer"></div><div class="item-meta">${esc(x.description||'')} · ${date(x.event_date)}</div></div>`));
+    (dash.scope_violations_7d||[]).forEach(x=>alerts.push(`<div class="item"><span class="chip warn">Scope violation</span><div class="spacer"></div><div class="item-meta">${esc(x.description||'')} · ${date(x.event_date)}</div></div>`));
+    (dash.workers_with_expired_credentials||[]).forEach(x=>alerts.push(`<div class="item"><span class="chip danger">Expired credential</span> <span class="item-title">${wname(x)}</span><div class="spacer"></div><div class="item-meta">${esc(x.credential_type||'')}</div></div>`));
+    document.getElementById('dash-alerts').innerHTML=alerts.length?alerts.join(''):`<div class="empty">No alerts in the last 7 days. 🎉</div>`;
+  }catch(e){document.getElementById('dash-stats').innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+
+// ── Contractor list ────────────────────────────────────────────
+async function loadContractors(){const r=await api('/api/contractors');contractors=r.contractors||[]}
+function renderList(){
+  const q=(document.getElementById('f-search')?.value||'').toLowerCase(),st=document.getElementById('f-status')?.value||'';
+  const rows=contractors.filter(c=>(!q||`${c.name} ${c.trade||''} ${c.contractor_number}`.toLowerCase().includes(q))&&(!st||c.status===st));
+  const el=document.getElementById('list-table');
+  if(!rows.length){el.innerHTML=`<div class="empty">No contractors match. <button class="btn primary small" style="margin-left:8px" onclick="openCreateContractor()">Add one</button></div>`;return}
+  el.innerHTML=`<table class="tbl"><thead><tr><th>Contractor</th><th>Trade</th><th>Prequal</th><th>Performance</th><th>Workers</th><th>Status</th></tr></thead><tbody>${
+    rows.map(c=>`<tr class="clickable" onclick="openContractor('${c.id}')"><td><div class="identity">${esc(c.name)}</div><div class="meta">${esc(c.contractor_number)}</div></td><td>${esc(c.trade||'—')}</td><td>${scoreGauge(c.prequalification_score)}</td><td>${scoreGauge(c.performance_score)} ${riskChip(c.risk_tier)}</td><td>${c.active_workers??0}</td><td>${statusChip(c.status)}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+
+// ── Contractor detail ──────────────────────────────────────────
+async function openContractor(id){
+  showView('contractor');const el=document.getElementById('view-contractor');el.innerHTML=`<div class="empty">Loading…</div>`;
+  try{
+    const r=await api('/api/contractors/'+id);curContractor=r.contractor;renderContractor();
+  }catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+function renderContractor(){
+  const c=curContractor;const workers=c.workers||[],scope=c.active_scope||[],events=c.recent_events||[];
+  const canApprove=['pending','under_review','conditional','suspended'].includes(c.status);
+  document.getElementById('view-contractor').innerHTML=`
+    <div class="page-hdr">
+      <div><h1>${esc(c.name)}</h1><div class="page-sub">${esc(c.contractor_number)} · ${esc(c.trade||'No trade')} · ${statusChip(c.status)} ${riskChip(c.risk_tier)}</div></div>
+      <div class="actions">
+        <button class="btn small" onclick="showView('list')">← All contractors</button>
+        <button class="btn small" onclick="openEditContractor()">Edit</button>
+        ${canApprove?`<button class="btn small ok" onclick="approveContractor()">Approve</button>`:''}
+        ${c.status==='approved'||c.status==='conditional'?`<button class="btn small" onclick="suspendContractor()">Suspend</button>`:''}
+        ${c.status!=='revoked'?`<button class="btn small danger" onclick="revokeContractor()">Revoke</button>`:''}
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="fact"><div class="fact-label">Prequalification</div><div class="fact-val">${scoreGauge(c.prequalification_score)}</div></div>
+      <div class="fact"><div class="fact-label">Performance</div><div class="fact-val">${scoreGauge(c.performance_score)}</div></div>
+      <div class="fact"><div class="fact-label">Approval expiry</div><div class="fact-val">${date(c.approval_expiry)}</div></div>
+      <div class="fact"><div class="fact-label">Contact</div><div class="fact-val">${esc(c.contact_name||'—')}${c.contact_phone?`<div class="meta">${esc(c.contact_phone)}</div>`:''}</div></div>
+      <div class="fact"><div class="fact-label">Next review</div><div class="fact-val">${date(c.next_review_date)}</div></div>
+      <div class="fact"><div class="fact-label">Agreement</div><div class="fact-val">${c.has_signed_agreement?expiryChip(c.agreement_expiry):'<span class="chip danger">Not signed</span>'}</div></div>
+    </div>
+    <div class="section-title">Prequalification documents</div>
+    <div class="prequal">
+      <div class="pq-item"><div class="pq-name"><b>WCB clearance</b>${esc(c.wcb_account_number||'No account #')}</div>${expiryChip(c.wcb_clearance_expiry)}</div>
+      <div class="pq-item"><div class="pq-name"><b>Insurance</b>${esc(c.insurance_provider||'No provider')}${c.insurance_limit?` · $${Number(c.insurance_limit).toLocaleString()}`:''}</div>${expiryChip(c.insurance_expiry)}</div>
+      <div class="pq-item"><div class="pq-name"><b>COR certification</b>${c.cor_certified?esc(c.cor_certificate_number||'Certified'):'Not certified'}</div>${c.cor_certified?expiryChip(c.cor_expiry):'<span class="chip muted">N/A</span>'}</div>
+      <div class="pq-item"><div class="pq-name"><b>Safety manual</b>${c.has_safety_manual?'On file':'Not provided'}</div>${c.has_safety_manual?'<span class="chip ok">Yes</span>':'<span class="chip warn">No</span>'}</div>
+    </div>
+    <div class="section-title">Scope of work <div class="spacer"></div><button class="btn small" onclick="openAddScope()">＋ Scope</button></div>
+    ${scope.length?scope.map(s=>`<div class="item"><div><div class="item-title">${esc(s.title)}</div><div class="item-meta">${esc(fmt(s.work_category||'general'))}${s.end_date?` · ends ${date(s.end_date)}`:''}${(s.sites_approved||[]).length?` · ${(s.sites_approved).map(esc).join(', ')}`:''}</div></div></div>`).join(''):`<div class="empty">No active scope of work defined.</div>`}
+    <div class="section-title">Workers (${workers.length}) <div class="spacer"></div><button class="btn small" onclick="openAddWorker()">＋ Worker</button></div>
+    ${workers.length?`<div class="table-wrap"><table class="tbl"><thead><tr><th>Worker</th><th>Trade</th><th>Status</th></tr></thead><tbody>${workers.map(w=>`<tr class="clickable" onclick="openWorker('${w.id}')"><td><div class="identity">${wname(w)}</div><div class="meta">${esc(w.worker_number||'')}</div></td><td>${esc(w.trade||w.job_title||'—')}</td><td>${statusChip(w.status)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">No workers registered.</div>`}
+    <div class="section-title">Recent performance events <div class="spacer"></div><button class="btn small" onclick="openAddEvent()">＋ Event</button></div>
+    ${events.length?events.map(eventRow).join(''):`<div class="empty">No performance events recorded.</div>`}
+  `;
+}
+function eventRow(e){const sev=e.severity==='positive'?'ok':e.severity==='critical'?'danger':e.severity==='major'?'warn':'muted';return `<div class="item"><span class="chip ${sev}">${fmt(e.event_type)}</span><div><div class="item-meta">${esc(e.description||'')}</div></div><div class="spacer"></div><div class="item-meta">${e.score_impact>0?'+':''}${e.score_impact} · ${date(e.event_date)}</div></div>`}
+
+// ── Worker detail ──────────────────────────────────────────────
+async function openWorker(id){
+  showView('worker');const el=document.getElementById('view-worker');el.innerHTML=`<div class="empty">Loading…</div>`;
+  try{const r=await api('/api/contractors/workers/'+id);curWorker=r.worker;renderWorker();}
+  catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+function renderWorker(){
+  const w=curWorker;const creds=w.credentials||[],access=w.site_access||[],presence=w.recent_presence||[];
+  const onSite=presence.find(p=>p.is_active);
+  document.getElementById('view-worker').innerHTML=`
+    <div class="page-hdr">
+      <div><h1>${wname(w)}</h1><div class="page-sub">${esc(w.worker_number||'')} · ${esc(w.trade||w.job_title||'')} · ${statusChip(w.status)}${onSite?' · <span class="chip accent">On site</span>':''}</div></div>
+      <div class="actions">
+        <button class="btn small" onclick="openContractor('${w.contractor_id}')">← Contractor</button>
+        ${onSite?`<button class="btn small" onclick="signOut('${w.id}')">Sign out</button>`:`<button class="btn small ok" onclick="openSignIn()">Sign in</button>`}
+      </div>
+    </div>
+    <div class="section-title">Site access <div class="spacer"></div><button class="btn small" onclick="openRequestAccess()">＋ Request access</button></div>
+    ${access.length?access.map(a=>`<div class="item"><span class="chip ${ACCESS_CHIP[a.access_status]||''}">${fmt(a.access_status)}</span><div><div class="item-title">${esc(a.site)}</div><div class="item-meta">${a.orientation_completed?`Oriented ${date(a.orientation_date)}`:'Orientation not done'}${a.access_expiry?` · access to ${date(a.access_expiry)}`:''}</div></div><div class="spacer"></div>${a.access_status==='pending'?`<button class="btn small ok" onclick="approveAccess('${a.id}')">Approve</button>`:''}${a.access_status==='approved'?`<button class="btn small danger" onclick="revokeAccess('${a.id}')">Revoke</button>`:''}</div>`).join(''):`<div class="empty">No site access on file. Request access, then approve after orientation.</div>`}
+    <div class="section-title">Credentials <div class="spacer"></div><button class="btn small" onclick="openAddCredential()">＋ Credential</button></div>
+    ${creds.length?creds.map(cr=>`<div class="item"><span class="chip ${CRED_CHIP[cr.credential_status]||''}">${fmt(cr.credential_status||'unknown')}</span><div><div class="item-title">${esc(cr.credential_type)}</div><div class="item-meta">${esc(cr.issuing_body||'')}${cr.expiry_date?` · expires ${date(cr.expiry_date)}`:' · no expiry'}${cr.verified_at?' · verified':''}</div></div><div class="spacer"></div>${!cr.verified_at?`<button class="btn small" onclick="verifyCredential('${cr.id}')">Verify</button>`:''}</div>`).join(''):`<div class="empty">No credentials on file.</div>`}
+    <div class="section-title">Recent presence</div>
+    ${presence.length?presence.map(p=>`<div class="item"><span class="chip ${p.is_active?'accent':'muted'}">${p.is_active?'On site':'Signed out'}</span><div><div class="item-title">${esc(p.site||'')}</div><div class="item-meta">In ${dt(p.signed_in_at)}${p.signed_out_at?` · out ${dt(p.signed_out_at)}`:''}${p.task_description?` · ${esc(p.task_description)}`:''}</div></div></div>`).join(''):`<div class="empty">No sign-in history.</div>`}
+  `;
+}
+
+// ── Actions: contractor ────────────────────────────────────────
+function contractorFields(c){return `
+  <div class="field"><label>Company name</label><input name="name" required maxlength="500" value="${esc(c?.name||'')}"></div>
+  <div class="frow"><div class="field"><label>Trade</label><input name="trade" value="${esc(c?.trade||'')}" placeholder="e.g. Electrical"></div><div class="field"><label>Contact name</label><input name="contact_name" value="${esc(c?.contact_name||'')}"></div></div>
+  <div class="frow"><div class="field"><label>Contact email</label><input name="contact_email" type="email" value="${esc(c?.contact_email||'')}"></div><div class="field"><label>Contact phone</label><input name="contact_phone" value="${esc(c?.contact_phone||'')}"></div></div>
+  <div class="frow"><div class="field"><label>WCB account #</label><input name="wcb_account_number" value="${esc(c?.wcb_account_number||'')}"></div><div class="field"><label>WCB clearance expiry</label><input name="wcb_clearance_expiry" type="date" value="${c?.wcb_clearance_expiry?c.wcb_clearance_expiry.slice(0,10):''}"></div></div>
+  <div class="frow"><div class="field"><label>Insurance provider</label><input name="insurance_provider" value="${esc(c?.insurance_provider||'')}"></div><div class="field"><label>Insurance expiry</label><input name="insurance_expiry" type="date" value="${c?.insurance_expiry?c.insurance_expiry.slice(0,10):''}"></div></div>
+  <label class="check"><input type="checkbox" name="cor_certified" ${c?.cor_certified?'checked':''}> COR certified</label>
+  <div class="field"><label>COR expiry</label><input name="cor_expiry" type="date" value="${c?.cor_expiry?c.cor_expiry.slice(0,10):''}"></div>
+  <label class="check"><input type="checkbox" name="has_safety_manual" ${c?.has_safety_manual?'checked':''}> Safety manual on file</label>
+  <label class="check"><input type="checkbox" name="has_signed_agreement" ${c?.has_signed_agreement?'checked':''}> Signed contractor agreement</label>
+  <div class="field"><label>Agreement expiry</label><input name="agreement_expiry" type="date" value="${c?.agreement_expiry?c.agreement_expiry.slice(0,10):''}"></div>`;
+}
+function contractorPayload(f){
+  const o=Object.fromEntries(f);
+  ['cor_certified','has_safety_manual','has_signed_agreement'].forEach(k=>o[k]=f.get(k)==='on');
+  return clean(o,['trade','contact_name','contact_email','contact_phone','wcb_account_number','wcb_clearance_expiry','insurance_provider','insurance_expiry','cor_expiry','agreement_expiry']);
+}
+function openCreateContractor(){modal('New contractor','Prequalification starts as pending. Add WCB, insurance, COR, and agreement details as you receive them.',contractorFields(null),async f=>{await api('/api/contractors',{method:'POST',body:JSON.stringify(contractorPayload(f))});toast('Contractor added')},async()=>{await loadContractors();renderList();showView('list')})}
+function openEditContractor(){const c=curContractor;modal('Edit contractor','',contractorFields(c),async f=>{await api('/api/contractors/'+c.id,{method:'PUT',body:JSON.stringify(contractorPayload(f))});toast('Contractor updated')},()=>openContractor(c.id))}
+function approveContractor(){modal('Approve contractor','Approving grants prequalified status. Set an approval expiry and next review date so it stays current.',`<div class="frow"><div class="field"><label>Approval expiry</label><input name="approval_expiry" type="date"></div><div class="field"><label>Next review date</label><input name="next_review_date" type="date"></div></div><div class="field"><label>Notes</label><textarea name="notes"></textarea></div>`,async f=>{const o=clean(Object.fromEntries(f),['approval_expiry','next_review_date','notes']);await api('/api/contractors/'+curContractor.id+'/approve',{method:'POST',body:JSON.stringify(o)});toast('Contractor approved')},()=>openContractor(curContractor.id))}
+function suspendContractor(){const reason=prompt('Reason for suspension:');if(reason===null)return;api('/api/contractors/'+curContractor.id+'/suspend',{method:'POST',body:JSON.stringify({reason})}).then(()=>{toast('Contractor suspended');openContractor(curContractor.id)}).catch(e=>toast(e.message))}
+function revokeContractor(){const reason=prompt('Reason for revoking access (this blocks all sign-ins):');if(reason===null)return;api('/api/contractors/'+curContractor.id+'/revoke',{method:'POST',body:JSON.stringify({reason})}).then(()=>{toast('Contractor access revoked');openContractor(curContractor.id)}).catch(e=>toast(e.message))}
+
+function openAddScope(){modal('Add scope of work','',`<div class="field"><label>Title</label><input name="title" required></div><div class="field"><label>Work category</label><select name="work_category"><option value="">— none —</option>${['mechanical','electrical','civil','instrumentation','welding','painting','insulation','scaffolding','cleaning','inspection','transportation','other'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="frow"><div class="field"><label>Start date</label><input name="start_date" type="date"></div><div class="field"><label>End date</label><input name="end_date" type="date"></div></div><div class="field"><label>Special requirements</label><textarea name="special_requirements"></textarea></div>`,async f=>{const o=clean(Object.fromEntries(f),['work_category','start_date','end_date','special_requirements']);await api('/api/contractors/'+curContractor.id+'/scope',{method:'POST',body:JSON.stringify(o)});toast('Scope added')},()=>openContractor(curContractor.id))}
+function openAddEvent(){modal('Record performance event','Score impact adjusts the contractor performance score (negative for issues, positive for commendations).',`<div class="frow"><div class="field"><label>Event type</label><select name="event_type">${['observation_negative','observation_positive','near_miss','incident','stop_work','scope_violation','flha_deficiency','permit_violation','commendation','audit_finding'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Severity</label><select name="severity"><option>minor</option><option>major</option><option>critical</option><option>positive</option></select></div></div><div class="field"><label>Score impact</label><input name="score_impact" type="number" value="-3"></div><div class="field"><label>Description</label><textarea name="description"></textarea></div>`,async f=>{const o=Object.fromEntries(f);o.score_impact=parseInt(o.score_impact)||0;clean(o,['description']);await api('/api/contractors/'+curContractor.id+'/performance/events',{method:'POST',body:JSON.stringify(o)});toast('Event recorded')},()=>openContractor(curContractor.id))}
+
+// ── Actions: worker ────────────────────────────────────────────
+function openAddWorker(){modal('Register worker','',`<div class="frow"><div class="field"><label>First name</label><input name="first_name" required></div><div class="field"><label>Last name</label><input name="last_name" required></div></div><div class="frow"><div class="field"><label>Trade</label><input name="trade"></div><div class="field"><label>Job title</label><input name="job_title"></div></div><div class="frow"><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Phone</label><input name="phone"></div></div>`,async f=>{const o=clean(Object.fromEntries(f),['trade','job_title','email','phone']);await api('/api/contractors/'+curContractor.id+'/workers',{method:'POST',body:JSON.stringify(o)});toast('Worker registered')},()=>openContractor(curContractor.id))}
+function openRequestAccess(){modal('Request site access','After requesting, approve it once orientation is complete. Sign-in is blocked until access is approved and oriented.',`<div class="field"><label>Site</label><input name="site" required placeholder="e.g. Calgary Hub HQ"></div><div class="field"><label>Notes</label><textarea name="notes"></textarea></div>`,async f=>{const o=clean(Object.fromEntries(f),['notes']);await api('/api/contractors/workers/'+curWorker.id+'/access',{method:'POST',body:JSON.stringify(o)});toast('Access requested')},()=>openWorker(curWorker.id))}
+function approveAccess(id){modal('Approve site access','Confirming orientation is complete unblocks sign-in for this site.',`<label class="check"><input type="checkbox" name="orientation_completed" checked> Orientation completed</label><div class="frow"><div class="field"><label>Orientation date</label><input name="orientation_date" type="date"></div><div class="field"><label>Access expiry</label><input name="access_expiry" type="date"></div></div>`,async f=>{const o=Object.fromEntries(f);o.orientation_completed=f.get('orientation_completed')==='on';clean(o,['orientation_date','access_expiry']);await api('/api/contractors/access/'+id+'/approve',{method:'POST',body:JSON.stringify(o)});toast('Access approved')},()=>openWorker(curWorker.id))}
+function revokeAccess(id){if(!confirm('Revoke this site access?'))return;api('/api/contractors/access/'+id+'/revoke',{method:'POST',body:JSON.stringify({})}).then(()=>{toast('Access revoked');openWorker(curWorker.id)}).catch(e=>toast(e.message))}
+function openAddCredential(){modal('Add credential','',`<div class="field"><label>Credential type</label><input name="credential_type" required placeholder="e.g. Fall Protection, H2S Alive"></div><div class="frow"><div class="field"><label>Issuing body</label><input name="issuing_body"></div><div class="field"><label>Credential #</label><input name="credential_number"></div></div><div class="frow"><div class="field"><label>Issue date</label><input name="issue_date" type="date"></div><div class="field"><label>Expiry date</label><input name="expiry_date" type="date"></div></div>`,async f=>{const o=clean(Object.fromEntries(f),['issuing_body','credential_number','issue_date','expiry_date']);await api('/api/contractors/workers/'+curWorker.id+'/credentials',{method:'POST',body:JSON.stringify(o)});toast('Credential added')},()=>openWorker(curWorker.id))}
+function verifyCredential(id){api('/api/contractors/credentials/'+id+'/verify',{method:'POST',body:JSON.stringify({})}).then(()=>{toast('Credential verified');openWorker(curWorker.id)}).catch(e=>toast(e.message))}
+function openSignIn(){modal('Sign in to site','Sign-in is blocked unless the contractor is approved, the worker is active, and site access is approved with orientation complete.',`<div class="field"><label>Site</label><input name="site" required placeholder="e.g. Calgary Hub HQ"></div><div class="field"><label>Task description</label><textarea name="task_description"></textarea></div>`,async f=>{const o=clean(Object.fromEntries(f),['task_description']);try{const r=await api('/api/contractors/workers/'+curWorker.id+'/sign-in',{method:'POST',body:JSON.stringify(o)});toast(r.scope_violation?'Signed in — SCOPE VIOLATION flagged':'Signed in')}catch(e){throw new Error(e.reason?`Blocked: ${e.reason}`:e.message)}},()=>openWorker(curWorker.id))}
+function signOut(id){api('/api/contractors/workers/'+id+'/sign-out',{method:'POST',body:JSON.stringify({})}).then(()=>{toast('Signed out');openWorker(id)}).catch(e=>toast(e.message))}
+
+async function init(){
+  session=await getVigilSession();token=session.token;
+  await loadContractors();
+  loadDash();
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${e.message}</div>`);
+</script>
+</body>
+</html>
