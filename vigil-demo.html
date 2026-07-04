@@ -1611,8 +1611,8 @@ function actionRoutePayload(a) {
 function openActionRoute(id) {
   const a = actionCenterItems.find(item=>item.id===id);
   if (!a) return;
-  if (a.route_module === 'meetings') return loadMod('jhsc', actionRoutePayload(a));
-  const route = a.route_module || 'admin';
+  const ACTION_ROUTE_ALIAS = {meetings:'jhsc', audit:'cor'};
+  const route = ACTION_ROUTE_ALIAS[a.route_module] || a.route_module || 'admin';
   loadMod(route, actionRoutePayload(a));
 }
 
@@ -1710,7 +1710,7 @@ function renderNotificationWorkflow() {
     return;
   }
   list.innerHTML = rows.map(a=>{
-    const route = a.route_module === 'meetings' ? 'jhsc' : (a.route_module || 'admin');
+    const route = ({meetings:'jhsc', audit:'cor'})[a.route_module] || a.route_module || 'admin';
     const parent = [a.parent_number, a.parent_title].filter(Boolean).join(' · ');
     const due = a.due_date ? `Due ${new Date(a.due_date).toLocaleDateString()}` : 'No due date';
     const overdueText = a.is_overdue ? ` · ${Math.abs(a.days_overdue || 0)} day${Math.abs(a.days_overdue || 0) === 1 ? '' : 's'} overdue` : '';
