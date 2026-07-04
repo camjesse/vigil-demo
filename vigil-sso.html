@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signing you in - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#F4F7FA;color:#102033;font-family:'Inter',sans-serif}
+.wrap{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:24px;text-align:center}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid #CBD5E1;border-top-color:#21B8E6;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.msg{font-size:13px;color:#42566B}
+.err{max-width:420px;font-size:13px;color:#B91C1C;background:#FEF2F2;border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:14px}
+a{color:#0E7CA8;font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="spin"></div>
+  <div class="msg">Completing single sign-on…</div>
+</div>
+<script>
+// The identity provider redirects here with a one-time token in the URL
+// FRAGMENT (never sent to the server, never logged) after ssoController
+// verifies the OIDC id_token and matches the user by email.
+(function () {
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const token = params.get('token');
+  const userRaw = params.get('user');
+  const companyId = params.get('companyId');
+
+  // Strip the fragment immediately so a page refresh/back-button never
+  // replays the token.
+  history.replaceState(null, '', window.location.pathname);
+
+  if (!token || !userRaw) {
+    document.getElementById('wrap').innerHTML =
+      '<div class="err">Sign-in did not complete. <a href="index.html">Return to sign in</a></div>';
+    return;
+  }
+  try {
+    const user = JSON.parse(userRaw);
+    window.localStorage.setItem('vigil_session', JSON.stringify({ token, user, companyId }));
+    window.location.replace('vigil-demo.html');
+  } catch (e) {
+    document.getElementById('wrap').innerHTML =
+      '<div class="err">Sign-in response was malformed. <a href="index.html">Return to sign in</a></div>';
+  }
+})();
+</script>
+</body>
+</html>

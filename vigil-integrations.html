@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrations & Security - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px;max-width:640px;line-height:1.5}.actions{display:flex;gap:7px;flex-shrink:0}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}.btn:disabled{opacity:.55;cursor:wait}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border)}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.panel-copy{padding:12px 13px;font-size:11.5px;color:var(--text2);line-height:1.55}
+.table-wrap{overflow:auto}.tbl{width:100%;min-width:640px;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.identity{color:var(--text);font-weight:700}.mono{font-family:'DM Mono',monospace;font-size:10.5px}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700;margin:1px 3px 1px 0}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.chip.danger{color:#FCA5A5;background:rgba(239,90,103,.09)}.chip.accent{color:var(--accent);background:rgba(33,184,230,.09)}.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select{height:38px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 10px;outline:none}.field input:focus,.field select:focus{border-color:var(--accent)}.field-hint{font-size:10px;color:var(--muted);margin-top:2px}
+.checks{display:flex;flex-direction:column;gap:8px}.checks label{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text2)}.checks input{width:16px;height:16px;accent-color:var(--accent)}
+.toggle-row{display:flex;align-items:flex-start;gap:12px;padding:14px}.toggle-row input{width:18px;height:18px;accent-color:var(--accent);margin-top:2px}.toggle-copy{flex:1;font-size:11.5px;color:var(--text2);line-height:1.5}.toggle-copy strong{color:var(--text);display:block;margin-bottom:3px;font-size:12px}
+.copyfield{display:flex;gap:6px}.copyfield input{flex:1;font-family:'DM Mono',monospace;font-size:11px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(500px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-size:17px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px;line-height:1.5}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}.warn-box{background:rgba(243,181,27,.08);border:1px solid rgba(243,181,27,.25);border-radius:6px;padding:10px;font-size:11px;color:#FAD467;margin-bottom:12px;line-height:1.5}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000;max-width:340px}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.page-hdr{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Integrations &amp; Security</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Integrations</div>
+      <button class="nav-item active" data-view="keys" onclick="showView('keys')">API keys</button>
+      <button class="nav-item" data-view="webhooks" onclick="showView('webhooks')">Webhooks</button>
+      <button class="nav-item" data-view="sso" onclick="showView('sso')">Single sign-on</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-keys">
+        <div class="page-hdr">
+          <div><h1>API Keys</h1><div class="page-sub">Machine-to-machine access for scripts and integrations. "Read" keys can fetch data everywhere; "Integration" keys can additionally bulk-import workers from an HRIS.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreateKey()">Create key</button></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Keys</div><div class="spacer"></div></div>
+          <div class="table-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Prefix</th><th>Access</th><th>Last used</th><th>Status</th><th>Actions</th></tr></thead><tbody id="key-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-webhooks" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Webhooks</h1><div class="page-sub">Get a signed HTTP POST when things happen in Vigil. Verify the X-Vigil-Signature header (HMAC-SHA256 of the raw body) against the secret shown at creation.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreateWebhook()">Add webhook</button></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Webhooks</div><div class="spacer"></div></div>
+          <div class="table-wrap"><table class="tbl"><thead><tr><th>Name</th><th>URL</th><th>Events</th><th>Deliveries</th><th>Status</th><th>Actions</th></tr></thead><tbody id="webhook-rows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="view-sso" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Single Sign-On</h1><div class="page-sub">Let your team sign in through Azure AD, Okta, Google Workspace, or any identity provider that exposes an OpenID Connect discovery document. Vigil matches by verified email — it never creates accounts automatically, so invite users first.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Redirect URI</div><div class="spacer"></div></div>
+          <div class="panel-copy">Register this exact URL as the redirect / callback URI in your identity provider's app registration:
+            <div class="copyfield" style="margin-top:8px"><input id="redirect-uri" readonly><button class="btn small" onclick="copyField('redirect-uri')">Copy</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Provider configuration</div><div class="spacer"></div></div>
+          <form id="sso-form" style="padding:13px">
+            <div class="error" id="sso-error"></div>
+            <div class="field"><label>Issuer URL</label><input id="sso-issuer" placeholder="https://login.microsoftonline.com/{tenant}/v2.0" required>
+              <div class="field-hint">The base URL — Vigil appends /.well-known/openid-configuration to discover the rest.</div></div>
+            <div class="field"><label>Client ID</label><input id="sso-client-id" required></div>
+            <div class="field"><label>Client secret <span id="sso-secret-status" style="color:var(--muted);text-transform:none;font-weight:400"></span></label><input id="sso-client-secret" type="password" placeholder="Leave blank to keep the current secret"></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text2);margin:14px 0"><input type="checkbox" id="sso-enabled" style="width:16px;height:16px;accent-color:var(--accent)"> Enable SSO sign-in for this company</label>
+            <button class="btn primary" type="submit" id="sso-save">Save configuration</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE;let token=null,session=null,keys=[],webhooks=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||body.details?.[0]?.message||`Request failed (${r.status})`);return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),3200)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name))}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+function copyField(id){const el=document.getElementById(id);el.select();navigator.clipboard?.writeText(el.value).then(()=>toast('Copied'))}
+function timeAgo(iso){if(!iso)return'Never';const d=new Date(iso);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+
+function modal(title,copy,bodyHtml,onSubmit,reload,submitLabel){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${bodyHtml}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">${submitLabel||'Save'}</button></div></form></div>`;
+  document.querySelector('.modal').onsubmit=async e=>{
+    e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;
+    try{await onSubmit(new FormData(e.target),e.target);if(reload)await reload()}
+    catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}
+  };
+}
+function infoModal(title,bodyHtml){document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><div class="modal"><h2>${title}</h2>${bodyHtml}<div class="modal-actions"><button class="btn primary" type="button" onclick="closeModal()">Done</button></div></div></div>`}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+
+// ── API Keys ─────────────────────────────────────────────────
+async function loadKeys(){const r=await api('/api/admin/api-keys');keys=r.api_keys;renderKeys()}
+function renderKeys(){
+  document.getElementById('key-rows').innerHTML=keys.map(k=>`<tr>
+    <td><div class="identity">${esc(k.name)}</div><div class="meta">Created ${timeAgo(k.created_at)}${k.created_by_email?' by '+esc(k.created_by_email):''}</div></td>
+    <td class="mono">${esc(k.key_prefix)}…</td>
+    <td><span class="chip ${k.access==='integration'?'accent':''}">${esc(k.access)}</span></td>
+    <td>${timeAgo(k.last_used_at)}</td>
+    <td>${k.revoked_at?'<span class="chip danger">Revoked</span>':'<span class="chip ok">Active</span>'}</td>
+    <td>${k.revoked_at?'':`<button class="btn small danger" onclick="revokeKey('${k.id}')">Revoke</button>`}</td>
+  </tr>`).join('')||'<tr><td colspan="6" class="empty">No API keys yet</td></tr>';
+}
+function openCreateKey(){
+  modal('Create API key','Give it a name that says what it is for — you will see this in the list later.',
+    `<div class="field"><label>Name</label><input name="name" required maxlength="200" placeholder="Payroll HRIS sync"></div>
+     <div class="field"><label>Access</label><select name="access"><option value="read">Read only</option><option value="integration">Integration (read + worker import)</option></select></div>`,
+    async f=>{
+      const r=await api('/api/admin/api-keys',{method:'POST',body:JSON.stringify(Object.fromEntries(f))});
+      closeModal();
+      infoModal('Copy your API key now',`<div class="warn-box">This is the only time the full key is shown. Store it in a password manager or secrets vault now.</div>
+        <div class="copyfield"><input id="new-key-value" readonly value="${esc(r.key)}"><button class="btn small" type="button" onclick="copyField('new-key-value')">Copy</button></div>
+        <div class="field-hint" style="margin-top:8px">Send it as <span class="mono">Authorization: Bearer ${esc(r.key.slice(0,12))}…</span></div>`);
+      await loadKeys();
+    },loadKeys,'Create');
+}
+async function revokeKey(id){
+  if(!confirm('Revoke this API key? Anything using it will stop working immediately.'))return;
+  try{await api('/api/admin/api-keys/'+id,{method:'DELETE'});toast('Key revoked');await loadKeys()}catch(e){toast(e.message)}
+}
+
+// ── Webhooks ─────────────────────────────────────────────────
+let availableEvents=[];
+async function loadWebhooks(){const r=await api('/api/admin/webhooks');webhooks=r.webhooks;availableEvents=r.available_events;renderWebhooks()}
+function renderWebhooks(){
+  document.getElementById('webhook-rows').innerHTML=webhooks.map(w=>`<tr>
+    <td><div class="identity">${esc(w.name)}</div><div class="meta">Created ${timeAgo(w.created_at)}</div></td>
+    <td class="mono" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(w.url)}</td>
+    <td>${w.events.map(e=>`<span class="chip">${esc(e)}</span>`).join('')}</td>
+    <td>${w.delivery_count} sent${w.failed_count?`<br><span class="chip danger">${w.failed_count} failed</span>`:''}</td>
+    <td>${w.enabled?'<span class="chip ok">Enabled</span>':'<span class="chip">Disabled</span>'}</td>
+    <td><div class="row-actions">
+      <button class="btn small" onclick="testWebhook('${w.id}')">Test</button>
+      <button class="btn small" onclick="viewDeliveries('${w.id}')">Deliveries</button>
+      <button class="btn small" onclick="toggleWebhook('${w.id}',${!w.enabled})">${w.enabled?'Disable':'Enable'}</button>
+      <button class="btn small danger" onclick="deleteWebhook('${w.id}')">Delete</button>
+    </div></td>
+  </tr>`).join('')||'<tr><td colspan="6" class="empty">No webhooks yet</td></tr>';
+}
+function eventChecks(selected=[]){
+  return `<div class="checks">${availableEvents.map(e=>`<label><input type="checkbox" name="events" value="${e}" ${selected.includes(e)?'checked':''}> ${esc(e)}</label>`).join('')}</div>`;
+}
+function openCreateWebhook(){
+  modal('Add webhook','Vigil signs every request with HMAC-SHA256 in the X-Vigil-Signature header so you can verify it really came from Vigil.',
+    `<div class="field"><label>Name</label><input name="name" required maxlength="200" placeholder="Slack incident alerts"></div>
+     <div class="field"><label>URL</label><input name="url" type="url" required placeholder="https://example.com/hooks/vigil"></div>
+     <div class="field"><label>Events</label>${eventChecks()}</div>`,
+    async (f,formEl)=>{
+      const events=[...formEl.querySelectorAll('[name=events]:checked')].map(c=>c.value);
+      const r=await api('/api/admin/webhooks',{method:'POST',body:JSON.stringify({name:f.get('name'),url:f.get('url'),events})});
+      closeModal();
+      infoModal('Copy your signing secret now',`<div class="warn-box">This is the only time the secret is shown. Use it to verify the X-Vigil-Signature header.</div>
+        <div class="copyfield"><input id="new-secret-value" readonly value="${esc(r.secret)}"><button class="btn small" type="button" onclick="copyField('new-secret-value')">Copy</button></div>`);
+      await loadWebhooks();
+    },loadWebhooks,'Create');
+}
+async function toggleWebhook(id,enabled){try{await api('/api/admin/webhooks/'+id,{method:'PATCH',body:JSON.stringify({enabled})});toast(enabled?'Webhook enabled':'Webhook disabled');await loadWebhooks()}catch(e){toast(e.message)}}
+async function deleteWebhook(id){if(!confirm('Delete this webhook?'))return;try{await api('/api/admin/webhooks/'+id,{method:'DELETE'});toast('Webhook deleted');await loadWebhooks()}catch(e){toast(e.message)}}
+async function testWebhook(id){try{const r=await api('/api/admin/webhooks/'+id+'/test',{method:'POST'});toast(r.message)}catch(e){toast(e.message)}}
+async function viewDeliveries(id){
+  const w=webhooks.find(x=>x.id===id);
+  const r=await api('/api/admin/webhooks/'+id+'/deliveries');
+  const rows=r.deliveries.map(d=>`<tr><td>${esc(d.event)}</td><td>${d.status==='sent'?'<span class="chip ok">sent</span>':d.status==='failed'?'<span class="chip danger">failed</span>':'<span class="chip">pending</span>'}</td><td>${d.response_code??'—'}</td><td>${d.attempts}</td><td class="meta">${timeAgo(d.created_at)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No deliveries yet</td></tr>';
+  infoModal('Recent deliveries — '+esc(w.name),`<div class="table-wrap"><table class="tbl" style="min-width:0"><thead><tr><th>Event</th><th>Status</th><th>Code</th><th>Attempts</th><th>When</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+// ── SSO ──────────────────────────────────────────────────────
+async function loadSso(){
+  document.getElementById('redirect-uri').value=API+'/api/auth/sso/callback';
+  const r=await api('/api/admin/sso');
+  const cfg=r.sso;
+  document.getElementById('sso-issuer').value=cfg?.issuer_url||'';
+  document.getElementById('sso-client-id').value=cfg?.client_id||'';
+  document.getElementById('sso-enabled').checked=!!cfg?.enabled;
+  document.getElementById('sso-secret-status').textContent=cfg?.has_secret?'(a secret is already saved)':'(none saved yet)';
+}
+document.getElementById('sso-form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const btn=document.getElementById('sso-save'),err=document.getElementById('sso-error');
+  btn.disabled=true;err.classList.remove('show');
+  try{
+    const body={
+      issuer_url:document.getElementById('sso-issuer').value.trim(),
+      client_id:document.getElementById('sso-client-id').value.trim(),
+      client_secret:document.getElementById('sso-client-secret').value,
+      enabled:document.getElementById('sso-enabled').checked,
+    };
+    await api('/api/admin/sso',{method:'PUT',body:JSON.stringify(body)});
+    document.getElementById('sso-client-secret').value='';
+    toast('SSO configuration saved');
+    await loadSso();
+  }catch(x){err.textContent=x.message;err.classList.add('show')}
+  finally{btn.disabled=false}
+});
+
+// ── Boot ─────────────────────────────────────────────────────
+async function init(){
+  session=await getVigilSession();token=session.token;
+  if(!['admin','superadmin'].includes(session.user.role)){document.querySelector('.content').innerHTML='<div class="empty">Administrator permission is required.</div>';return}
+  await Promise.all([loadKeys(),loadWebhooks(),loadSso()]);
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${esc(e.message)}</div>`);
+</script>
+</body>
+</html>

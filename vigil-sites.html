@@ -149,7 +149,7 @@ function jurOptions(selected){return `<option value="">Inherit from parent / com
 
 function modal(title,copy,fields,onSubmit,reload){
   document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal"><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;
-  document.querySelector('.modal form').onsubmit=async e=>{
+  document.querySelector('.modal').onsubmit=async e=>{
     e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;
     try{await onSubmit(new FormData(e.target));closeModal();if(reload)await reload()}
     catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}

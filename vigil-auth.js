@@ -247,6 +247,18 @@
           <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E8F0;text-align:center;font-size:11.5px;color:#64788D">
             New to Vigil? <a href="vigil-signup.html" style="color:#0E7CA8;font-weight:700;text-decoration:none">Create your company</a>
           </div>
+          <div style="margin-top:8px;text-align:center">
+            <button class="vigil-auth-link" type="button" data-sso-toggle style="font-size:11.5px">Sign in with company SSO instead</button>
+          </div>
+          <div data-sso-panel style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0">
+            <div class="vigil-auth-field">
+              <label for="vigil-auth-sso-slug">Company ID (from your invite link)</label>
+              <input id="vigil-auth-sso-slug" type="text" autocomplete="organization" placeholder="e.g. northern-express-transport">
+            </div>
+            <div class="vigil-auth-actions">
+              <button class="vigil-auth-btn" type="button" data-sso-go>Continue to sign-in provider</button>
+            </div>
+          </div>
         </form>
       `;
 
@@ -256,6 +268,22 @@
       const errorBox = backdrop.querySelector('.vigil-auth-error');
       const submitButton = backdrop.querySelector('[type="submit"]');
       const forgotButton = backdrop.querySelector('[data-forgot]');
+      const ssoToggle = backdrop.querySelector('[data-sso-toggle]');
+      const ssoPanel = backdrop.querySelector('[data-sso-panel]');
+      const ssoSlugInput = backdrop.querySelector('#vigil-auth-sso-slug');
+      const ssoGoButton = backdrop.querySelector('[data-sso-go]');
+
+      ssoToggle.addEventListener('click', () => {
+        const showing = ssoPanel.style.display !== 'none';
+        ssoPanel.style.display = showing ? 'none' : 'block';
+        ssoToggle.textContent = showing ? 'Sign in with company SSO instead' : 'Use email and password instead';
+        if (!showing) ssoSlugInput.focus();
+      });
+      ssoGoButton.addEventListener('click', () => {
+        const slug = ssoSlugInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+        if (!slug) { ssoSlugInput.focus(); return; }
+        window.location.href = `${API_BASE}/api/auth/sso/${slug}/start`;
+      });
 
       forgotButton.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -336,8 +364,12 @@
       if (validated) return saveSession(validated);
 
       clearSession();
-      const expired = stored || new URLSearchParams(window.location.search).has('expired');
-      const session = await openLoginDialog(expired ? 'Your session expired. Please sign in again.' : '');
+      const qs = new URLSearchParams(window.location.search);
+      const expired = stored || qs.has('expired');
+      const ssoError = qs.get('sso_error');
+      if (ssoError) history.replaceState(null, '', window.location.pathname);
+      const message = ssoError || (expired ? 'Your session expired. Please sign in again.' : '');
+      const session = await openLoginDialog(message);
       return saveSession(session);
     })().finally(() => {
       pendingSession = null;
