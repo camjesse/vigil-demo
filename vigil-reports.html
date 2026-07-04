@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Builder - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select,textarea{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.panel-body{padding:14px}
+.ai-box{display:flex;gap:8px;flex-wrap:wrap}.ai-box textarea{flex:1;min-width:240px;min-height:44px;resize:vertical;background:var(--s2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px;font-size:12px;line-height:1.5}.ai-box textarea:focus{outline:none;border-color:var(--accent)}
+.ai-hint{font-size:10.5px;color:var(--muted);margin-top:8px}.ai-msg{font-size:11px;color:var(--accent);margin-top:8px;padding:8px 10px;background:rgba(33,184,230,.06);border:1px solid rgba(33,184,230,.2);border-radius:6px;display:none}.ai-msg.show{display:block}.ai-msg.warn{color:var(--warn);background:rgba(243,181,27,.06);border-color:rgba(243,181,27,.2)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select{height:36px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 10px;outline:none}.field input:focus,.field select:focus{border-color:var(--accent)}
+.cols{display:flex;flex-wrap:wrap;gap:7px}.col-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer}.col-chip input{accent-color:var(--accent)}.col-chip.on{border-color:var(--accent);color:var(--text)}
+.filters-wrap{display:flex;flex-wrap:wrap;gap:10px}.filter-item{display:flex;flex-direction:column;gap:4px}.filter-item label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}.filter-item input{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}
+.table-wrap{overflow:auto}.tbl{width:100%;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);white-space:nowrap}.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);white-space:nowrap}.tbl tr:last-child td{border-bottom:0}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.saved-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border)}.saved-item:last-child{border-bottom:0}.saved-name{font-weight:700;color:var(--text);font-size:12px}.saved-meta{font-size:10px;color:var(--muted);margin-top:2px}.saved-item .spacer{flex:1}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.grid{grid-template-columns:1fr}.page-hdr{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Report Builder</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Reports</div>
+      <button class="nav-item active" data-view="build" onclick="showView('build')">Build a report</button>
+      <button class="nav-item" data-view="saved" onclick="showView('saved')">Saved reports</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-build">
+        <div class="page-hdr">
+          <div><h1>Report Builder</h1><div class="page-sub">Describe what you need in plain language, or build it by hand. Run it, export to CSV, and save it to re-run later.</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Describe your report</span></div>
+          <div class="panel-body">
+            <div class="ai-box">
+              <textarea id="ai-prompt" placeholder="e.g. Serious incidents at Main Plant from last month"></textarea>
+              <button class="btn primary" onclick="interpret()">Interpret</button>
+            </div>
+            <div class="ai-hint">Rule-based interpreter — it fills the builder below, which you can adjust before running. (An AI model can be connected later for free-form requests.)</div>
+            <div class="ai-msg" id="ai-msg"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Builder</span><span class="spacer"></span>
+            <button class="btn" onclick="openSave()">Save report</button>
+            <button class="btn primary" onclick="runReport()">Run</button>
+          </div>
+          <div class="panel-body">
+            <div class="grid">
+              <div class="field"><label>Data</label><select id="b-dataset" onchange="datasetChanged()"></select></div>
+              <div class="field"><label>Name (for saving)</label><input id="b-name" placeholder="e.g. Monthly incident summary"></div>
+            </div>
+            <div class="field"><label>Columns</label><div class="cols" id="b-columns"></div></div>
+            <div class="field"><label>Date range (on the record's primary date)</label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <input id="b-from" type="date" style="width:160px">
+                <span style="align-self:center;color:var(--muted);font-size:11px">to</span>
+                <input id="b-to" type="date" style="width:160px">
+              </div>
+            </div>
+            <div class="field"><label>Filters</label><div class="filters-wrap" id="b-filters"></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Results</span><span class="spacer"></span><span id="result-count" style="font-size:10.5px;color:var(--muted)"></span>
+            <button class="btn small" id="btn-export" style="display:none" onclick="exportCurrent()">Export CSV</button>
+          </div>
+          <div class="table-wrap" id="results"><div class="empty">Run a report to see results.</div></div>
+        </div>
+      </section>
+
+      <section id="view-saved" class="hidden">
+        <div class="page-hdr"><div><h1>Saved Reports</h1><div class="page-sub">Re-run or export any saved definition. Results always reflect current data and your site access.</div></div></div>
+        <div class="panel"><div id="saved-list"></div></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
+let token=null,session=null,catalog=[],lastResult=null,lastSavedId=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=s=>String(s??'—').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+const val=id=>document.getElementById(id)?.value?.trim()||'';
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||`Request failed (${r.status})`);return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2800)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='saved')loadSaved()}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+function currentDataset(){return catalog.find(d=>d.key===document.getElementById('b-dataset').value)}
+function datasetChanged(){
+  const ds=currentDataset(); if(!ds)return;
+  document.getElementById('b-columns').innerHTML=ds.columns.map(c=>`<label class="col-chip on"><input type="checkbox" value="${c.key}" checked onchange="this.closest('.col-chip').classList.toggle('on',this.checked)"> ${esc(c.label)}</label>`).join('');
+  document.getElementById('b-filters').innerHTML=ds.filters.length?ds.filters.map(f=>`<div class="filter-item"><label>${esc(fmt(f))}</label><input id="flt-${f}" placeholder="any"></div>`).join(''):`<span style="font-size:11px;color:var(--muted)">No filters for this dataset.</span>`;
+}
+function selectedColumns(){return [...document.querySelectorAll('#b-columns input:checked')].map(c=>c.value)}
+function collectFilters(){const ds=currentDataset();const out={};(ds?.filters||[]).forEach(f=>{const v=val('flt-'+f);if(v)out[f]=v});return out}
+function buildSpec(){return {dataset:document.getElementById('b-dataset').value,columns:selectedColumns(),filters:collectFilters(),date_from:val('b-from')||null,date_to:val('b-to')||null}}
+
+async function runReport(){
+  try{
+    const spec=buildSpec();
+    lastResult=await api('/api/reports/run',{method:'POST',body:JSON.stringify(spec)});
+    lastSavedId=null;
+    renderResults();
+  }catch(e){toast(e.message)}
+}
+function renderResults(){
+  const el=document.getElementById('results');
+  const r=lastResult;
+  document.getElementById('result-count').textContent=r?`${r.count} row${r.count===1?'':'s'}${r.truncated?' (capped at 5000)':''}`:'';
+  document.getElementById('btn-export').style.display=r&&r.count?'inline-flex':'none';
+  if(!r||!r.rows.length){el.innerHTML='<div class="empty">No rows matched.</div>';return}
+  el.innerHTML=`<table class="tbl"><thead><tr>${r.columns.map(c=>`<th>${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${
+    r.rows.slice(0,500).map(row=>`<tr>${r.columns.map(c=>`<td>${esc(cell(row[c.key]))}</td>`).join('')}</tr>`).join('')
+  }</tbody></table>${r.rows.length>500?`<div class="empty">Showing first 500 of ${r.count}. Export CSV for all.</div>`:''}`;
+}
+function cell(v){if(v==null)return '—';if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T/.test(v))return v.slice(0,10);return String(v)}
+
+async function exportCurrent(){
+  // Export requires a saved report; if unsaved, save a transient one first.
+  try{
+    let id=lastSavedId;
+    if(!id){
+      const name=val('b-name')||'Report '+new Date().toISOString().slice(0,10);
+      const saved=await api('/api/reports',{method:'POST',body:JSON.stringify({...buildSpec(),name})});
+      id=saved.report.id; lastSavedId=id; toast('Saved as "'+name+'" and exporting');
+    }
+    const r=await fetch(API+`/api/reports/${id}/export.csv`,{headers:{Authorization:`Bearer ${token}`}});
+    if(!r.ok)throw new Error('Export failed');
+    const blob=await r.blob(); const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='report.csv'; document.body.appendChild(a); a.click(); a.remove();
+  }catch(e){toast(e.message)}
+}
+
+async function interpret(){
+  const prompt=val('ai-prompt');
+  const msg=document.getElementById('ai-msg');
+  if(!prompt){toast('Describe the report first');return}
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    const r=await api('/api/reports/interpret',{method:'POST',body:JSON.stringify({prompt,today})});
+    msg.className='ai-msg show'+(r.matched?'':' warn');
+    msg.textContent=r.message;
+    if(r.matched&&r.spec)applySpec(r.spec);
+  }catch(e){msg.className='ai-msg show warn';msg.textContent=e.message}
+}
+function applySpec(spec){
+  document.getElementById('b-dataset').value=spec.dataset;
+  datasetChanged();
+  // columns
+  const set=new Set(spec.columns||[]);
+  document.querySelectorAll('#b-columns input').forEach(c=>{c.checked=set.size?set.has(c.value):true;c.closest('.col-chip').classList.toggle('on',c.checked)});
+  // filters
+  const ds=currentDataset();
+  (ds?.filters||[]).forEach(f=>{const el=document.getElementById('flt-'+f);if(el)el.value=(spec.filters&&spec.filters[f])||''});
+  document.getElementById('b-from').value=spec.date_from||'';
+  document.getElementById('b-to').value=spec.date_to||'';
+}
+
+function openSave(){
+  const name=val('b-name');
+  if(!name){toast('Give the report a name first (Name field)');document.getElementById('b-name').focus();return}
+  api('/api/reports',{method:'POST',body:JSON.stringify({...buildSpec(),name})})
+    .then(r=>{lastSavedId=r.report.id;toast('Report saved')}).catch(e=>toast(e.message));
+}
+
+async function loadSaved(){
+  const el=document.getElementById('saved-list');
+  el.innerHTML='<div class="empty">Loading…</div>';
+  try{
+    const r=await api('/api/reports');
+    const rows=r.reports||[];
+    if(!rows.length){el.innerHTML='<div class="empty">No saved reports yet. Build one and hit Save.</div>';return}
+    el.innerHTML=rows.map(rep=>`<div class="saved-item"><div><div class="saved-name">${esc(rep.name)}</div><div class="saved-meta">${esc(fmt(rep.dataset))}${rep.date_from?` · ${rep.date_from}${rep.date_to?' → '+rep.date_to:''}`:''}</div></div><div class="spacer"></div><button class="btn small" onclick="runSaved('${rep.id}')">Run</button><button class="btn small" onclick="exportSaved('${rep.id}')">CSV</button><button class="btn small danger" onclick="deleteSaved('${rep.id}')">Delete</button></div>`).join('');
+  }catch(e){el.innerHTML=`<div class="empty">${esc(e.message)}</div>`}
+}
+async function runSaved(id){
+  try{lastResult=await api(`/api/reports/${id}/run`,{method:'POST'});lastSavedId=id;showView('build');renderResults();toast('Ran "'+(lastResult.name||'report')+'"')}
+  catch(e){toast(e.message)}
+}
+async function exportSaved(id){
+  try{const r=await fetch(API+`/api/reports/${id}/export.csv`,{headers:{Authorization:`Bearer ${token}`}});if(!r.ok)throw new Error('Export failed');const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='report.csv';document.body.appendChild(a);a.click();a.remove()}
+  catch(e){toast(e.message)}
+}
+async function deleteSaved(id){
+  if(!confirm('Delete this saved report?'))return;
+  try{await api('/api/reports/'+id,{method:'DELETE'});toast('Deleted');loadSaved()}catch(e){toast(e.message)}
+}
+
+async function init(){
+  session=await getVigilSession();token=session.token;
+  const r=await api('/api/reports/datasets');
+  catalog=r.datasets||[];
+  document.getElementById('b-dataset').innerHTML=catalog.map(d=>`<option value="${d.key}">${esc(d.label)}</option>`).join('');
+  datasetChanged();
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${e.message}</div>`);
+</script>
+</body>
+</html>
