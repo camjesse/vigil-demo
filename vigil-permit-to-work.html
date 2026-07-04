@@ -427,7 +427,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           </div>
           <div class="form-group">
             <label class="form-label">Department</label>
-            <input type="text" class="form-input" id="f-dept" placeholder="e.g. Field Services">
+            <select class="form-select" id="f-dept">
+              <option value="">— Select department —</option>
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -439,11 +441,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             <label class="form-label">Site <span class="req">*</span></label>
             <select class="form-select" id="f-site">
               <option value="">— Select site —</option>
-              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
-              <option value="Edmonton Hub">Edmonton Hub</option>
-              <option value="Site B Pipeline">Site B Pipeline</option>
-              <option value="Red Deer Terminal">Red Deer Terminal</option>
-              <option value="Highway / En Route">Highway / En Route</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0">
@@ -588,6 +585,8 @@ let permits = [];
 let activePermits = [];
 let workers = [];
 let assessments = [];
+let refSites = [];
+let refDepartments = [];
 let formStep = 1;
 let formData = {};
 let selectedType = null;
@@ -720,17 +719,22 @@ async function init() {
   LOGGED_IN = {id:session.worker.id, name:session.worker.name};
   document.getElementById('f-issuer-name').value = LOGGED_IN.name;
 
-  const [pData, aData, wData, haData] = await Promise.all([
+  const [pData, aData, wData, haData, sData, dData] = await Promise.all([
     apiGet('/api/permits?limit=100'),
     apiGet('/api/permits/dashboard'),
     apiGet('/api/workers?limit=100'),
     apiGet('/api/hazard/assessments?limit=50'),
+    apiGet('/api/sites'),
+    apiGet('/api/sites/departments'),
   ]);
 
   permits      = (pData&&pData.permits)   || [];
   activePermits= (aData&&aData.active_permits) || [];
   workers      = (wData&&wData.workers)   || [];
   assessments  = (haData&&haData.assessments) || [];
+  refSites     = (sData&&sData.sites)     || [];
+  refDepartments = (dData&&dData.departments) || [];
+  populateSiteDeptDropdowns();
 
   document.getElementById('worker-pill').textContent =
     `${workers.length} Workers`;
@@ -1061,6 +1065,35 @@ function populateAssessmentDropdown() {
     opt.textContent = `${a.assessment_number} · ${a.title}`;
     sel.appendChild(opt);
   });
+}
+
+// Fill a <select> from a list of names, deduped and sorted. If `current` is set
+// but not in the list (a value from before this list existed), it is pinned as
+// a selectable "(legacy)" option so re-saving never silently drops it.
+function fillNameSelect(sel, names, current, placeholder) {
+  if (!sel) return;
+  const seen = new Set(), uniq = [];
+  names.filter(Boolean).forEach(n => {
+    const key = n.trim().toLowerCase();
+    if (!seen.has(key)) { seen.add(key); uniq.push(n.trim()); }
+  });
+  uniq.sort((a,b)=>a.localeCompare(b));
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const opts = [`<option value="">${placeholder}</option>`];
+  uniq.forEach(n => opts.push(`<option value="${esc(n)}">${esc(n)}</option>`));
+  const cur = (current||'').trim();
+  const matched = cur && uniq.find(n => n.toLowerCase() === cur.toLowerCase());
+  if (cur && !matched) opts.push(`<option value="${esc(cur)}" selected>${esc(cur)} (legacy)</option>`);
+  sel.innerHTML = opts.join('');
+  if (cur) sel.value = matched || cur;
+}
+
+// Live sites + departments feed the permit form's Site and Department dropdowns
+// so values match what admins actually created (no free-text drift, no canned
+// demo sites). Accepts optional current values to preserve when editing.
+function populateSiteDeptDropdowns(currentSite, currentDept) {
+  fillNameSelect(document.getElementById('f-site'), refSites.map(s=>s.name), currentSite, '— Select site —');
+  fillNameSelect(document.getElementById('f-dept'), refDepartments.map(d=>d.name), currentDept, '— Select department —');
 }
 
 // ── FORM: STEP 3 CONTROLS ──────────────────────────────────────

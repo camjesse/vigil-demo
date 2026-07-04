@@ -460,11 +460,6 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
             <label class="form-label">Site <span class="req">*</span></label>
             <select class="form-select" id="f-site">
               <option value="">— Select site —</option>
-              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
-              <option value="Edmonton Hub">Edmonton Hub</option>
-              <option value="Site B Pipeline">Site B Pipeline</option>
-              <option value="Red Deer Terminal">Red Deer Terminal</option>
-              <option value="Highway / En Route">Highway / En Route</option>
             </select>
           </div>
           <div class="form-group">
@@ -496,7 +491,9 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
           </div>
           <div class="form-group">
             <label class="form-label">Department</label>
-            <input type="text" class="form-input" id="f-department" placeholder="e.g. Operations, Field Services…">
+            <select class="form-select" id="f-department">
+              <option value="">— Select department —</option>
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -743,6 +740,8 @@ let incidents = [];
 let capas = [];
 let workers = [];
 let stats = null;
+let refSites = [];
+let refDepartments = [];
 let currentPanel = 'dash';
 let newIncidentId = null;
 let bodySelected = new Set();
@@ -889,6 +888,32 @@ function toast(msg, type) {
   setTimeout(() => { t.style.transform = 'translateY(60px)'; t.style.opacity = '0'; }, 3000);
 }
 
+// ── SITE / DEPARTMENT DROPDOWNS ───────────────────────────────
+// Fill a <select> from a list of names (deduped, sorted). A `current` value
+// not in the list is pinned as a selectable "(legacy)" option so re-saving an
+// older record never silently drops it.
+function fillNameSelect(sel, names, current, placeholder) {
+  if (!sel) return;
+  const seen = new Set(), uniq = [];
+  names.filter(Boolean).forEach(n => {
+    const key = n.trim().toLowerCase();
+    if (!seen.has(key)) { seen.add(key); uniq.push(n.trim()); }
+  });
+  uniq.sort((a,b)=>a.localeCompare(b));
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const opts = [`<option value="">${placeholder}</option>`];
+  uniq.forEach(n => opts.push(`<option value="${esc(n)}">${esc(n)}</option>`));
+  const cur = (current||'').trim();
+  const matched = cur && uniq.find(n => n.toLowerCase() === cur.toLowerCase());
+  if (cur && !matched) opts.push(`<option value="${esc(cur)}" selected>${esc(cur)} (legacy)</option>`);
+  sel.innerHTML = opts.join('');
+  if (cur) sel.value = matched || cur;
+}
+function populateSiteDeptDropdowns(currentSite, currentDept) {
+  fillNameSelect(document.getElementById('f-site'), refSites.map(s=>s.name), currentSite, '— Select site —');
+  fillNameSelect(document.getElementById('f-department'), refDepartments.map(d=>d.name), currentDept, '— Select department —');
+}
+
 // ── SEVERITY / TYPE CHIP HELPERS ──────────────────────────────
 function sevChip(s) {
   const map = {
@@ -953,17 +978,22 @@ async function init() {
   }
   LOGGED_IN = {id:session.worker.id, name:session.worker.name};
 
-  const [incData, capaData, statsData, workerData] = await Promise.all([
+  const [incData, capaData, statsData, workerData, siteData, deptData] = await Promise.all([
     apiGet('/api/incidents?limit=100'),
     apiGet('/api/corrective-actions?limit=100'),
     apiGet('/api/incidents/stats?hours_worked=94000'),
     apiGet('/api/workers?limit=100'),
+    apiGet('/api/sites'),
+    apiGet('/api/sites/departments'),
   ]);
 
   incidents = (incData && incData.incidents) || [];
   capas     = (capaData && capaData.corrective_actions) || [];
   stats     = statsData || {};
   workers   = (workerData && workerData.workers) || [];
+  refSites  = (siteData && siteData.sites) || [];
+  refDepartments = (deptData && deptData.departments) || [];
+  populateSiteDeptDropdowns();
 
   // Worker count pill
   const wc = document.getElementById('worker-pill');
