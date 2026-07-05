@@ -638,6 +638,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script src="vigil-auth.js?v=20260607-1"></script>
+<script src="vigil-offline.js?v=20260705-1"></script>
 <script>
 const API = window.VIGIL_API_BASE;
 
@@ -1221,13 +1222,27 @@ async function submitObservation() {
   btn.disabled = true;
   btn.textContent = 'Submitting…';
 
-  const res = await apiPost('/api/observations', payload);
+  // Offline-tolerant submit: queues the observation with no signal and syncs it
+  // (deduped) when back online.
+  const res = await VigilOutbox.post('/api/observations', payload);
+
+  if (res.queued) {
+    document.getElementById('form-body').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    document.getElementById('success-obs-num').textContent = 'Saved offline';
+    const viewBtn = document.getElementById('success-view-btn');
+    if (viewBtn) viewBtn.style.display = 'none';
+    toast('Saved offline — will submit when back online', 'warn');
+    return;
+  }
+
   if (res.ok && res.data?.observation) {
     const obs = res.data.observation;
     document.getElementById('form-body').style.display = 'none';
     document.getElementById('form-success').style.display = 'block';
     document.getElementById('success-obs-num').textContent = obs.observation_number;
-    document.getElementById('success-view-btn').onclick = () => viewObservation(obs.id);
+    const viewBtn = document.getElementById('success-view-btn');
+    if (viewBtn) { viewBtn.style.display = ''; viewBtn.onclick = () => viewObservation(obs.id); }
 
     // Refresh list
     const fresh = await apiGet('/api/observations?limit=100');

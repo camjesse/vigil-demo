@@ -96,6 +96,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="modal-back" id="modal"><div class="modal"><div class="modal-head" id="modal-title"></div><div class="modal-body" id="modal-body"></div><div class="modal-foot" id="modal-foot"></div></div></div>
 
 <script src="vigil-auth.js?v=20260607-1"></script>
+<script src="vigil-offline.js?v=20260705-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token='', session=null, inspections=[], stats={}, trends=[], overdue=[], workers=[], actionItems=[], current=null, focusActionId=null, focusActionIntent='open', pendingAction=null;
@@ -254,7 +255,10 @@ async function reviewInspection(){await mutate(`/api/inspections/${current.id}/r
 async function closeInspection(){modal('Close Inspection',`<div class="item"><div class="item-title">Close inspection?</div><div class="item-copy">Critical open actions will block closure. Verified or non-critical actions can remain in the record.</div></div>`,async()=>mutate(`/api/inspections/${current.id}/close`,'POST',{}),'Close')}
 async function completeAction(id){try{await api(`/api/actions/inspection_action/${id}/complete`,{method:'POST',body:JSON.stringify({})});toast('Inspection action completed');await refreshAll();if(current)await openDetail(current.id)}catch(e){toast(e.message)}}
 async function verifyAction(id){try{await api(`/api/actions/inspection_action/${id}/verify`,{method:'POST',body:JSON.stringify({})});toast('Inspection action verified');await refreshAll();if(current)await openDetail(current.id)}catch(e){toast(e.message)}}
-async function mutate(path,method,body){try{await api(path,{method,body:JSON.stringify(body||{})});closeModal();toast('Saved');await refreshAll();if(current)await openDetail(current.id)}catch(e){toast(e.message)}}
+// Inspection lifecycle transitions (start/complete/review/close) run through the
+// offline outbox: each is an idempotent-keyed POST against an existing inspection
+// so it queues in the field with no signal and replays — deduped — on reconnect.
+async function mutate(path,method,body){try{const res=await VigilOutbox.post(path,body||{},method);if(res.queued){closeModal();toast('Saved offline — will sync when back online');return}if(!res.ok)throw new Error(res.data?.error||res.data?.message||`Request failed (${res.status})`);closeModal();toast('Saved');await refreshAll();if(current)await openDetail(current.id)}catch(e){toast(e.message)}}
 function modal(title,body,action,label='Save'){$('modal-title').textContent=title;$('modal-body').innerHTML=body;$('modal-foot').innerHTML=`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="modal-save">${label}</button>`;$('modal-save').onclick=action;$('modal').classList.add('show')}
 function closeModal(){$('modal').classList.remove('show')}
 

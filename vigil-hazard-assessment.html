@@ -664,6 +664,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <div id="toast"></div>
 
 <script src="vigil-auth.js?v=20260607-1"></script>
+<script src="vigil-offline.js?v=20260705-1"></script>
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
 const API = window.VIGIL_API_BASE;
@@ -1467,6 +1468,22 @@ async function submitFlha() {
   const riskTier = formData.riskTier || (formTemplate && formTemplate.risk_tier) || null;
   const now = new Date().toISOString();
 
+  // Build hazard/control responses keyed by TEMPLATE ids — the ids the client
+  // knows offline and the server matches on. formControlResponses also holds
+  // ad-hoc 'gen-N' keys for general controls that aren't template confirmations;
+  // the server ignores any key without a matching row, so they're harmless.
+  const hazard_responses = {};
+  for (const thId of Object.keys(formHazardResponses)) {
+    hazard_responses[thId] = { confirmation_status: formHazardResponses[thId] || 'unsure', worker_notes: formHazardNotes[thId] || null };
+  }
+  for (const thId of Object.keys(formHazardNotes)) {
+    if (!hazard_responses[thId]) hazard_responses[thId] = { confirmation_status: 'unsure', worker_notes: formHazardNotes[thId] || null };
+  }
+  const control_responses = {};
+  for (const tcId of Object.keys(formControlResponses)) {
+    control_responses[tcId] = Boolean(formControlResponses[tcId]);
+  }
+
   const payload = {
     title,
     assessment_type: formData.assessmentType || (formTemplate && formTemplate.assessment_type) || 'flha',
@@ -1477,93 +1494,59 @@ async function submitFlha() {
     submitted_by:    LOGGED_IN.id,
     weather_conditions: formData.weather || null,
     work_start_time: formData.startTime ? new Date(formData.startTime).toISOString() : now,
+    what_changed_today:  formData.whatChanged || null,
+    reflection_response: formData.reflection || null,
+    hazard_responses,
+    control_responses,
+    site_hazards: formSiteHazards
+      .filter(h => h.description && h.description.trim())
+      .map(h => ({ hazard_description: h.description.trim(), hazard_category: h.category || 'other', severity_potential: h.severity_potential || 'minor' })),
+    crew_ids: formCrewIds,
+    time_to_complete_seconds: 300,
   };
 
-  const createRes = await apiPost('/api/hazard/assessments', payload);
-
-  if (!createRes.ok || !createRes.data?.assessment) {
-    btn.textContent = 'Submit FLHA'; btn.disabled = false;
-    const errDetail = createRes.data?.message || createRes.data?.error || `HTTP ${createRes.status}`;
-    toast(`Failed: ${errDetail}`, 'danger');
-    console.error('[Vigil] FLHA create error:', createRes.status, createRes.data);
-    return;
-  }
-
-  const created = createRes.data.assessment;
-  lastSubmittedId = created.id;
-
-  const syncResults = [];
-  syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}`, {
-    what_changed_today: formData.whatChanged || null,
-    reflection_response: formData.reflection || null,
-  }));
-
-  const detail = await apiGet(`/api/hazard/assessments/${created.id}`);
-  const createdDetail = detail && detail.assessment;
-  if (createdDetail) {
-    for (const confirmation of createdDetail.hazard_confirmations || []) {
-      syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}/hazards/${confirmation.id}`, {
-        confirmation_status: formHazardResponses[confirmation.template_hazard_id] || 'unsure',
-        worker_notes: formHazardNotes[confirmation.template_hazard_id] || null,
-      }));
-    }
-    for (const confirmation of createdDetail.control_confirmations || []) {
-      syncResults.push(await apiPut(`/api/hazard/assessments/${created.id}/controls/${confirmation.id}`, {
-        confirmed: Boolean(formControlResponses[confirmation.template_control_id]),
-        notes: null,
-      }));
-    }
-  }
-  for (const hazard of formSiteHazards.filter(h => h.description && h.description.trim())) {
-    syncResults.push(await apiPost(`/api/hazard/assessments/${created.id}/site-hazards`, {
-      hazard_description: hazard.description.trim(),
-      hazard_category: hazard.category || 'other',
-      severity_potential: hazard.severity_potential || 'minor',
-    }));
-  }
-  for (const workerId of formCrewIds) {
-    syncResults.push(await apiPost(`/api/hazard/assessments/${created.id}/crew`, {
-      worker_id: workerId,
-      understood_hazards: true,
-    }));
-  }
-  const failedSync = syncResults.find(r => !r.ok);
-  if (failedSync) {
-    btn.textContent = 'Submit FLHA'; btn.disabled = false;
-    const errDetail = failedSync.data?.message || failedSync.data?.error || `HTTP ${failedSync.status}`;
-    toast(`FLHA details failed to save: ${errDetail}`, 'danger');
-    return;
-  }
-
-  // Submit for quality scoring
-  const submitRes = await apiPost(`/api/hazard/assessments/${created.id}/submit`, {time_to_complete_seconds:300});
-  if (!submitRes.ok || !submitRes.data?.assessment) {
-    btn.textContent = 'Submit FLHA'; btn.disabled = false;
-    const errDetail = submitRes.data?.message || submitRes.data?.error || `HTTP ${submitRes.status}`;
-    toast(`FLHA submit failed: ${errDetail}`, 'danger');
-    return;
-  }
-  const final = submitRes.data.assessment;
+  // One-shot, offline-tolerant submit. The entire FLHA (create + confirmations +
+  // site hazards + crew + submit/scoring) is a single idempotent request, so it
+  // queues on the device with no signal and syncs — deduped — when back online.
+  const res = await VigilOutbox.post('/api/hazard/assessments/full', payload);
 
   btn.textContent = 'Submit FLHA'; btn.disabled = false;
 
-  assessments.unshift(final);
-  renderAssessmentsTable();
-  renderKPIs();
-
-  document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
-  document.getElementById('step-bar').style.display = 'none';
-  document.getElementById('form-success').style.display = 'block';
-  document.getElementById('success-assessment-num').textContent = final.assessment_number;
-
-  const qs = final.quality_score;
-  const qsEl = document.getElementById('success-quality-score');
-  qsEl.textContent = qs != null ? qs : '—';
-  if (qs != null) {
-    qsEl.style.color = qs >= 86 ? 'var(--ok)' : qs >= 71 ? 'var(--accent)' : qs >= 50 ? 'var(--warn)' : 'var(--danger)';
+  if (res.queued) {
+    document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+    document.getElementById('step-bar').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    document.getElementById('success-assessment-num').textContent = 'Saved offline';
+    const qsEl = document.getElementById('success-quality-score');
+    if (qsEl) { qsEl.textContent = '—'; qsEl.style.color = 'var(--text2)'; }
+    toast('Saved offline — will submit when back online', 'warn');
+    return;
   }
 
-  toast(`${final.assessment_number} submitted`, 'ok');
+  if (res.ok && res.data && res.data.assessment) {
+    const final = res.data.assessment;
+    lastSubmittedId = final.id;
+    assessments.unshift(final);
+    renderAssessmentsTable();
+    renderKPIs();
+
+    document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+    document.getElementById('step-bar').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    document.getElementById('success-assessment-num').textContent = final.assessment_number;
+
+    const qs = final.quality_score;
+    const qsEl = document.getElementById('success-quality-score');
+    qsEl.textContent = qs != null ? qs : '—';
+    if (qs != null) {
+      qsEl.style.color = qs >= 86 ? 'var(--ok)' : qs >= 71 ? 'var(--accent)' : qs >= 50 ? 'var(--warn)' : 'var(--danger)';
+    }
+    toast(`${final.assessment_number} submitted`, 'ok');
+  } else {
+    const errDetail = res.data?.message || res.data?.error || `HTTP ${res.status}`;
+    toast(`FLHA submit failed: ${errDetail}`, 'danger');
+    console.error('[Vigil] FLHA full-create error:', res.status, res.data);
+  }
 }
 
 function viewSubmittedDetail() {
