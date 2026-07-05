@@ -1,25 +1,34 @@
-/* Vigil PWA service worker — Phase 0 (app-shell caching only).
+/* Vigil PWA service worker.
  *
- * Scope: caches the app shell so Vigil LOADS offline. It does NOT cache API
- * responses or handle offline writes — that is Phase 1/2. Deliberately
- * conservative so a bad cache can't strand users:
- *   - /api/* and any non-GET request: network only, never cached.
- *   - same-origin GET assets: stale-while-revalidate (serve cache instantly,
- *     refresh in the background) so updates always land within one reload.
- *   - Google Fonts: cache-first (immutable, versioned URLs).
- *   - a failed navigation with nothing cached falls back to /offline.html.
- * Bump CACHE to invalidate everything; old caches are deleted on activate.
+ * Phase 0: caches the app shell so Vigil LOADS offline.
+ * Phase 1: network-first caching of safety-read API GETs so pages show their
+ *          last-seen data with no signal (fresh whenever online).
+ * Still deliberately conservative so a bad cache can't strand users:
+ *   - non-GET and /api/auth/*: network only, never cached.
+ *   - GET /api/* (non-auth): network-FIRST, cached as a fallback for offline.
+ *   - same-origin GET assets: stale-while-revalidate (cache instantly, refresh
+ *     in the background) so updates land within one reload.
+ *   - Google Fonts: cache-first (immutable). Failed navigation → /offline.html.
+ * Bump CACHE / API_CACHE to invalidate; old caches are deleted on activate.
  */
-const CACHE = 'vigil-shell-v4';
+const CACHE = 'vigil-shell-v6';
+const API_CACHE = 'vigil-api-v1';
+const KEEP = [CACHE, API_CACHE];
 const PRECACHE = [
   '/vigil-demo.html',
-  '/vigil-emergency.html',
   '/vigil-auth.js',
   '/vigil-module.css',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   '/offline.html',
+  // Core field pages precached so they load offline before their first visit.
+  '/vigil-emergency.html',
+  '/vigil-permit-to-work.html',
+  '/vigil-hazard-assessment.html',
+  '/vigil-incident-reporting.html',
+  '/vigil-observations.html',
+  '/vigil-documents.html',
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,7 +42,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => !KEEP.includes(k)).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -51,9 +60,25 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Never touch API traffic or non-GET requests — always straight to network.
-  if (req.method !== 'GET' || url.pathname.startsWith('/api/') || url.pathname === '/health') {
-    return; // default browser handling (network)
+  // Non-GET, /health, and auth: always straight to network (never cached).
+  if (req.method !== 'GET' || url.pathname === '/health' || url.pathname.startsWith('/api/auth')) {
+    return;
+  }
+
+  // Safety-read API GETs: network-first, fall back to the last cached copy.
+  // Online users always get fresh data; offline users get what they last saw.
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res.ok) { const clone = res.clone(); caches.open(API_CACHE).then((c) => c.put(req, clone)); }
+          return res;
+        })
+        .catch(() => caches.open(API_CACHE).then((c) => c.match(req)).then((hit) =>
+          hit || new Response(JSON.stringify({ error: 'offline', offline: true }), { status: 503, headers: { 'Content-Type': 'application/json' } })
+        ))
+    );
+    return;
   }
 
   // Google Fonts: cache-first (immutable).
@@ -69,7 +94,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Same-origin GET: stale-while-revalidate.
+  // Same-origin GET assets: stale-while-revalidate.
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.open(CACHE).then((cache) =>
@@ -77,7 +102,6 @@ self.addEventListener('fetch', (event) => {
           const network = fetch(req)
             .then((res) => { if (res.ok && res.type === 'basic') cache.put(req, res.clone()); return res; })
             .catch(() => null);
-          // Serve cache immediately if present; otherwise wait for the network.
           return cached || network.then((res) => res || fallback(req));
         })
       )
@@ -88,7 +112,6 @@ self.addEventListener('fetch', (event) => {
 });
 
 function fallback(req) {
-  // Only navigations get the offline page; other misses just error out.
   if (req.mode === 'navigate') return caches.match('/offline.html');
   return new Response('', { status: 504, statusText: 'Offline' });
 }

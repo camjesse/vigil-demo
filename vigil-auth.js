@@ -90,11 +90,20 @@
   async function validateSession(session) {
     if (!session || !session.token) return null;
 
-    const response = await fetch(`${API_BASE}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${session.token}` },
-    }).catch(() => null);
+    let response;
+    try {
+      response = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${session.token}` },
+      });
+    } catch {
+      // Network error (offline / server unreachable): trust the stored session
+      // instead of forcing a login. The token drives live calls when back
+      // online; if it is genuinely expired, those calls 401 and are handled
+      // per-request. This is what lets pages load with no signal.
+      return session;
+    }
 
-    if (!response || !response.ok) return null;
+    if (!response.ok) return null; // server rejected the token → sign in
     const body = await response.json();
     return { token: session.token, ...body };
   }
