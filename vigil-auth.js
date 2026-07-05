@@ -399,6 +399,30 @@
     return (await window.getVigilSession()).worker || null;
   };
 
+  // Refresh the access token using the stored refresh token. Used by the
+  // offline write queue: after a long offline stretch the 8h access token may
+  // be expired, so a queued write's sync 401s — refresh once, then retry.
+  // Returns the new access token, or null if refresh isn't possible (no
+  // refresh token, or it was revoked by a password change).
+  window.vigilRefreshAccessToken = async function vigilRefreshAccessToken() {
+    const stored = readStoredSession();
+    if (!stored || !stored.refresh_token) return null;
+    try {
+      const r = await fetch(`${API_BASE}/api/auth/refresh`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: stored.refresh_token }),
+      });
+      if (!r.ok) return null;
+      const body = await r.json();
+      stored.token = body.token;
+      currentSession = stored;
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(stored));
+      return body.token;
+    } catch {
+      return null;
+    }
+  };
+
   window.openVigilSecurity = function openVigilSecurity() {
     openSecurityDialog();
   };
