@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigil — Offline</title>
+<style>
+  html,body{height:100%;margin:0;background:#080B12;color:#D7E3EE;font-family:Inter,system-ui,sans-serif}
+  .wrap{height:100%;display:grid;place-items:center;padding:24px;text-align:center}
+  .mark{width:56px;height:56px;border-radius:13px;background:linear-gradient(135deg,#21B8E6,#19C995);display:grid;place-items:center;font-weight:800;font-size:28px;color:#061018;margin:0 auto 18px}
+  h1{font-size:19px;margin:0 0 8px}
+  p{font-size:13px;color:#93A9BC;line-height:1.6;max-width:340px;margin:0 auto 20px}
+  button{height:40px;padding:0 18px;border-radius:8px;border:1px solid #21B8E6;background:#21B8E6;color:#061018;font:700 13px Inter,sans-serif;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="mark">V</div>
+      <h1>You're offline</h1>
+      <p>This page hasn't been saved for offline use yet. Reconnect and try again — pages you've already opened stay available offline.</p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Vigil HSE — Northern Express Transport</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0D121B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vigil">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ── BASE ─────────────────────────────────────────────────── */
@@ -1878,6 +1884,23 @@ function renderExpiring(credResults) {
     const chipCls = daysLeft<=7?'rd':daysLeft<=14?'yw':'bl';
     return `<tr onclick="loadMod('employees')"><td style="font-weight:600">${worker.first_name.charAt(0)}. ${worker.last_name}</td><td>${cred.credential_type}</td><td><span class="chip ${chipCls}">${dateStr}</span></td></tr>`;
   }).join('');
+}
+</script>
+<script>
+// PWA (Phase 0): register the app-shell service worker so Vigil loads offline.
+// Emergency recovery: run window.__vigilDisableOffline() in the console to
+// unregister the SW and clear its caches.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+      .catch((e) => console.warn('SW registration failed:', e));
+  });
+  window.__vigilDisableOffline = async () => {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    regs.forEach((r) => { if (r.active) r.active.postMessage({ type: 'UNREGISTER' }); r.unregister(); });
+    if (window.caches) (await caches.keys()).forEach((k) => caches.delete(k));
+    console.log('Vigil offline support disabled; reload to confirm.');
+  };
 }
 </script>
 </body>
