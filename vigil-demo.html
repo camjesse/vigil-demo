@@ -391,6 +391,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
     <div class="hdr-mod-tag" id="hdr-mod-tag">HSE Platform</div>
   </div>
   <div class="hdr-right">
+    <span id="net-badge" style="display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#FAD467;background:rgba(243,181,27,.1);border:1px solid rgba(243,181,27,.3);border-radius:999px;padding:4px 9px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Offline</span>
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">Light</button>
     <div class="jur-toggle" id="jurToggle">
       <button class="jt-btn ca active" id="jt-ca" onclick="setJurisdiction('ca')">Canada</button>
@@ -468,6 +469,9 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         <div class="sb-item" id="sbi-employees" onclick="loadMod('employees')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" /> <path d="M14 6a6 6 0 0 1 6 6v3" /> <path d="M4 15v-3a6 6 0 0 1 6-6" /> <rect x="2" y="15" width="20" height="4" rx="1" /> </svg></span><span class="sb-label">Employees</span>
           <span class="sb-badge yw">4</span>
+        </div>
+        <div class="sb-item" id="sbi-emergency" onclick="loadMod('emergency')">
+          <span class="sb-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2z"/></svg></span><span class="sb-label">Emergency Access</span>
         </div>
         <div class="sb-item" id="sbi-incidents" onclick="loadMod('incidents')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M7 18v-6a5 5 0 1 1 10 0v6" /> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" /> <path d="M21 12h1" /> <path d="M18.5 4.5 18 5" /> <path d="M2 12h1" /> <path d="M12 2v1" /> <path d="m4.929 4.929.707.707" /> <path d="M12 12v6" /> </svg></span><span class="sb-label">Incidents</span>
@@ -867,6 +871,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   <iframe class="mframe" id="frm-sites"         src="about:blank"></iframe>
   <iframe class="mframe" id="frm-executive"     src="about:blank"></iframe>
   <iframe class="mframe" id="frm-integrations"  src="about:blank"></iframe>
+  <iframe class="mframe" id="frm-emergency"     src="about:blank"></iframe>
   <iframe class="mframe" id="frm-documents"     src="about:blank"></iframe>
   <iframe class="mframe" id="frm-contractors"   src="about:blank"></iframe>
   <iframe class="mframe" id="frm-reports"       src="about:blank"></iframe>
@@ -890,6 +895,7 @@ const MODS = {
   fleet:        {src:'vigil-fleet.html',               label:'Fleet & Equipment'},
   fatigue:      {src:'vigil-fatigue.html',             label:'Hours & Fatigue'},
   jhsc:         {src:'vigil-jhsc-meetings.html',       label:'JHSC & Safety Meetings'},
+  emergency:    {src:'vigil-emergency.html',           label:'Emergency Access'},
   documents:    {src:'vigil-documents.html',           label:'Document Control'},
   contractors:  {src:'vigil-contractors.html',         label:'Contractor Management'},
   cor:          {src:'vigil-audit-readiness.html',     label:'COR Audit'},
@@ -1902,6 +1908,14 @@ if ('serviceWorker' in navigator) {
     console.log('Vigil offline support disabled; reload to confirm.');
   };
 }
+// Offline status badge in the header.
+(function () {
+  const badge = document.getElementById('net-badge');
+  const sync = () => { if (badge) badge.style.display = navigator.onLine ? 'none' : 'inline-flex'; };
+  window.addEventListener('online', sync);
+  window.addEventListener('offline', sync);
+  sync();
+})();
 </script>
 </body>
 </html>

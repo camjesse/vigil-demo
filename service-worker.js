@@ -10,9 +10,10 @@
  *   - a failed navigation with nothing cached falls back to /offline.html.
  * Bump CACHE to invalidate everything; old caches are deleted on activate.
  */
-const CACHE = 'vigil-shell-v1';
+const CACHE = 'vigil-shell-v4';
 const PRECACHE = [
   '/vigil-demo.html',
+  '/vigil-emergency.html',
   '/vigil-auth.js',
   '/vigil-module.css',
   '/manifest.json',

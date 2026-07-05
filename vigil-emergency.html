@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Emergency Access - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{min-height:56px;display:flex;align-items:center;padding:10px 18px;gap:12px;background:var(--s1);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--danger),#B4232F);display:grid;place-items:center;color:#fff}.module{font-size:11px;color:var(--muted);font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.net{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:999px;border:1px solid var(--border)}.net.online{color:var(--ok);border-color:rgba(25,201,149,.3);background:rgba(25,201,149,.07)}.net.offline{color:var(--warn);border-color:rgba(243,181,27,.3);background:rgba(243,181,27,.08)}
+.net .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.small{height:29px;padding:0 9px;font-size:10px}.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.content{padding:16px;overflow:auto;flex:1}
+.banner{display:none;align-items:center;gap:10px;padding:10px 13px;border-radius:8px;font-size:12px;margin-bottom:14px;line-height:1.45}.banner.show{display:flex}.banner.stale{background:rgba(243,181,27,.08);border:1px solid rgba(243,181,27,.28);color:#FAD467}
+.search{width:100%;height:42px;border:1px solid var(--border);border-radius:8px;background:var(--s2);color:var(--text);padding:0 12px;font-size:14px;outline:none;margin-bottom:12px}.search:focus{border-color:var(--accent)}
+.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:12px 13px;cursor:pointer;display:flex;gap:11px;align-items:center}.card:hover{border-color:var(--b2);background:var(--s2)}
+.avatar{width:40px;height:40px;border-radius:9px;background:var(--s3);display:grid;place-items:center;font-weight:800;color:var(--text2);flex-shrink:0;font-size:14px}
+.card-name{font-weight:700;font-size:13px}.card-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.badges{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}.chip.fa{color:#6EE7C1;background:rgba(25,201,149,.11)}.chip.med{color:#FCA5A5;background:rgba(239,90,103,.12)}.chip.cached{color:var(--muted);background:var(--s3)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.11)}.chip.danger{color:#FCA5A5;background:rgba(239,90,103,.13)}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}
+/* Emergency card detail */
+.ecard{max-width:640px;margin:0 auto}
+.ec-head{display:flex;gap:14px;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.ec-avatar{width:60px;height:60px;border-radius:12px;background:var(--s3);display:grid;place-items:center;font-weight:800;font-size:22px;color:var(--text2)}
+.ec-name{font-size:20px;font-weight:800}.ec-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.sec{margin-top:18px}.sec-title{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:800;margin-bottom:8px}
+.alert{padding:11px 13px;border-radius:8px;margin-bottom:7px;border:1px solid}.alert.critical{background:rgba(239,90,103,.1);border-color:rgba(239,90,103,.35)}.alert.high{background:rgba(243,181,27,.09);border-color:rgba(243,181,27,.3)}.alert.moderate,.alert.low{background:var(--s2);border-color:var(--border)}
+.alert-type{font-weight:800;font-size:13px}.alert-desc{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.45}
+.contact{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--s2);border:1px solid var(--border);border-radius:8px;margin-bottom:7px}
+.contact-info{flex:1}.contact-name{font-weight:700;font-size:13px}.contact-rel{font-size:11px;color:var(--muted);margin-top:1px}
+.call{height:38px;padding:0 14px;border-radius:8px;border:1px solid var(--ok);background:rgba(25,201,149,.1);color:#6EE7C1;font-weight:800;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.fact{display:flex;justify-content:space-between;padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;font-size:12px}.fact b{color:var(--text)}
+.support-item{font-size:12px;color:var(--text2);padding:7px 11px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:5px}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+.hidden{display:none!important}
+@media(max-width:560px){.roster{grid-template-columns:1fr}.content{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">✚</div><div>VIGIL <span class="module">/ Emergency Access</span></div></div>
+    <div class="topbar-right">
+      <span class="net online" id="net"><span class="dot"></span><span id="net-label">Online</span></span>
+      <button class="btn small" id="dl-btn" onclick="downloadAll()">⭳ Save all for offline</button>
+      <button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Dashboard</button>
+    </div>
+  </header>
+  <main class="content">
+    <div class="banner stale" id="stale-banner"></div>
+
+    <section id="view-roster">
+      <input class="search" id="search" placeholder="Search worker name, number, or site…" oninput="renderRoster()">
+      <div class="roster" id="roster"><div class="empty">Loading roster…</div></div>
+    </section>
+
+    <section id="view-card" class="hidden"></section>
+  </main>
+</div>
+<script src="vigil-auth.js?v=20260607-1"></script>
+<script>
+const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
+let token=null,session=null,roster=[],rosterCachedAt=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const initials=w=>((w.first_name||' ')[0]+(w.last_name||' ')[0]).toUpperCase();
+function relTime(ts){if(!ts)return 'never';const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+' min ago';if(s<86400)return Math.floor(s/3600)+' h ago';return Math.floor(s/86400)+' d ago'}
+function toast(m){const e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3000)}
+
+async function api(path){const r=await fetch(API+path,{headers:{Authorization:`Bearer ${token}`}});if(!r.ok)throw new Error(`Request failed (${r.status})`);return r.json()}
+
+// ── IndexedDB (single kv store: 'roster' + 'profile:<id>') ─────
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('vigil-emergency',1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('kv'))db.createObjectStore('kv')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbSet(key,val){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(val,key);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+async function idbGet(key){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const q=tx.objectStore('kv').get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function idbKeys(){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const q=tx.objectStore('kv').getAllKeys();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+
+// ── Network state ──────────────────────────────────────────────
+function isOnline(){return navigator.onLine}
+function setNet(){
+  const el=document.getElementById('net'), lbl=document.getElementById('net-label');
+  if(isOnline()){el.className='net online';lbl.textContent='Online'}
+  else{el.className='net offline';lbl.textContent='Offline'}
+  document.getElementById('dl-btn').style.display=isOnline()?'':'none';
+}
+window.addEventListener('online',()=>{setNet();loadRoster()});
+window.addEventListener('offline',setNet);
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+// ── Roster ─────────────────────────────────────────────────────
+async function loadRoster(){
+  if(isOnline()){
+    try{
+      const r=await api('/api/workers?status=active&limit=500');
+      roster=(r.workers||[]).filter(w=>w.status!=='inactive');
+      rosterCachedAt=Date.now();
+      await idbSet('roster',{data:roster,cachedAt:rosterCachedAt});
+      updateBanner(false);
+    }catch(e){ await loadRosterFromCache(true) }
+  }else{
+    await loadRosterFromCache(true);
+  }
+  renderRoster();
+}
+async function loadRosterFromCache(offline){
+  const cached=await idbGet('roster');
+  if(cached){roster=cached.data;rosterCachedAt=cached.cachedAt;updateBanner(true)}
+  else{roster=[];updateBanner(true,true)}
+}
+function updateBanner(stale,noData){
+  const b=document.getElementById('stale-banner');
+  if(!stale){b.classList.remove('show');return}
+  b.classList.add('show');
+  b.innerHTML=noData
+    ? `<span>⚠︎</span><span>You are offline and no emergency data has been saved yet. Connect once and tap "Save all for offline" so this works without signal.</span>`
+    : `<span>⚠︎</span><span>Offline — showing emergency data saved <b>${relTime(rosterCachedAt)}</b>. It may not reflect recent changes.</span>`;
+}
+async function cachedProfileIds(){
+  const keys=await idbKeys();
+  return new Set(keys.filter(k=>typeof k==='string'&&k.startsWith('profile:')).map(k=>k.slice(8)));
+}
+let cachedIds=new Set();
+async function renderRoster(){
+  cachedIds=await cachedProfileIds();
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const rows=roster.filter(w=>!q||`${w.first_name} ${w.last_name} ${w.employee_number||''} ${w.site||''}`.toLowerCase().includes(q));
+  const el=document.getElementById('roster');
+  if(!rows.length){el.innerHTML=`<div class="empty">${roster.length?'No workers match.':'No workers available.'}</div>`;return}
+  el.innerHTML=rows.map(w=>`
+    <div class="card" onclick="openCard('${w.id}')">
+      <div class="avatar">${esc(initials(w))}</div>
+      <div style="min-width:0">
+        <div class="card-name">${esc(w.first_name)} ${esc(w.last_name)}</div>
+        <div class="card-sub">${esc(w.job_title||'—')} · ${esc(w.site||'—')}</div>
+        <div class="badges">
+          ${w.is_first_aider?'<span class="chip fa">First aider</span>':''}
+          ${cachedIds.has(w.id)?'<span class="chip cached">✓ Offline</span>':(isOnline()?'':'<span class="chip warn">Not saved</span>')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Emergency card ─────────────────────────────────────────────
+async function openCard(id){
+  showView('card');
+  const el=document.getElementById('view-card');
+  el.innerHTML=`<div class="empty">Loading…</div>`;
+  let profile=null, cachedAt=null, fromCache=false;
+  if(isOnline()){
+    try{ profile=await api(`/api/workers/${id}/emergency`); cachedAt=Date.now(); await idbSet('profile:'+id,{data:profile,cachedAt}); }
+    catch(e){ const c=await idbGet('profile:'+id); if(c){profile=c.data;cachedAt=c.cachedAt;fromCache=true} }
+  }else{
+    const c=await idbGet('profile:'+id);
+    if(c){profile=c.data;cachedAt=c.cachedAt;fromCache=true}
+  }
+  if(!profile){
+    el.innerHTML=`<div class="ecard"><button class="btn small" onclick="showView('roster')">← Roster</button><div class="empty">This worker's emergency profile hasn't been saved for offline use. Connect to load it.</div></div>`;
+    return;
+  }
+  renderCard(profile, cachedAt, fromCache||!isOnline());
+}
+function renderCard(p, cachedAt, stale){
+  const id=p.identity||{};
+  const contacts=(p.emergency_contacts||[]).slice().sort((a,b)=>(a.priority_order||99)-(b.priority_order||99));
+  const meds=p.medical_alerts||null; // undefined if non-elevated
+  const support=p.nearby_support||{};
+  const sev=s=>['critical','high','moderate','low'].includes(String(s||'').toLowerCase())?String(s).toLowerCase():'moderate';
+  const el=document.getElementById('view-card');
+  el.innerHTML=`<div class="ecard">
+    <button class="btn small" onclick="showView('roster')" style="margin-bottom:12px">← Roster</button>
+    ${stale?`<div class="banner stale show" style="margin-bottom:14px"><span>⚠︎</span><span>Saved <b>${relTime(cachedAt)}</b>${navigator.onLine?'':' · offline'}. Verify critical details if possible.</span></div>`:''}
+    <div class="ec-head">
+      <div class="ec-avatar">${esc(initials(id))}</div>
+      <div><div class="ec-name">${esc(id.full_name||`${id.first_name||''} ${id.last_name||''}`)}</div>
+      <div class="ec-sub">${esc(id.job_title||'—')} · ${esc(id.department||'')} · ${esc(id.site||'')}</div></div>
+    </div>
+
+    ${meds===undefined?'':`<div class="sec"><div class="sec-title">Medical alerts</div>${
+      (meds&&meds.length)?meds.map(m=>`<div class="alert ${sev(m.severity)}"><div class="alert-type">${esc(m.alert_type||'Alert')}${m.severity?` · ${esc(m.severity)}`:''}</div>${m.description?`<div class="alert-desc">${esc(m.description)}</div>`:''}</div>`).join('')
+      :'<div class="support-item">No medical alerts on file.</div>'}</div>`}
+    ${meds===undefined?'<div class="sec"><div class="sec-title">Medical alerts</div><div class="support-item">Medical details are restricted to supervisors and above.</div></div>':''}
+
+    <div class="sec"><div class="sec-title">Emergency contacts</div>${
+      contacts.length?contacts.map(c=>`<div class="contact"><div class="contact-info"><div class="contact-name">${esc(c.contact_name)}</div><div class="contact-rel">${esc(c.relationship||'Contact')}${c.special_instructions?` · ${esc(c.special_instructions)}`:''}</div></div>${c.phone_primary?`<a class="call" href="tel:${esc(c.phone_primary)}">Call</a>`:''}</div>`).join('')
+      :'<div class="support-item">No emergency contacts on file.</div>'}</div>
+
+    <div class="sec"><div class="sec-title">First aid</div>
+      <div class="fact"><span>First aider</span><b>${id.first_aid_level?esc(id.first_aid_level):'No'}${id.first_aid_current===false?' (expired)':''}</b></div>
+      ${(id.expired_credentials&&id.expired_credentials.length)?`<div class="fact" style="border-color:rgba(239,90,103,.3)"><span>Expired credentials</span><b style="color:#FCA5A5">${id.expired_credentials.length}</b></div>`:''}
+    </div>
+
+    <div class="sec"><div class="sec-title">Nearby support at ${esc(id.site||'site')}</div>
+      ${(support.first_aiders||[]).length?`<div class="support-item"><b>First aiders:</b> ${support.first_aiders.map(f=>esc((f.first_name||'')+' '+(f.last_name||''))).join(', ')}</div>`:''}
+      ${(support.muster_points||[]).length?`<div class="support-item"><b>Muster points:</b> ${support.muster_points.map(m=>esc(m.name||m.location||'')).join(', ')}</div>`:''}
+      ${(support.emergency_equipment||[]).length?`<div class="support-item"><b>Equipment:</b> ${support.emergency_equipment.map(e=>esc(e.name||e.equipment_type||'')).join(', ')}</div>`:''}
+      ${support.active_emergency_plan?`<div class="support-item"><b>Active emergency plan:</b> ${esc(support.active_emergency_plan.title||support.active_emergency_plan.plan_number||'On file')}</div>`:''}
+      ${!(support.first_aiders||[]).length&&!(support.muster_points||[]).length&&!(support.emergency_equipment||[]).length?'<div class="support-item">No site support records.</div>':''}
+    </div>
+  </div>`;
+}
+function showView(name){document.getElementById('view-roster').classList.toggle('hidden',name!=='roster');document.getElementById('view-card').classList.toggle('hidden',name!=='card')}
+
+// ── Download all for offline ───────────────────────────────────
+async function downloadAll(){
+  if(!isOnline()){toast('Connect to the internet first');return}
+  const btn=document.getElementById('dl-btn');
+  btn.disabled=true;
+  let done=0, failed=0;
+  for(const w of roster){
+    btn.textContent=`⭳ Saving ${done+1}/${roster.length}…`;
+    try{ const p=await api(`/api/workers/${w.id}/emergency`); await idbSet('profile:'+w.id,{data:p,cachedAt:Date.now()}); done++; }
+    catch(e){ failed++; }
+  }
+  btn.disabled=false; btn.textContent='⭳ Save all for offline';
+  toast(`Saved ${done} profile${done===1?'':'s'} for offline${failed?` (${failed} failed)`:''}`);
+  renderRoster();
+}
+
+// Never depend on the network or vigil-auth.js for auth. getVigilSession()
+// validates over the network (hangs offline). The session in localStorage can
+// also be disturbed by the shell's auth boot when offline. So: read the token
+// from localStorage when present, and keep a copy in the emergency IndexedDB
+// (which nothing else touches) so it survives offline. Offline we don't need a
+// valid token at all — cached data is served regardless.
+function localSession(){ try{ return JSON.parse(localStorage.getItem('vigil_session')||'null'); }catch{ return null; } }
+async function init(){
+  setNet();
+  session=localSession();
+  token=session?.token || null;
+  if(!token){ try{ token=await idbGet('token')||null; }catch{} }
+  if(token){ try{ await idbSet('token',token); }catch{} }
+  await loadRoster(); // handles online (fetch) and offline (cache) internally
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${e.message}</div>`);
+</script>
+</body>
+</html>
