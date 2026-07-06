@@ -43,7 +43,15 @@
       const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
   }
-  function notify() { all().then((items) => listeners.forEach((cb) => { try { cb(items.length); } catch {} })); }
+  function notify() {
+    all().then((items) => {
+      const n = items.length;
+      listeners.forEach((cb) => { try { cb(n); } catch {} });
+      // Report queue depth up to a hosting shell (module pages run inside its
+      // iframe) so a global "N pending sync" badge updates instantly on change.
+      try { if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'VIGIL_OUTBOX', pending: n }, '*'); } catch {}
+    });
+  }
 
   // One live attempt for a queued item. Returns 'done' (synced or permanently
   // rejected), 'retry' (still offline — stop and keep it), or 'auth' handled.
@@ -64,6 +72,11 @@
       return 'retry'; // couldn't refresh (e.g. offline) — keep it queued
     }
     if (res.ok || (res.status >= 200 && res.status < 300)) return 'done';
+    // 409 = another sync (a second tab, or the shell syncing the shared queue)
+    // is already replaying this key. Not a rejection — keep the item; the
+    // in-flight one completes and a later sync gets the stored 2xx via the
+    // idempotent replay.
+    if (res.status === 409) return 'retry';
     // A 4xx that isn't auth means the write itself is invalid — don't block the
     // queue forever. Mark it failed and drop it (surfaced to the page).
     if (res.status >= 400 && res.status < 500) {
@@ -130,4 +143,7 @@
   // Auto-sync when connectivity returns and once on load.
   window.addEventListener('online', () => Outbox.sync());
   if (navigator.onLine) setTimeout(() => Outbox.sync(), 1500);
+  // Report the current queue depth on load so a hosting shell's badge is
+  // accurate even before the first change this session.
+  notify();
 })();

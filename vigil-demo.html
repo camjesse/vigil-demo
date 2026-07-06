@@ -392,6 +392,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   </div>
   <div class="hdr-right">
     <span id="net-badge" style="display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#FAD467;background:rgba(243,181,27,.1);border:1px solid rgba(243,181,27,.3);border-radius:999px;padding:4px 9px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Offline</span>
+    <span id="sync-badge" style="display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#7CC4FF;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.32);border-radius:999px;padding:4px 9px;white-space:nowrap;cursor:pointer" title="Changes saved on this device — they sync automatically when you're back online. Tap to retry now."><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span id="sync-badge-count">0</span>&nbsp;pending sync</span>
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">Light</button>
     <div class="jur-toggle" id="jurToggle">
       <button class="jt-btn ca active" id="jt-ca" onclick="setJurisdiction('ca')">Canada</button>
@@ -882,6 +883,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </div><!-- /shell -->
 
 <script src="vigil-auth.js?v=20260607-1"></script>
+<script src="vigil-offline.js?v=20260705-2"></script>
 <script>
 // ── MODULE CONFIG ─────────────────────────────────────────────
 const MODS = {
@@ -1915,6 +1917,42 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('online', sync);
   window.addEventListener('offline', sync);
   sync();
+})();
+
+// Queued-writes ("N pending sync") badge. The write outbox lives in each module
+// iframe; pages post their queue depth up to the shell on every change
+// (VIGIL_OUTBOX), and we also poll the shared IndexedDB queue directly so a
+// pre-existing queue shows on shell load. Tapping the badge syncs now.
+(function () {
+  const badge = document.getElementById('sync-badge');
+  const count = document.getElementById('sync-badge-count');
+  if (!badge || !count) return;
+  let last = -1;
+  const render = (n) => {
+    if (typeof n !== 'number' || n === last) return;
+    last = n;
+    count.textContent = n;
+    badge.style.display = n > 0 ? 'inline-flex' : 'none';
+  };
+  const poll = () => { if (window.VigilOutbox) window.VigilOutbox.pendingCount().then(render).catch(() => {}); };
+  // Instant updates pushed up from module iframes.
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'VIGIL_OUTBOX' && typeof e.data.pending === 'number') render(e.data.pending);
+  });
+  // Fallback poll (covers a queue that predates this shell load) + on reconnect.
+  poll();
+  setInterval(poll, 4000);
+  window.addEventListener('online', () => setTimeout(poll, 1500));
+  // Tap to retry: the shell's own outbox instance syncs the shared queue.
+  let syncing = false;
+  badge.addEventListener('click', async () => {
+    if (syncing || !window.VigilOutbox) return;
+    if (!navigator.onLine) { if (window.toast) toast('Still offline — your work syncs automatically when you reconnect'); return; }
+    syncing = true;
+    try { await window.VigilOutbox.sync(); } catch {}
+    syncing = false;
+    poll();
+  });
 })();
 </script>
 </body>
