@@ -11,12 +11,13 @@
  *   - Google Fonts: cache-first (immutable). Failed navigation → /offline.html.
  * Bump CACHE / API_CACHE to invalidate; old caches are deleted on activate.
  */
-const CACHE = 'vigil-shell-v9';
+const CACHE = 'vigil-shell-v10';
 const API_CACHE = 'vigil-api-v1';
 const KEEP = [CACHE, API_CACHE];
 const PRECACHE = [
   '/vigil-demo.html',
   '/vigil-auth.js',
+  '/vigil-crypto.js',
   '/vigil-offline.js',
   '/vigil-module.css',
   '/manifest.json',
@@ -63,7 +64,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
 
   // Non-GET, /health, and auth: always straight to network (never cached).
-  if (req.method !== 'GET' || url.pathname === '/health' || url.pathname.startsWith('/api/auth')) {
+  // The worker emergency endpoint (medical alerts / PII) is also network-only so
+  // plaintext never sits in Cache Storage — the emergency page keeps its own
+  // encrypted IndexedDB copy for offline, so it doesn't need the SW cache.
+  const isEmergency = /^\/api\/workers\/[^/]+\/emergency$/.test(url.pathname);
+  if (req.method !== 'GET' || url.pathname === '/health' || url.pathname.startsWith('/api/auth') || isEmergency) {
     return;
   }
 

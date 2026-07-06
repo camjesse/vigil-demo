@@ -66,6 +66,7 @@ button,input{font:inherit}.app{min-height:100%;display:flex;flex-direction:colum
   </main>
 </div>
 <script src="vigil-auth.js?v=20260607-1"></script>
+<script src="vigil-crypto.js?v=20260705-1"></script>
 <script>
 const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
 let token=null,session=null,roster=[],rosterCachedAt=null;
@@ -78,8 +79,10 @@ async function api(path){const r=await fetch(API+path,{headers:{Authorization:`B
 
 // ── IndexedDB (single kv store: 'roster' + 'profile:<id>') ─────
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('vigil-emergency',1);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains('kv'))db.createObjectStore('kv')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-async function idbSet(key,val){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(val,key);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
-async function idbGet(key){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const q=tx.objectStore('kv').get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+// Values are encrypted at rest (medical alerts / PII). Legacy plaintext still
+// reads (VigilCrypto.decrypt passes non-encrypted values through).
+async function idbSet(key,val){const stored=window.VigilCrypto?await VigilCrypto.encrypt(val):val;const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(stored,key);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+async function idbGet(key){const db=await idb();const raw=await new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const q=tx.objectStore('kv').get(key);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});return window.VigilCrypto?await VigilCrypto.decrypt(raw):raw}
 async function idbKeys(){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('kv','readonly');const q=tx.objectStore('kv').getAllKeys();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 
 // ── Network state ──────────────────────────────────────────────

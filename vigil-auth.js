@@ -87,6 +87,28 @@
     document.querySelector('.vigil-session-control')?.remove();
   }
 
+  // Wipe on-device HSE data so a shared/lost device can't be mined for cached
+  // medical alerts or PII. `keepOutbox` preserves unsynced field writes (and the
+  // key that decrypts them) — used on a forced 401 re-auth, which is usually
+  // just token expiry, not a device handover. Explicit logout wipes everything.
+  function purgeOfflineData(opts) {
+    const keepOutbox = !!(opts && opts.keepOutbox);
+    const dbs = ['vigil-emergency'];
+    if (!keepOutbox) dbs.push('vigil-outbox', 'vigil-keys');
+    const delDb = (name) => new Promise((res) => {
+      let done = false; const finish = () => { if (!done) { done = true; res(); } };
+      try { const r = window.indexedDB.deleteDatabase(name); r.onsuccess = finish; r.onerror = finish; r.onblocked = finish; }
+      catch { finish(); }
+      setTimeout(finish, 600);
+    });
+    const tasks = dbs.map(delDb);
+    if (window.caches) {
+      tasks.push(caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}));
+    }
+    return Promise.all(tasks).catch(() => {});
+  }
+  window.purgeVigilOfflineData = purgeOfflineData;
+
   async function validateSession(session) {
     if (!session || !session.token) return null;
 
@@ -429,12 +451,19 @@
 
   window.logoutVigil = function logoutVigil() {
     clearSession();
-    window.top.location.href = 'index.html';
+    // Explicit logout = device handover: wipe everything, including queued writes.
+    purgeOfflineData({ keepOutbox: false }).finally(() => {
+      window.top.location.href = 'index.html';
+    });
   };
 
   window.handleVigilUnauthorized = function handleVigilUnauthorized() {
     clearSession();
-    window.top.location.href = 'index.html?expired=1';
+    // Forced re-auth (token truly rejected): clear cached PII but keep the
+    // outbox + its key so unsynced field work survives a re-login.
+    purgeOfflineData({ keepOutbox: true }).finally(() => {
+      window.top.location.href = 'index.html?expired=1';
+    });
   };
 
   window.addEventListener('DOMContentLoaded', () => {
