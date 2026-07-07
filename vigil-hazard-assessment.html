@@ -681,6 +681,17 @@ let formHazardResponses = {};
 let formHazardNotes = {};
 let formSiteHazards = [];
 let formControlResponses = {};
+// Controls documented on a custom / no-template FLHA (or added on top of a
+// template). Seeded with common general controls; workers can edit, toggle, and
+// add their own. Confirmed rows are persisted so the record documents controls
+// even with no template (COR requirement).
+const DEFAULT_GENERAL_CONTROLS = [
+  { description: 'PPE donned and inspected',    control_type: 'ppe',            confirmed: false },
+  { description: 'Work area assessed for hazards', control_type: 'administrative', confirmed: false },
+  { description: 'Emergency procedures reviewed', control_type: 'administrative', confirmed: false },
+  { description: 'Communication established',    control_type: 'administrative', confirmed: false },
+];
+let formAdHocControls = [];
 let formCrewIds = [];
 let formData = {};
 let lastSubmittedId = null;
@@ -1106,6 +1117,7 @@ function resetForm() {
   formHazardNotes = {};
   formSiteHazards = [];
   formControlResponses = {};
+  formAdHocControls = DEFAULT_GENERAL_CONTROLS.map(c => ({ ...c }));
   formCrewIds = [];
   formData = {};
   lastSubmittedId = null;
@@ -1302,50 +1314,65 @@ function removeSiteHazard(i) {
 }
 
 // ── STEP 4: CONTROLS ──────────────────────────────────────────
+const CONTROL_TYPES = ['elimination','substitution','engineering','administrative','ppe'];
+const secSub = (t) => `<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:4px 0 8px">${t}</div>`;
+
 async function renderStep4() {
   const container = document.getElementById('step4-controls');
+  let templateHtml = '';
 
-  if (!formTemplate) {
-    container.innerHTML = `<div style="background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:14px">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">No template selected. Confirm general safety controls are in place:</div>
-      ${['PPE donned and inspected','Area assessed for hazards','Emergency procedures reviewed','Communication established'].map((c,i) => `
-        <div class="ctrl-row ${formControlResponses['gen-'+i]?'confirmed':''}">
-          <span class="ctrl-hier administrative">Admin</span>
-          <span class="ctrl-desc">${c}</span>
-          <label class="toggle"><input type="checkbox" ${formControlResponses['gen-'+i]?'checked':''} onchange="setControl('gen-${i}',this.checked)"><span class="toggle-slider"></span></label>
-        </div>
-      `).join('')}
-    </div>`;
-    return;
-  }
-
-  // Load controls if not yet loaded
-  if (!formTemplate.controls) {
-    container.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading controls…</span></div>`;
-    const res = await apiGet(`/api/hazard/templates/${formTemplate.id}`);
-    if (res) {
-      const full = res.template || res;
-      formTemplate = {...formTemplate, ...full};
+  if (formTemplate) {
+    if (!formTemplate.controls) {
+      container.innerHTML = `<div class="loading-wrap"><div class="spinner"></div><span>Loading controls…</span></div>`;
+      const res = await apiGet(`/api/hazard/templates/${formTemplate.id}`);
+      if (res) { const full = res.template || res; formTemplate = {...formTemplate, ...full}; }
+    }
+    const controls = (formTemplate.controls || []).sort((a,b) => (a.sort_order||0)-(b.sort_order||0));
+    if (controls.length) {
+      templateHtml = secSub('Template controls') + controls.map(c => `
+        <div class="ctrl-row ${formControlResponses[c.id]?'confirmed':''}" id="ctrl-${c.id}">
+          <span class="ctrl-hier ${c.control_type||'administrative'}">${fmt(c.control_type||'admin').slice(0,5)}</span>
+          <div style="flex:1">
+            <div class="ctrl-desc">${c.control_description}</div>
+            ${c.is_required ? '<div class="ctrl-req-badge">Required</div>' : ''}
+          </div>
+          <label class="toggle"><input type="checkbox" ${formControlResponses[c.id]?'checked':''} onchange="setControl('${c.id}',this.checked)"><span class="toggle-slider"></span></label>
+        </div>`).join('');
     }
   }
 
-  const controls = (formTemplate.controls || []).sort((a,b) => (a.sort_order||0)-(b.sort_order||0));
+  const intro = formTemplate
+    ? (templateHtml ? secSub('Additional controls')
+                    : `<div style="font-size:12px;color:var(--text2);margin-bottom:10px">This template has no predefined controls — document the controls in place for this task:</div>`)
+    : `<div style="font-size:12px;color:var(--text2);margin-bottom:10px">No template selected. Document the controls in place for this task (persisted with the record):</div>`;
 
-  if (!controls.length) {
-    container.innerHTML = `<div class="empty-state" style="padding:16px 0"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>No controls defined for this template</div>`;
-    return;
+  container.innerHTML = templateHtml + intro + renderAdHocControls();
+}
+
+function renderAdHocControls() {
+  const rows = formAdHocControls.map((c,i) => `
+    <div class="ctrl-row ${c.confirmed?'confirmed':''}" style="gap:8px;align-items:center;flex-wrap:wrap">
+      <select class="form-select" style="max-width:118px;font-size:10.5px;padding:6px 8px" onchange="updateAdHocControl(${i},'control_type',this.value)">
+        ${CONTROL_TYPES.map(t=>`<option value="${t}" ${c.control_type===t?'selected':''}>${fmt(t)}</option>`).join('')}
+      </select>
+      <input type="text" class="form-input" style="flex:1;min-width:150px;font-size:11.5px" value="${(c.description||'').replace(/"/g,'&quot;')}" placeholder="Describe the control…" oninput="updateAdHocControl(${i},'description',this.value)">
+      <label class="toggle"><input type="checkbox" ${c.confirmed?'checked':''} onchange="updateAdHocControl(${i},'confirmed',this.checked)"><span class="toggle-slider"></span></label>
+      <button class="btn btn-ghost btn-sm" style="color:var(--muted);padding:4px 9px" onclick="removeAdHocControl(${i})" title="Remove control">✕</button>
+    </div>`).join('');
+  return `<div id="adhoc-controls" style="display:flex;flex-direction:column;gap:6px">${rows}</div>
+    <button class="btn btn-ghost btn-sm" onclick="addAdHocControl()" style="margin-top:8px">+ Add control</button>`;
+}
+
+function addAdHocControl() { formAdHocControls.push({ description:'', control_type:'administrative', confirmed:true }); renderStep4(); }
+function removeAdHocControl(i) { formAdHocControls.splice(i,1); renderStep4(); }
+function updateAdHocControl(i, field, value) {
+  if (!formAdHocControls[i]) return;
+  formAdHocControls[i][field] = value;
+  // Toggle only needs a class refresh; text edits must NOT re-render (keeps focus).
+  if (field === 'confirmed') {
+    const rows = document.querySelectorAll('#adhoc-controls .ctrl-row');
+    if (rows[i]) rows[i].classList.toggle('confirmed', value);
   }
-
-  container.innerHTML = controls.map(c => `
-    <div class="ctrl-row ${formControlResponses[c.id]?'confirmed':''}" id="ctrl-${c.id}">
-      <span class="ctrl-hier ${c.control_type||'administrative'}">${fmt(c.control_type||'admin').slice(0,5)}</span>
-      <div style="flex:1">
-        <div class="ctrl-desc">${c.control_description}</div>
-        ${c.is_required ? '<div class="ctrl-req-badge">Required</div>' : ''}
-      </div>
-      <label class="toggle"><input type="checkbox" ${formControlResponses[c.id]?'checked':''} onchange="setControl('${c.id}',this.checked)"><span class="toggle-slider"></span></label>
-    </div>
-  `).join('');
 }
 
 function setControl(id, val) {
@@ -1499,6 +1526,9 @@ async function submitFlha() {
     reflection_response: formData.reflection || null,
     hazard_responses,
     control_responses,
+    ad_hoc_controls: formAdHocControls
+      .filter(c => c.description && c.description.trim())
+      .map(c => ({ control_description: c.description.trim(), control_type: c.control_type || 'administrative', confirmed: !!c.confirmed })),
     site_hazards: formSiteHazards
       .filter(h => h.description && h.description.trim())
       .map(h => ({ hazard_description: h.description.trim(), hazard_category: h.category || 'other', severity_potential: h.severity_potential || 'minor' })),
@@ -1604,10 +1634,16 @@ function renderDetail(a) {
     ['Permit #', a.permit_number || '—'],
   ].map(([k,v]) => `<div class="detail-fact"><div class="detail-fact-lbl">${k}</div><div class="detail-fact-val">${v}</div></div>`).join('');
 
-  // Quality flags
+  // Quality flags. The list endpoint returns these as flag-type strings; the
+  // detail endpoint returns rich objects ({flag_type, flag_description}). Handle
+  // both — treating an object as a string here used to throw and break the whole
+  // detail view (so no hazards/controls showed at all).
   const flags = a.quality_flags || [];
   const flagsHtml = flags.length
-    ? `<div class="section-title">Quality Flags</div>${flags.map(f => `<div class="flag-item">${fmt(f)}</div>`).join('')}`
+    ? `<div class="section-title">Quality Flags</div>${flags.map(f => {
+        const label = typeof f === 'string' ? fmt(f) : (f.flag_description || fmt(f.flag_type || ''));
+        return `<div class="flag-item">${label}</div>`;
+      }).join('')}`
     : '';
 
   // Hazard confirmations
@@ -1636,7 +1672,7 @@ function renderDetail(a) {
       <div class="haz-card" style="margin-bottom:6px">
         <div class="haz-card-top">
           <div class="haz-cat-dot" style="background:${hazCatColor(h.hazard_category)}"></div>
-          <div style="flex:1"><div class="haz-desc">${h.description}</div>
+          <div style="flex:1"><div class="haz-desc">${h.description || h.hazard_description || '—'}</div>
           <div class="haz-meta">${fmt(h.hazard_category)} · ${fmt(h.severity_potential)}</div></div>
         </div>
       </div>
@@ -1712,9 +1748,9 @@ function renderDetail(a) {
     ${a.reflection_response ? `<div class="section-title">Reflection Response</div><div class="desc-box">${a.reflection_response}</div>` : ''}
 
     ${flagsHtml}
-    ${hazHtml}
-    ${siteHazHtml}
-    ${ctrlHtml}
+    ${(hazConfs.length || siteHazards.length || ctrlConfs.length)
+      ? `${hazHtml}${siteHazHtml}${ctrlHtml}`
+      : `<div class="section-title">Hazards &amp; Controls</div><div class="desc-box" style="color:var(--muted)">No hazards or controls were documented on this assessment. For COR and OHS records, capture site hazards and the controls in place when completing an FLHA.</div>`}
     ${crewHtml}
     ${supComments}
   `;
