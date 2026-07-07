@@ -1782,6 +1782,12 @@ async function openNotificationPreferences() {
   root.innerHTML = `<form class="pref-dialog" onsubmit="saveNotificationPreferences(event)">
     <div class="pref-title">Notification preferences</div>
     <div class="pref-copy">In-app notifications always remain available. Choose which routine updates should also be emailed to you.</div>
+    <label class="pref-row"><div class="pref-row-copy"><div class="pref-row-title">Email cadence</div><div class="pref-row-desc">How expiring tickets and open action items are emailed. A weekly summary avoids one email per item. Critical incidents always email immediately.</div></div>
+      <select name="digest_frequency" class="pref-select" style="background:var(--s2,#101520);color:var(--text,#e2e8f0);border:1px solid var(--border,#1E2D40);border-radius:7px;padding:7px 9px;font-size:12px">
+        <option value="weekly" ${(p.digest_frequency||'weekly')==='weekly'?'selected':''}>Weekly summary</option>
+        <option value="immediate" ${p.digest_frequency==='immediate'?'selected':''}>Immediate (each item)</option>
+        <option value="off" ${p.digest_frequency==='off'?'selected':''}>Off (in-app only)</option>
+      </select></label>
     ${preferenceRow('assignment_email','Assignments','Corrective actions and other work assigned to you.',p.assignment_email)}
     ${preferenceRow('incident_email','Incident reports','Routine and serious incident reporting updates.',p.incident_email)}
     ${preferenceRow('system_email','System updates','Account and platform notifications.',p.system_email)}
@@ -1804,6 +1810,7 @@ async function saveNotificationPreferences(event) {
   const button = event.target.querySelector('[type=submit]');
   button.disabled = true;
   const body = Object.fromEntries(['assignment_email','incident_email','system_email'].map(name=>[name,event.target.elements[name].checked]));
+  body.digest_frequency = event.target.elements['digest_frequency'].value;
   const response = await fetch(`${DASH_API}/api/notifications/preferences`, {method:'PATCH',headers:{Authorization:`Bearer ${dashToken}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data = await response.json().catch(()=>({}));
   if (!response.ok) { button.disabled=false; return toast(data.error || 'Unable to save preferences'); }
