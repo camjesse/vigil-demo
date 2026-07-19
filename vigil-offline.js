@@ -56,12 +56,18 @@
   // One live attempt for a queued item. Returns 'done' (synced or permanently
   // rejected), 'retry' (still offline — stop and keep it), or 'auth' handled.
   async function send(item, allowRefresh) {
+    // The body is stored encrypted at rest — decrypt just before sending. A hard
+    // decrypt failure means the key is gone (post-wipe), so the item is
+    // unrecoverable; drop it rather than block the queue forever.
+    let body;
+    try { body = window.VigilCrypto ? await VigilCrypto.decrypt(item.body) : item.body; }
+    catch { item.error = 'Queued item could not be decrypted'; return 'failed'; }
     let res;
     try {
       res = await fetch(API + item.path, {
         method: item.method || 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}`, 'Idempotency-Key': item.id },
-        body: JSON.stringify(item.body),
+        body: JSON.stringify(body),
       });
     } catch {
       return 'retry'; // network error → still offline
@@ -112,7 +118,9 @@
           // fell through to offline below
         }
       }
-      const item = { id, path, method: method || 'POST', body, createdAt: Date.now(), attempts: 0 };
+      // Encrypt the body at rest — queued writes can hold injury details / PII.
+      const storedBody = window.VigilCrypto ? await VigilCrypto.encrypt(body) : body;
+      const item = { id, path, method: method || 'POST', body: storedBody, createdAt: Date.now(), attempts: 0 };
       await put(item);
       notify();
       return { queued: true, id };
