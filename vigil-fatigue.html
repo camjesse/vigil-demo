@@ -317,7 +317,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <button class="btn btn-p btn-sm" onclick="openDispatchCheck()">Check Driver Hours</button>
   </div>
 
-  <div class="alert bl"><strong>Dispatch Gate Policy:</strong> The system automatically blocks dispatch for any driver who has exceeded HOS limits or whose fatigue index is Critical. Supervisors cannot override Critical blocks — only HSE Manager authorization with documented justification. All overrides are permanently logged.</div>
+  <div class="alert bl"><strong>Dispatch Gate Policy:</strong> The system automatically blocks dispatch for any driver who has exceeded HOS limits or whose fatigue index is Critical. Supervisors cannot override Critical blocks — only HSE Manager authorization with documented justification. All overrides are recorded to the driver's fatigue log.</div>
 
   <div id="dispatchGatePanel"></div>
 </div>
@@ -384,7 +384,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- ===== OVERRIDES ===== -->
 <div class="panel" id="panel-overrides">
   <div class="page-hdr">
-    <div><div class="page-title">Override Log</div><div class="page-sub">All HOS override authorizations — permanent audit record</div></div>
+    <div><div class="page-title">Override Log</div><div class="page-sub">HOS override authorizations issued this session — each is recorded to the driver's fatigue log</div></div>
   </div>
   <div id="overridesPanel"></div>
 </div>
@@ -461,6 +461,20 @@ async function apiFetch(path) {
     return v;
   };
   return body.data !== undefined ? unwrap(body.data) : unwrap(body);
+}
+
+async function apiPost(path, body, method='POST') {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {'Authorization':`Bearer ${authToken}`,'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let msg = `${res.status}`;
+    try { const e = await res.json(); msg = e.error || e.message || msg; } catch(_) {}
+    throw new Error(msg);
+  }
+  return res.json().catch(()=>({}));
 }
 
 // ─── LOADING STATE ────────────────────────────────────────────
@@ -1189,33 +1203,60 @@ function confirmDispatch(id){
 function openOverride(driverId){
   const d = drivers.find(x=>x.id===driverId);
   showModal('HSE Manager Override — '+d?.name,`
-    <div class="alert rd">Overriding a HOS block is a serious decision. This override is permanently logged and may be reviewed in a carrier safety audit. Only proceed if there is a legitimate operational necessity.</div>
+    <div class="alert rd">Overriding a HOS block is a serious decision. This override is recorded to the driver's fatigue log and may be reviewed in a carrier safety audit. Only proceed if there is a legitimate operational necessity.</div>
     <div class="fg"><div class="fl">Justification for Override <span style="color:var(--danger)">*</span></div><textarea class="fi fi-ta" id="ov-reason" placeholder="Provide specific justification. Generic reasons will not be accepted..."></textarea></div>
     <div class="fg"><div class="fl">Additional Safety Measures</div><input class="fi" id="ov-measures" placeholder="What additional controls will be in place? e.g. 2-hour check-in requirement, shorter route assigned..."></div>
     <div class="fg"><div class="fl">Override Duration</div><select class="fi fi-sel" id="ov-duration"><option>This dispatch only</option><option>Today only</option></select></div>
-    <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:4px">By approving this override, you accept responsibility for this driver's dispatch in violation of standard HOS limits. This record is permanent.</div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:4px">By approving this override, you accept responsibility for this driver's dispatch in violation of standard HOS limits. This decision is recorded against the driver's fatigue history.</div>
   `,[
     {label:'Approve Override',cls:'btn-yw',action:`doOverride('${driverId}')`},
     {label:'Cancel',cls:'btn-g',action:'closeModal()'}
   ]);
 }
 
-function doOverride(id){
+async function doOverride(id){
   const reason = document.getElementById('ov-reason')?.value.trim();
   const measures = document.getElementById('ov-measures')?.value.trim();
+  const duration = document.getElementById('ov-duration')?.value || 'This dispatch only';
   if(!reason){showToast('error','Justification is required');return;}
   const d = drivers.find(x=>x.id===id);
-  overrides.push({
-    id:'OV-'+String(overrides.length+1).padStart(3,'0'),
-    driver:d?.name||'Unknown',
-    date:new Date().toISOString().split('T')[0],
-    reason, measures,
-    approvedBy:'HSE Manager',
-    blockReasons:d?.dispatchBlockReasons||[],
-  });
-  closeModal();closeDrawer();
-  renderAll();
-  showToast('warn',`Override approved and logged — ${d?.name} cleared for this dispatch only`);
+
+  // Persist the override as a supervisor fatigue assessment against the driver's
+  // record so it survives reload and shows up in the fatigue history / audit
+  // export. There is no separate dispatch-override table, so this is the real,
+  // queryable home for the authorization + its justification.
+  const outcome = [
+    `HOS DISPATCH OVERRIDE (${duration}).`,
+    `Justification: ${reason}.`,
+    measures ? `Additional controls: ${measures}.` : '',
+    (d?.dispatchBlockReasons||[]).length ? `Blocks overridden: ${d.dispatchBlockReasons.join('; ')}.` : '',
+  ].filter(Boolean).join(' ');
+
+  const btn = document.querySelector('#modalActions .btn-yw');
+  if(btn){ btn.disabled = true; btn.textContent = 'Recording…'; }
+
+  try {
+    await apiPost('/api/hours/fatigue', {
+      worker_id: id,
+      assessment_type: 'supervisor_assessment',
+      trigger_reason: 'supervisor_concern',
+      outcome,
+    });
+    overrides.push({
+      id:'OV-'+String(overrides.length+1).padStart(3,'0'),
+      driver:d?.name||'Unknown',
+      date:new Date().toISOString().split('T')[0],
+      reason, measures,
+      approvedBy:'HSE Manager',
+      blockReasons:d?.dispatchBlockReasons||[],
+    });
+    closeModal();closeDrawer();
+    renderAll();
+    showToast('warn',`Override recorded to ${d?.name}'s fatigue log — cleared for ${duration.toLowerCase()}`);
+  } catch(e) {
+    showToast('error','Could not record override: '+e.message);
+    if(btn){ btn.disabled = false; btn.textContent = 'Approve Override'; }
+  }
 }
 
 // ─── GPS AUDIT PANEL ──────────────────────────────────────────
@@ -1456,11 +1497,11 @@ function renderOverridesPanel(){
   const el = document.getElementById('overridesPanel');
   if(!el) return;
   el.innerHTML = overrides.length===0
-    ? `<div class="alert gr">No override authorizations on record. All dispatches have been within standard HOS limits.</div>
-       <div style="font-size:12px;color:var(--muted);line-height:1.7">Override requests appear here when an HSE Manager authorizes dispatch for a driver who has exceeded HOS limits. Every override is permanently logged and included in carrier safety audit packages.</div>`
-    : `<div class="alert yw">${overrides.length} override${overrides.length>1?'s have':' has'} been issued. These are permanent records and may be reviewed during a carrier safety audit.</div>
+    ? `<div class="alert gr">No overrides issued this session. All dispatches have been within standard HOS limits.</div>
+       <div style="font-size:12px;color:var(--muted);line-height:1.7">Override authorizations appear here when an HSE Manager clears a driver who has exceeded HOS limits. Each one is written to that driver's fatigue log, where it can be reviewed during a carrier safety audit.</div>`
+    : `<div class="alert yw">${overrides.length} override${overrides.length>1?'s have':' has'} been issued this session. Each is recorded to the driver's fatigue log and may be reviewed during a carrier safety audit.</div>
        <div class="card">
-         <div class="ch"><div class="ct">Override Authorization Log — Permanent Record</div></div>
+         <div class="ch"><div class="ct">Override Authorization Log</div></div>
          <div style="overflow-x:auto"><table class="tbl">
            <thead><tr><th>Override ID</th><th>Driver</th><th>Date</th><th>HOS Violations</th><th>Justification</th><th>Approved By</th></tr></thead>
            <tbody>

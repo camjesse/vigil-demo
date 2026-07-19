@@ -801,11 +801,15 @@ function mapWorker(worker, credentials) {
     if (!cred.expiry_date) return;
     const key = mapCredentialType(cred.credential_type);
     if (!key) return;
-    // Keep the one with the latest expiry if duplicates
+    // Keep the one with the latest expiry if duplicates. Retain the real
+    // credential id + type so an edit can PUT the existing row rather than
+    // creating a duplicate.
     if (!creds[key] || cred.expiry_date > creds[key].expiry) {
       creds[key] = {
         expiry: cred.expiry_date.slice(0, 10),
         issuer: cred.issuing_body || '',
+        id: cred.id,
+        credType: cred.credential_type,
       };
     }
     if (key === 'license') {
@@ -925,6 +929,18 @@ function credStatus(expiry) {
   if (days <= 30) return 'critical';
   if (days <= 60) return 'expiring';
   return 'valid';
+}
+
+// Called when the Role select changes in the drawer: flag which credential
+// fields are required for the chosen role so the user knows what to fill in.
+function updateCredFields() {
+  const role = document.getElementById('f-role')?.value || '';
+  CRED_TYPES.forEach(ct => {
+    const label = document.querySelector(`#f-cred-${ct.key}`)?.closest('.form-grid')?.querySelector('.form-label');
+    if (!label) return;
+    const req = ct.required.includes(role);
+    label.innerHTML = ct.label + (req ? ' <span class="required">*</span>' : '');
+  });
 }
 
 function credChip(expiry, credKey, role) {
@@ -1297,6 +1313,7 @@ function openDrawer(mode, empId) {
   `;
 
   openDrawerEl();
+  updateCredFields();
 }
 
 function openDrawerEl() {
@@ -1330,7 +1347,7 @@ async function reactivateEmployee(uuid, name) {
   } catch (e) { showToast('error', e.message); }
 }
 
-function saveEmployee(existingId) {
+async function saveEmployee(existingId) {
   const name = document.getElementById('f-name').value.trim();
   const role = document.getElementById('f-role').value;
   let valid = true;
@@ -1341,72 +1358,78 @@ function saveEmployee(existingId) {
   if (!role) { document.getElementById('e-role').classList.add('show'); document.getElementById('f-role').classList.add('error'); valid = false; }
   else { document.getElementById('e-role').classList.remove('show'); document.getElementById('f-role').classList.remove('error'); }
 
-  if (!valid) return;
-
-  const creds = {};
-  CRED_TYPES.forEach(ct => {
-    const expiry = document.getElementById('f-cred-' + ct.key)?.value;
-    const issuer = document.getElementById('f-issuer-' + ct.key)?.value;
-    if (expiry) creds[ct.key] = {expiry, issuer: issuer || ''};
-    else {
-      const existing = existingId ? employees.find(e => e.id === existingId) : null;
-      if (existing?.creds[ct.key]) creds[ct.key] = existing.creds[ct.key];
-    }
-  });
-
-  if (existingId) {
-    const idx = employees.findIndex(e => e.id === existingId);
-    employees[idx] = {
-      ...employees[idx],
-      name,
-      role,
-      licenseClass: document.getElementById('f-licClass').value,
-      site: document.getElementById('f-site').value,
-      startDate: document.getElementById('f-start').value,
-      phone: document.getElementById('f-phone').value,
-      email: document.getElementById('f-email').value,
-      creds,
-    };
-    showToast('success', name + "'s record updated successfully");
-  } else {
-    const newId = 'EMP-' + String(employees.length + 1).padStart(3, '0');
-    employees.push({
-      id: newId,
-      name, role,
-      licenseClass: document.getElementById('f-licClass').value,
-      site: document.getElementById('f-site').value,
-      startDate: document.getElementById('f-start').value,
-      phone: document.getElementById('f-phone').value,
-      email: document.getElementById('f-email').value,
-      status: 'active',
-      creds,
-    });
-    showToast('success', name + ' added to registry');
+  // The form takes a single Full Name; the API needs first + last.
+  const parts = name.split(/\s+/);
+  const firstName = parts[0];
+  const lastName  = parts.slice(1).join(' ');
+  if (!lastName) {
+    const err = document.getElementById('e-name');
+    err.textContent = 'Enter first and last name';
+    err.classList.add('show');
+    document.getElementById('f-name').classList.add('error');
+    return;
   }
 
-  closeDrawer();
-  renderAll();
-}
+  // Sanitise the optional fields — the registry renders missing values as "—",
+  // which must not be sent back as data.
+  const clean = v => { v = (v || '').trim(); return (!v || v === '—') ? '' : v; };
+  const rawEmail = clean(document.getElementById('f-email').value);
+  const rawPhone = clean(document.getElementById('f-phone').value);
+  const rawStart = clean(document.getElementById('f-start').value);
+  const site     = clean(document.getElementById('f-site').value);
 
-function deleteEmployee(empId) {
-  const emp = employees.find(e => e.id === empId);
-  showModal(
-    'Remove Employee',
-    `Are you sure you want to remove <strong>${emp.name}</strong> from the registry? This action cannot be undone.`,
-    [
-      {label:'Cancel', cls:'btn-ghost', action:'closeModal()'},
-      {label:'Remove Employee', cls:'btn-danger', action:`confirmDelete('${empId}')`}
-    ]
-  );
-}
+  const payload = {
+    first_name: firstName,
+    last_name:  lastName,
+    job_title:  role,   // the registry's Role maps 1:1 back to job_title on reload
+    email:      /.+@.+\..+/.test(rawEmail) ? rawEmail : '',
+    phone:      rawPhone || null,
+    site:       site || null,
+    hire_date:  /^\d{4}-\d{2}-\d{2}$/.test(rawStart) ? rawStart : null,
+  };
 
-function confirmDelete(empId) {
-  const emp = employees.find(e => e.id === empId);
-  employees = employees.filter(e => e.id !== empId);
-  closeDrawer();
-  closeModal();
-  renderAll();
-  showToast('success', emp.name + ' removed from registry');
+  const existing = existingId ? employees.find(e => e.id === existingId) : null;
+
+  const saveBtn = document.querySelector('#drawerFooter .btn-primary');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+  try {
+    let workerUuid;
+    if (existing) {
+      workerUuid = existing._uuid;
+      await apiFetch(`/api/workers/${workerUuid}`, { method: 'PUT', body: JSON.stringify(payload) });
+    } else {
+      const { worker } = await apiFetch('/api/workers', { method: 'POST', body: JSON.stringify(payload) });
+      workerUuid = worker.id;
+    }
+
+    // Persist credentials: for each type with an expiry entered, PUT the
+    // existing credential row or POST a new one. Types left blank are untouched.
+    for (const ct of CRED_TYPES) {
+      const expiry = clean(document.getElementById('f-cred-' + ct.key)?.value);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry)) continue;
+      const issuer = clean(document.getElementById('f-issuer-' + ct.key)?.value);
+      const prev = existing?.creds[ct.key];
+      const body = JSON.stringify({
+        credential_type: prev?.credType || ct.label,
+        expiry_date: expiry,
+        issuing_body: issuer || null,
+      });
+      if (prev?.id) {
+        await apiFetch(`/api/workers/${workerUuid}/credentials/${prev.id}`, { method: 'PUT', body });
+      } else {
+        await apiFetch(`/api/workers/${workerUuid}/credentials`, { method: 'POST', body });
+      }
+    }
+
+    showToast('success', existing ? name + "'s record updated" : name + ' added to registry');
+    closeDrawer();
+    await loadData();
+    renderAll();
+  } catch (e) {
+    showToast('error', 'Could not save: ' + e.message);
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = existing ? 'Save Changes' : 'Add Employee'; }
+  }
 }
 
 // ============================================================

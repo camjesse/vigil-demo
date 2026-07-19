@@ -389,7 +389,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <div class="panel" id="panel-equipment">
   <div class="page-hdr">
     <div><div class="page-title">Equipment Registry</div><div class="page-sub">Forklifts · Cranes · Lifting gear · Safety equipment · Power tools</div></div>
-    <button class="btn btn-p btn-sm" onclick="showToast('success','+ Equipment record created')">+ Add Equipment</button>
+    <button class="btn btn-p btn-sm" onclick="openAddVehicle('equipment')">+ Add Equipment</button>
   </div>
   <div id="equipPanel"></div>
 </div>
@@ -470,14 +470,11 @@ function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString(
 function fmtDate(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
 function fmtDateShort(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
 
-const ROAD_CONDITIONS = [
-  {route:'Hwy 2 Southbound',region:'Red Deer — Calgary',status:'advisory',condition:'Black ice reported — multiple locations',temp:'-8°C',wind:'31 km/h',vis:'4.2 km',activeDrivers:['P. Whitehorse','A. Reyes']},
-  {route:'Hwy 63 North',region:'Edmonton — Fort McMurray',status:'clear',condition:'Bare and dry',temp:'-4°C',wind:'18 km/h',vis:'Good',activeDrivers:['D. Mensah']},
-  {route:'Hwy 16 West',region:'Edmonton — Jasper',status:'caution',condition:'Compact snow — reduced traction',temp:'-10°C',wind:'24 km/h',vis:'6.1 km',activeDrivers:[]},
-  {route:'Hwy 2 Northbound',region:'Calgary — Red Deer',status:'caution',condition:'Slushy — treated',temp:'-5°C',wind:'22 km/h',vis:'Good',activeDrivers:[]},
-  {route:'Hwy 1 East',region:'Calgary — Medicine Hat',status:'clear',condition:'Clear and dry',temp:'-2°C',wind:'15 km/h',vis:'Good',activeDrivers:[]},
-  {route:'Hwy 43 West',region:'Edmonton — Grande Prairie',status:'clear',condition:'Bare and dry',temp:'-6°C',wind:'20 km/h',vis:'Good',activeDrivers:[]},
-];
+// Road/weather condition data comes from an external road-report integration
+// that isn't connected yet. Kept empty rather than seeded with invented weather
+// so nothing on screen implies a live feed we don't have. When the integration
+// lands, populate this from the API and the overlays light up automatically.
+const ROAD_CONDITIONS = [];
 
 // ─── MAPPING ──────────────────────────────────────────────────
 function mapAssetStatus(a) {
@@ -528,6 +525,7 @@ function mapMaintenance(m) {
   else if (m.scheduled_date === today) status = 'Due Today';
   return {
     id: m.maintenance_number || m.id,
+    _uuid: m.id,
     vehId: m.asset_id,
     unit: m.asset_name || m.asset_number || '—',
     type: m.title || m.maintenance_type || 'Service',
@@ -932,9 +930,9 @@ function openVehicleDetail(id){
   `;
 
   document.getElementById('drawerFooter').innerHTML=`
-    <button class="btn btn-g btn-sm" onclick="showToast('success','Vehicle record exported')">Export Record</button>
+    <button class="btn btn-g btn-sm" onclick="exportVehicleRecord('${id}')">Export Record</button>
     ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="dispatchVehicle('${id}')">Dispatch →</button>`:''}
-    ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="showToast('success','Maintenance work order opened for '+v.unit)">Open Work Order</button>`:''}
+    ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="closeDrawer();openAddMaintenance('${id}')">Open Work Order</button>`:''}
     <button class="btn btn-g" style="margin-left:auto" onclick="closeDrawer()">Close</button>
   `;
   openDrawerEl();
@@ -989,14 +987,20 @@ function renderMaintPanel(){
   `;
 }
 
-function completeMaint(id){
+async function completeMaint(id){
   const m=maintenance.find(x=>x.id===id);
-  if(m){m.status='Complete';}
-  renderAll();showToast('success',`${id} marked complete — service record updated`);
+  if(!m||!m._uuid){showToast('error','Could not find that work order');return;}
+  try{
+    await apiFetch(`/api/fleet/maintenance/${m._uuid}/complete`,{method:'POST',body:JSON.stringify({completed_date:new Date().toISOString().split('T')[0]})});
+    showToast('success',`${id} marked complete — service record updated`);
+    await loadData();renderAll();
+  }catch(e){showToast('error','Could not complete: '+e.message);}
 }
 
-function scheduleMaintenance(id){
-  showToast('success','Service scheduled — notifications sent to fleet manager');
+// The Service Due panel's "Schedule" shortcut opens the real scheduling form
+// pre-selected to that vehicle rather than pretending a service was booked.
+function scheduleMaintenance(vehId){
+  openAddMaintenance(vehId||'');
 }
 
 function openAddMaintenance(vehId=''){
@@ -1016,25 +1020,42 @@ function openAddMaintenance(vehId=''){
   ]);
 }
 
-function saveNewMaint(){
+// Map the friendly service-type label to the backend maintenance_type enum.
+function maintTypeEnum(label){
+  const t=(label||'').toLowerCase();
+  if(t.includes('inspection'))return'inspection';
+  if(t.includes('certification'))return'certification';
+  if(t.includes('recall'))return'recall';
+  if(t.includes('repair')||t.includes('replacement'))return'repair';
+  return'scheduled';
+}
+
+async function saveNewMaint(){
   const veh=vehicles.find(v=>v.id===document.getElementById('new-maint-veh')?.value);
+  if(!veh){showToast('error','Select a vehicle');return;}
   const type=document.getElementById('new-maint-type')?.value||'Service';
-  const id='MWO-'+String(maintenance.length+1).padStart(3,'0');
-  maintenance.push({id,vehId:veh?.id||'',unit:veh?.unit||'Unknown',type,priority:document.getElementById('new-maint-pri')?.value||'Medium',dueDate:document.getElementById('new-maint-due')?.value||rd(7),status:'Upcoming',estimatedHours:3,cost:0,notes:document.getElementById('new-maint-notes')?.value||''});
-  closeModal();renderAll();
-  showToast('success',`${id} created — ${veh?.unit||''} ${type}`);
+  const priority=document.getElementById('new-maint-pri')?.value||'Medium';
+  const due=document.getElementById('new-maint-due')?.value||rd(7);
+  const notes=document.getElementById('new-maint-notes')?.value||'';
+  const body=JSON.stringify({
+    maintenance_type:maintTypeEnum(type),
+    title:type,
+    scheduled_date:due,
+    description:[priority!=='Medium'?`Priority: ${priority}.`:'',notes].filter(Boolean).join(' ').trim()||null,
+  });
+  try{
+    await apiFetch(`/api/fleet/${veh.id}/maintenance`,{method:'POST',body});
+    closeModal();
+    showToast('success',`Service scheduled — ${veh.unit} ${type}`);
+    await loadData();renderAll();
+  }catch(e){showToast('error','Could not schedule: '+e.message);}
 }
 
 // ─── ROADS PANEL ──────────────────────────────────────────────
 function renderRoadsPanel(){
   const el=document.getElementById('roadsPanel');
   if(!el) return;
-  const advisory=ROAD_CONDITIONS.filter(r=>r.status==='advisory');
-
-  el.innerHTML=`
-    ${advisory.length>0?`<div class="alert rd"><strong>${advisory.length} active road advisory${advisory.length>1?'s':''}</strong> — all affected drivers have been notified. Journey plans updated.</div>`:''}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      ${ROAD_CONDITIONS.map(r=>`
+  const cards=ROAD_CONDITIONS.map(r=>`
         <div class="card" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.25)':r.status==='caution'?'rgba(255,184,0,.2)':'var(--border)'}">
           <div class="ch" style="border-color:${r.status==='advisory'?'rgba(255,69,69,.15)':'var(--border)'}">
             <div class="ct">${r.route}</div>
@@ -1048,18 +1069,13 @@ function renderRoadsPanel(){
               <div><span style="color:var(--muted)">Wind:</span><div style="font-weight:600;margin-top:1px">${r.wind}</div></div>
               <div><span style="color:var(--muted)">Visibility:</span><div style="font-weight:600;margin-top:1px">${r.vis}</div></div>
             </div>
-            ${r.activeDrivers.length>0?`
-              <div style="background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:11.5px">
-                <span style="color:var(--muted)">Drivers on this route:</span>
-                <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap">
-                  ${r.activeDrivers.map(d=>`<span class="chip bl">${d}</span>`).join('')}
-                </div>
-              </div>
-            `:'<div style="font-size:11px;color:var(--muted)">No active drivers on this route</div>'}
           </div>
-        </div>
-      `).join('')}
-    </div>
+        </div>`).join('');
+
+  el.innerHTML=`
+    ${ROAD_CONDITIONS.length===0
+      ? `<div class="alert bl">Live road &amp; weather conditions require an external road-report integration, which isn't connected on this account yet. Once connected, route conditions and advisories appear here and overlay onto the dispatch board.</div>`
+      : `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">${cards}</div>`}
     <div class="card">
       <div class="ch"><div class="ct">Journey Plan Check-in Requirements</div></div>
       <div class="cb">
@@ -1279,7 +1295,7 @@ function renderCertPanel(){
     });
   });
   rows.sort((a,b)=>a.days-b.days);
-  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="showToast('success','Certification report exported')">Export</div></div>
+  el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="exportCertReport()">Export</div></div>
     <div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Unit</th><th>Certification</th><th>Expiry Date</th><th>Days Remaining</th><th>Status</th></tr></thead>
       <tbody>
@@ -1342,7 +1358,84 @@ function doDispatch(id){
 }
 
 function issueAdvisory(){showToast('warn','Driver advisory issued — all active drivers notified of route conditions');}
-function openAddVehicle(){showModal('Add Vehicle',`<div class="fg"><div class="fl">Unit Number</div><input class="fi" placeholder="e.g. Unit 42"></div><div class="fgrid"><div class="fg"><div class="fl">Make</div><input class="fi" placeholder="e.g. Peterbilt"></div><div class="fg"><div class="fl">Model</div><input class="fi" placeholder="e.g. 579"></div></div><div class="fgrid"><div class="fg"><div class="fl">Year</div><input class="fi" type="number" placeholder="2024"></div><div class="fg"><div class="fl">Vehicle Type</div><select class="fi fi-sel"><option>Class 1 Semi</option><option>Class 3 Truck</option><option>Service Truck</option><option>Pickup 4x4</option><option>Van</option></select></div></div>`,[{label:'Add Vehicle',cls:'btn-p',action:"closeModal();showToast('success','Vehicle added to fleet registry')"},{label:'Cancel',cls:'btn-g',action:'closeModal()'}]);}
+// Vehicle vs. equipment share one create form — only the type options differ.
+const ASSET_TYPE_OPTIONS = {
+  vehicle:   [['semi','Class 1 Semi'],['truck','Class 3 Truck'],['truck','Service Truck'],['pickup','Pickup 4x4'],['van','Van'],['suv','SUV'],['tanker','Tanker'],['flatbed','Flatbed']],
+  equipment: [['forklift','Forklift'],['excavator','Excavator'],['loader','Loader'],['crane','Crane'],['compressor','Compressor'],['generator','Generator'],['pump','Pump'],['welder','Welder'],['other','Other']],
+};
+
+function openAddVehicle(kind='vehicle'){
+  const isEquip=kind==='equipment';
+  const opts=ASSET_TYPE_OPTIONS[isEquip?'equipment':'vehicle'];
+  showModal(isEquip?'Add Equipment':'Add Vehicle',`
+    <div class="fg"><div class="fl">${isEquip?'Asset Name / Unit':'Unit Number'} <span style="color:var(--danger)">*</span></div><input class="fi" id="nv-unit" placeholder="${isEquip?'e.g. Forklift 3':'e.g. Unit 42'}"></div>
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Make</div><input class="fi" id="nv-make" placeholder="e.g. ${isEquip?'Caterpillar':'Peterbilt'}"></div>
+      <div class="fg"><div class="fl">Model</div><input class="fi" id="nv-model" placeholder="e.g. ${isEquip?'D6':'579'}"></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><div class="fl">Year</div><input class="fi" id="nv-year" type="number" placeholder="2024"></div>
+      <div class="fg"><div class="fl">${isEquip?'Equipment':'Vehicle'} Type</div><select class="fi fi-sel" id="nv-cat">${opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div>
+    </div>
+    <div class="fg"><div class="fl">VIN / Serial</div><input class="fi" id="nv-vin" placeholder="Optional"></div>
+  `,[
+    {label:isEquip?'Add Equipment':'Add Vehicle',cls:'btn-p',action:`saveNewVehicle('${kind}')`},
+    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
+  ]);
+}
+
+async function saveNewVehicle(kind='vehicle'){
+  const unit=(document.getElementById('nv-unit')?.value||'').trim();
+  if(!unit){showToast('error','Enter a unit number / name');return;}
+  const yearRaw=parseInt(document.getElementById('nv-year')?.value,10);
+  const body=JSON.stringify({
+    asset_type:kind==='equipment'?'heavy_equipment':'vehicle',
+    category:document.getElementById('nv-cat')?.value||'other',
+    name:unit,
+    make:(document.getElementById('nv-make')?.value||'').trim()||null,
+    model:(document.getElementById('nv-model')?.value||'').trim()||null,
+    year:Number.isFinite(yearRaw)?yearRaw:null,
+    vin_serial:(document.getElementById('nv-vin')?.value||'').trim()||null,
+  });
+  try{
+    await apiFetch('/api/fleet',{method:'POST',body});
+    closeModal();
+    showToast('success',`${unit} added to ${kind==='equipment'?'equipment registry':'fleet registry'}`);
+    await loadData();renderAll();
+  }catch(e){showToast('error','Could not add: '+e.message);}
+}
+
+// ─── CSV EXPORT (real, client-side from loaded data) ──────────
+function downloadCSV(filename, rows){
+  const esc=v=>{const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  const csv=rows.map(r=>r.map(esc).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportVehicleRecord(id){
+  const v=vehicles.find(x=>x.id===id);
+  if(!v){showToast('error','Vehicle not found');return;}
+  const rows=[
+    ['Field','Value'],
+    ['Unit',v.unit],['Type',v.type],['Make',v.make],['Model',v.model],['Year',v.year],
+    ['VIN/Serial',v.vin],['Plate',v.plate],['Status',v.status],['Site',v.site],
+    ['Odometer (km)',v.odometer],['Next service',v.nextService],
+    ['CVIP expiry',v.certs.cvip],['Insurance expiry',v.certs.insurance],['Registration expiry',v.certs.registration],
+    ['Open deficiencies',v.deficiencies.join('; ')],
+  ];
+  downloadCSV(`vehicle-${(v.unit||'record').replace(/\s+/g,'-')}.csv`,rows);
+  showToast('success',`${v.unit} record exported`);
+}
+
+function exportCertReport(){
+  const header=['Unit','Type','CVIP expiry','Insurance expiry','Registration expiry'];
+  const rows=[header,...vehicles.map(v=>[v.unit,v.type,v.certs.cvip,v.certs.insurance,v.certs.registration])];
+  downloadCSV('vehicle-certifications.csv',rows);
+  showToast('success','Certification report exported');
+}
 
 function filterFleet(type){renderFleetRegistry(type);}
 
