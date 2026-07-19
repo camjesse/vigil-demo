@@ -417,15 +417,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 <!-- ALERT STRIP -->
 <div class="astrip" id="astrip">
   <span class="al">Alerts</span>
-  <div class="ai-item" style="color:var(--danger)" onclick="loadMod('employees')"><div class="ad" style="background:var(--danger)"></div>4 expired credentials</div>
-  <span class="asep">·</span>
-  <div class="ai-item" style="color:var(--danger)" onclick="loadMod('incidents')"><div class="ad" style="background:var(--danger)"></div>2 open incidents</div>
-  <span class="asep">·</span>
-  <div class="ai-item" style="color:var(--warn)" onclick="loadMod('incidents')"><div class="ad" style="background:var(--warn)"></div>7 CAPA overdue</div>
-  <span class="asep">·</span>
-  <div class="ai-item" style="color:var(--purple)" onclick="loadMod('ai')"><div class="ad" style="background:var(--purple)"></div>EXTREME risk — Calgary Hub tomorrow 06:00</div>
-  <span class="asep">·</span>
-  <div class="ai-item" style="color:var(--warn)" onclick="loadMod('employees')"><div class="ad" style="background:var(--warn)"></div>11 credentials expiring 30d</div>
+  <span id="astrip-items" style="display:contents"><div class="ai-item" style="color:var(--a3)"><div class="ad" style="background:currentColor"></div>Loading…</div></span>
   <div class="aact">
     <button class="btn btn-rd" onclick="reportIncidentWorkflow()">Report Incident</button>
     <button class="btn btn-g" onclick="document.getElementById('astrip').classList.add('off')">✕</button>
@@ -469,14 +461,14 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         </div>
         <div class="sb-item" id="sbi-employees" onclick="loadMod('employees')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" /> <path d="M14 6a6 6 0 0 1 6 6v3" /> <path d="M4 15v-3a6 6 0 0 1 6-6" /> <rect x="2" y="15" width="20" height="4" rx="1" /> </svg></span><span class="sb-label">Employees</span>
-          <span class="sb-badge yw">4</span>
+          <span class="sb-badge yw" id="sb-badge-employees" style="display:none">0</span>
         </div>
         <div class="sb-item" id="sbi-emergency" onclick="loadMod('emergency')">
           <span class="sb-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2z"/></svg></span><span class="sb-label">Emergency Access</span>
         </div>
         <div class="sb-item" id="sbi-incidents" onclick="loadMod('incidents')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M7 18v-6a5 5 0 1 1 10 0v6" /> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" /> <path d="M21 12h1" /> <path d="M18.5 4.5 18 5" /> <path d="M2 12h1" /> <path d="M12 2v1" /> <path d="m4.929 4.929.707.707" /> <path d="M12 12v6" /> </svg></span><span class="sb-label">Incidents</span>
-          <span class="sb-badge rd">2</span>
+          <span class="sb-badge rd" id="sb-badge-incidents" style="display:none">0</span>
         </div>
         <div class="sb-item" id="sbi-investigations" onclick="loadMod('investigations')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /> </svg></span><span class="sb-label">Investigations</span>
@@ -547,7 +539,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
       <div class="sb-sec-items">
         <div class="sb-item ai-mod" id="sbi-ai" onclick="loadMod('ai')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" /> <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" /> <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" /> <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" /> <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" /> <path d="M3.477 10.896a4 4 0 0 1 .585-.396" /> <path d="M19.938 10.5a4 4 0 0 1 .585.396" /> <path d="M6 18a4 4 0 0 1-1.967-.516" /> <path d="M19.967 17.484A4 4 0 0 1 18 18" /> </svg></span><span class="sb-label">Predictive AI</span>
-          <span class="sb-badge rd">4</span>
+          <span class="sb-badge rd" id="sb-badge-ai" style="display:none">0</span>
         </div>
         <div class="sb-item" id="sbi-executive" onclick="loadMod('executive')">
           <span class="sb-icon"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /> </svg></span><span class="sb-label">Executive Report</span>
@@ -601,7 +593,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         <div>
           <div class="dash-eyebrow">Overview</div>
           <div class="dash-title">Today's Safety Picture</div>
-          <p class="dash-copy">A cleaner view of the work that needs attention now: open incidents, overdue CAPA, risk signals, credentials, and site health across Northern Express Transport.</p>
+          <p class="dash-copy">A cleaner view of the work that needs attention now: open incidents, overdue CAPA, risk signals, credentials, and site health across <span id="dash-co">your organization</span>.</p>
         </div>
         <div class="dash-pulse">
           <span class="pd"></span>
@@ -616,8 +608,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           <div class="priority-icon">!</div>
           <div>
             <div class="priority-label">Needs assignment</div>
-            <div class="priority-title">2 open incidents are still unassigned</div>
-            <div class="priority-meta">Assign ownership before the next shift handoff.</div>
+            <div class="priority-title" id="prio-needs-title">No open incidents</div>
+            <div class="priority-meta" id="prio-needs-meta">Nothing needs assignment right now.</div>
             <button class="priority-link" onclick="loadMod('incidents')">Open incidents</button>
           </div>
         </article>
@@ -625,8 +617,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           <div class="priority-icon">7</div>
           <div>
             <div class="priority-label">Overdue work</div>
-            <div class="priority-title">CAPA closure is behind target</div>
-            <div class="priority-meta"><span id="kpi-capa-sub">7 overdue</span> actions need follow-up.</div>
+            <div class="priority-title" id="prio-capa-title">Corrective actions on track</div>
+            <div class="priority-meta"><span id="kpi-capa-sub">0 overdue</span> actions need follow-up.</div>
             <button class="priority-link" onclick="loadMod('incidents')">Review CAPA register</button>
           </div>
         </article>
@@ -634,8 +626,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           <div class="priority-icon">AI</div>
           <div>
             <div class="priority-label">Risk window</div>
-            <div class="priority-title">Calgary Hub risk predicted for 06:00</div>
-            <div class="priority-meta">Fatigue, weather, vehicle movement, and open actions are converging.</div>
+            <div class="priority-title" id="prio-risk-title">No elevated risk signals</div>
+            <div class="priority-meta" id="prio-risk-meta">The risk engine hasn't flagged any active windows.</div>
             <button class="priority-link" onclick="loadMod('ai')">View risk factors</button>
           </div>
         </article>
@@ -681,26 +673,8 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           </div>
           <div class="ops-body">
             <div class="trend-panel">
-              <div class="trend-bars">
-                <div class="trend-col"><div class="trend-bar" style="height:60%"></div><div class="trend-label">Apr</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:80%"></div><div class="trend-label">May</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:50%"></div><div class="trend-label">Jun</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:90%;background:var(--danger)"></div><div class="trend-label">Jul</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:40%"></div><div class="trend-label">Aug</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:55%"></div><div class="trend-label">Sep</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:35%;background:var(--a3)"></div><div class="trend-label">Oct</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:28%;background:var(--a3)"></div><div class="trend-label">Nov</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:22%;background:var(--a3)"></div><div class="trend-label">Dec</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:18%;background:var(--a3)"></div><div class="trend-label">Jan</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:14%;background:var(--a3)"></div><div class="trend-label">Feb</div></div>
-                <div class="trend-col"><div class="trend-bar" style="height:10%;background:var(--a3)"></div><div class="trend-label">Mar</div></div>
-              </div>
-              <div class="trend-legend">
-                <span>LTI <b style="color:var(--danger)">1</b></span>
-                <span>Medical aid <b style="color:var(--warn)">2</b></span>
-                <span>First aid <b style="color:var(--accent)">2</b></span>
-                <span>Near miss <b style="color:var(--a3)">1</b></span>
-              </div>
+              <div class="trend-bars" id="trend-bars"></div>
+              <div class="trend-legend" id="trend-legend"></div>
             </div>
           </div>
         </article>
@@ -1203,6 +1177,13 @@ function toast(msg) {
 }
 
 function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+// Sidebar count badges: show the real number, hide entirely when zero.
+function setBadge(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (n > 0) { el.textContent = n; el.style.display = ''; }
+  else { el.style.display = 'none'; }
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', () => {
@@ -1224,6 +1205,30 @@ window.addEventListener('message', (e) => {
 
 // ── JURISDICTION ──────────────────────────────────────────────
 let JUR = 'ca';
+let COMPANY_NAME = '';
+
+// Show the logged-in company everywhere (header, tab title, dashboard copy) —
+// never a hard-coded demo name.
+function applyCompanyName(name) {
+  if (!name) return;
+  COMPANY_NAME = name;
+  const co = document.getElementById('coTag'); if (co) co.textContent = name;
+  const copy = document.getElementById('dash-co'); if (copy) copy.textContent = name;
+  document.title = `Vigil HSE — ${name}`;
+}
+
+// Clear the seeded demo numbers before real data loads, so a slow or failed
+// fetch never leaves another company's fake figures on screen.
+function resetDashboardToNeutral() {
+  [['kpi-trif','0.0'],['kpi-ltif','0.0'],['kpi-lost-days','0'],['kpi-nearmiss','0'],
+   ['kpi-inspection','0%'],['kpi-inspection-sub','0/0 done'],['kpi-capa','—'],['kpi-capa-sub','0 overdue'],
+   ['kpi-jha','0'],['kpi-talks','0'],['workers-count','0'],['workers-count-dashboard','0'],
+   // Clear the fabricated year-over-year notes — there's no real comparison baseline.
+   ['kpi-trif-sub','200,000-hour basis'],['kpi-ltif-sub','200,000-hour basis']
+  ].forEach(([id,v]) => setEl(id, v));
+  ['kpi-inspection-bar','kpi-capa-bar'].forEach(id => { const b=document.getElementById(id); if(b) b.style.width='0%'; });
+  ['sb-badge-employees','sb-badge-incidents','sb-badge-ai'].forEach(id => setBadge(id, 0));
+}
 
 const JUR_CONFIG = {
   ca: {
@@ -1242,7 +1247,7 @@ function setJurisdiction(jur) {
   const cfg = JUR_CONFIG[jur];
   document.querySelectorAll('.jt-btn:not(.mx)').forEach(b => b.classList.remove('active'));
   document.getElementById('jt-' + jur).classList.add('active');
-  document.getElementById('coTag').textContent = cfg.coTag;
+  document.getElementById('coTag').textContent = COMPANY_NAME || cfg.coTag;
   updateAlertStrip(jur);
   Object.keys(loaded).forEach(id => {
     const f = document.getElementById('frm-' + id);
@@ -1284,6 +1289,8 @@ async function initDashboard() {
     const session = await getVigilSession();
     dashToken = session.token;
     if (!dashToken) return;
+    applyCompanyName(session.companyName || session.user?.company_name);
+    resetDashboardToNeutral();
     document.getElementById('sbi-admin')?.classList.toggle('hidden', !['admin','superadmin'].includes(session.user?.role));
     loadNotifications();
     loadActionCenter();
@@ -1291,8 +1298,9 @@ async function initDashboard() {
     const hdr = {'Authorization':`Bearer ${dashToken}`,'Content-Type':'application/json'};
     const apiGet = url => fetch(`${DASH_API}${url}`,{headers:hdr}).then(r=>r.ok?r.json():null).catch(()=>null);
 
-    const [incidents, corrective, hazard, meetings, inspections, signals, riskDash, workers] = await Promise.all([
+    const [incidents, incidentList, corrective, hazard, meetings, inspections, signals, riskDash, workers] = await Promise.all([
       apiGet('/api/incidents/stats?hours_worked=94000'),
+      apiGet('/api/incidents?limit=200'),
       apiGet('/api/corrective-actions?limit=100'),
       apiGet('/api/hazard/stats'),
       apiGet('/api/meetings/stats'),
@@ -1304,10 +1312,8 @@ async function initDashboard() {
 
     const workerArr = workers && (workers.workers || workers.data || (Array.isArray(workers) ? workers : []));
     const workerCount = Array.isArray(workerArr) ? workerArr.length : 0;
-    if (workerCount > 0) {
-      setEl('workers-count', workerCount);
-      setEl('workers-count-dashboard', workerCount);
-    }
+    setEl('workers-count', workerCount);
+    setEl('workers-count-dashboard', workerCount);
 
     const inc   = (incidents && incidents.summary) || {};
     const rates = (incidents && incidents.rates)   || {};
@@ -1315,7 +1321,9 @@ async function initDashboard() {
     const ltiCount   = inc.lost_time_incidents  || 0;
     const nearMiss   = inc.near_miss_incidents  || 0;
     const lostDays   = inc.total_lost_time_days || 0;
-    const estHours   = Math.max(workerCount || 47, 1) * 2000;
+    const incList = (incidentList && (incidentList.incidents || incidentList.data)) || [];
+    const openIncidents = incList.filter(i => !['closed','void','resolved'].includes((i.workflow_status||'').toLowerCase())).length;
+    const estHours   = Math.max(workerCount, 1) * 2000;
     const trif = rates.trir  != null ? (+rates.trir).toFixed(1)  : ((recordable/estHours)*200000).toFixed(1);
     const ltif = rates.ltifr != null ? (+rates.ltifr).toFixed(1) : ((ltiCount/estHours)*200000).toFixed(1);
     setEl('kpi-trif', trif);
@@ -1324,51 +1332,82 @@ async function initDashboard() {
     setEl('kpi-lost-days-sub', `${ltiCount} LTI incident${ltiCount!==1?'s':''}`);
     setEl('kpi-nearmiss', nearMiss);
 
-    const cas = (corrective && (corrective.corrective_actions || corrective.data)) || [];
-    if (cas.length > 0) {
-      const casCompleted = cas.filter(c => c.status === 'completed').length;
-      const casOverdue   = cas.filter(c => c.is_overdue).length;
-      const casPct       = Math.round((casCompleted / cas.length) * 100);
-      setEl('kpi-capa', `${casPct}%`);
-      setEl('kpi-capa-sub', `${casOverdue} overdue`);
-      const bar = document.getElementById('kpi-capa-bar');
-      if (bar) bar.style.width = `${casPct}%`;
-      renderActions(cas);
+    // Needs-assignment priority card, from real open incidents.
+    if (openIncidents > 0) {
+      setEl('prio-needs-title', `${openIncidents} open incident${openIncidents!==1?'s':''} need${openIncidents!==1?'':'s'} attention`);
+      setEl('prio-needs-meta', 'Assign ownership before the next shift handoff.');
     }
+
+    const cas = (corrective && (corrective.corrective_actions || corrective.data)) || [];
+    const casCompleted = cas.filter(c => c.status === 'completed').length;
+    const casOverdue   = cas.filter(c => c.is_overdue).length;
+    const casPct       = cas.length ? Math.round((casCompleted / cas.length) * 100) : null;
+    setEl('kpi-capa', casPct != null ? `${casPct}%` : '—');
+    setEl('kpi-capa-sub', `${casOverdue} overdue`);
+    const capaBar = document.getElementById('kpi-capa-bar'); if (capaBar) capaBar.style.width = `${casPct || 0}%`;
+    setEl('prio-capa-title', casOverdue > 0 ? 'CAPA closure is behind target' : 'Corrective actions on track');
+    renderActions(cas);
 
     const inspTotal = (inspections && inspections.total_inspections) || 0;
     const inspDone  = ((inspections && inspections.by_status)||[]).find(s=>s.status==='completed');
     const inspCount = inspDone ? inspDone.count : 0;
-    if (inspTotal > 0) {
-      const inspPct = Math.round((inspCount/inspTotal)*100);
-      setEl('kpi-inspection', `${inspPct}%`);
-      setEl('kpi-inspection-sub', `${inspCount}/${inspTotal} done`);
-      const bar = document.getElementById('kpi-inspection-bar');
-      if (bar) bar.style.width = `${inspPct}%`;
-    }
+    const inspPct   = inspTotal ? Math.round((inspCount/inspTotal)*100) : 0;
+    setEl('kpi-inspection', `${inspPct}%`);
+    setEl('kpi-inspection-sub', inspTotal ? `${inspCount}/${inspTotal} done` : 'No inspections yet');
+    const inspBar = document.getElementById('kpi-inspection-bar'); if (inspBar) inspBar.style.width = `${inspPct}%`;
 
     const jhaTotal = hazard && hazard.stats && hazard.stats.total;
-    if (jhaTotal != null) setEl('kpi-jha', jhaTotal);
+    setEl('kpi-jha', jhaTotal != null ? jhaTotal : 0);
 
     const ttRow = ((meetings && meetings.by_type)||[]).find(t=>t.meeting_type==='toolbox_talk');
-    if (ttRow) setEl('kpi-talks', ttRow.total || ttRow.completed || 0);
+    setEl('kpi-talks', ttRow ? (ttRow.total || ttRow.completed || 0) : 0);
 
     const sigList = (signals && signals.signals) || [];
-    if (sigList.length > 0) renderPredictions(sigList.slice(0,3));
+    renderPredictions(sigList.slice(0,3));
+    if (sigList.length > 0) {
+      const top = sigList[0];
+      setEl('prio-risk-title', `${top.title || top.signal_type || 'Elevated risk'}${top.site ? ' — ' + top.site : ''}`);
+      setEl('prio-risk-meta', `${(top.severity||'').toUpperCase()} risk signal flagged by the engine.`);
+    }
 
     const workersBySite = {};
     (Array.isArray(workerArr)?workerArr:[]).forEach(w=>{if(w.site)workersBySite[w.site]=(workersBySite[w.site]||0)+1;});
     const incidentsBySite = {};
     ((incidents && incidents.by_site)||[]).forEach(s=>{if(s.site)incidentsBySite[s.site]=s.count;});
     const sites = (riskDash && riskDash.top_sites_at_risk) || [];
-    if (sites.length > 0) renderSites(sites, workersBySite, incidentsBySite);
+    renderSites(sites, workersBySite, incidentsBySite);
 
+    // Credentials → expiring table + alert-ticker counts.
+    let expiredCreds = 0, expiringCreds = 0;
     if (Array.isArray(workerArr) && workerArr.length > 0) {
       const credResults = await Promise.all(
         workerArr.map(w => apiGet(`/api/workers/${w.id}/credentials`).then(r=>({worker:w,creds:(r&&r.credentials)||[]})))
       );
       renderExpiring(credResults);
+      const now = Date.now(), in30 = now + 30*24*3600*1000;
+      for (const {creds} of credResults) for (const c of creds) {
+        if (!c.expiry_date) continue;
+        const t = new Date(c.expiry_date).getTime();
+        if (t < now) expiredCreds++; else if (t <= in30) expiringCreds++;
+      }
     }
+
+    // Real alert ticker — only items that actually apply, in the real numbers.
+    renderAlertTicker([
+      expiredCreds  && { color:'var(--danger)', mod:'employees', text:`${expiredCreds} expired credential${expiredCreds!==1?'s':''}` },
+      openIncidents && { color:'var(--danger)', mod:'incidents', text:`${openIncidents} open incident${openIncidents!==1?'s':''}` },
+      casOverdue    && { color:'var(--warn)',   mod:'incidents', text:`${casOverdue} CAPA overdue` },
+      sigList.length && { color:'var(--purple)', mod:'ai', text:`${sigList[0].title || 'Elevated risk signal'}${sigList[0].site ? ' — ' + sigList[0].site : ''}` },
+      expiringCreds && { color:'var(--warn)',   mod:'employees', text:`${expiringCreds} credential${expiringCreds!==1?'s':''} expiring 30d` },
+    ].filter(Boolean));
+
+    // Sidebar count badges reflect the same real numbers.
+    setBadge('sb-badge-employees', expiredCreds + expiringCreds);
+    setBadge('sb-badge-incidents', openIncidents);
+    setBadge('sb-badge-ai', sigList.length);
+
+    // Incident trend: real 12-month buckets + severity legend from the incident list.
+    renderTrend(incList);
   } catch(e) { console.warn('[Vigil Dashboard] init error:', e); }
 }
 
@@ -1823,6 +1862,10 @@ document.addEventListener('click',()=>document.getElementById('notif-panel')?.cl
 function renderPredictions(sigs) {
   const el = document.getElementById('card-predictions');
   if (!el) return;
+  if (!sigs.length) {
+    el.innerHTML = `<div style="text-align:center;color:var(--a3);padding:16px 10px;font-size:11px">No active risk signals</div>`;
+    return;
+  }
   const sevClass = {extreme:'extreme',critical:'extreme',high:'high',medium:'medium',low:'medium'};
   const sevColor = {extreme:'var(--danger)',critical:'var(--danger)',high:'var(--warn)',medium:'var(--accent)',low:'var(--a3)'};
   el.innerHTML = sigs.map(s => {
@@ -1833,11 +1876,24 @@ function renderPredictions(sigs) {
     const lco = sevColor[sev] || 'var(--accent)';
     return `<div class="pm ${lc}" onclick="loadMod('ai')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><div style="font-size:11px;font-weight:700">${s.title||s.signal_type||'Risk Signal'}</div><div style="font-size:10px;color:var(--muted)">${s.site||''}</div></div>
+        <div><div style="font-size:11px;font-weight:700">${escapeDashboardText(s.title||s.signal_type||'Risk Signal')}</div><div style="font-size:10px;color:var(--muted)">${escapeDashboardText(s.site||'')}</div></div>
         <div style="text-align:right"><div style="font-variant-numeric:tabular-nums;font-size:15px;font-weight:800;color:${lco}">${pct?pct+'%':sev.toUpperCase()}</div><div style="font-size:8.5px;color:var(--muted)">${sev.toUpperCase()}</div></div>
       </div>
     </div>`;
   }).join('');
+}
+
+// The top alert ticker, built from the real counts (empty → "All clear").
+function renderAlertTicker(items) {
+  const el = document.getElementById('astrip-items');
+  if (!el) return;
+  if (!items.length) {
+    el.innerHTML = `<div class="ai-item" style="color:var(--ok,#10b981)"><div class="ad" style="background:currentColor"></div>All clear</div>`;
+    return;
+  }
+  el.innerHTML = items.map((it,i) =>
+    `${i>0?'<span class="asep">·</span>':''}<div class="ai-item" style="color:${it.color}" onclick="loadMod('${it.mod}')"><div class="ad" style="background:${it.color}"></div>${escapeDashboardText(it.text)}</div>`
+  ).join('');
 }
 
 function renderActions(cas) {
@@ -1846,11 +1902,14 @@ function renderActions(cas) {
   const chipCls = c => c.is_overdue?'rd':c.status==='completed'?'gr':c.status==='in_progress'?'bl':'gy';
   const chipLbl = c => c.is_overdue?'Overdue':c.status==='completed'?'Closed':c.status==='in_progress'?'In Progress':'Pending';
   const open = cas.filter(c=>c.status!=='completed').slice(0,5);
-  if (!open.length) return;
+  if (!open.length) {
+    el.innerHTML = `<div style="text-align:center;color:var(--a3);padding:16px 10px;font-size:11px">✓ No open corrective actions</div>`;
+    return;
+  }
   el.innerHTML = open.map((c,i) => {
     const border = i<open.length-1?'border-bottom:1px solid var(--border);':'';
-    const desc = c.title||c.description||c.action_required||'Corrective Action';
-    const sub  = [c.incident_number, (c.assignee_first_name&&c.assignee_last_name?`${c.assignee_first_name} ${c.assignee_last_name}`:null)].filter(Boolean).join(' · ') || '';
+    const desc = escapeDashboardText(c.title||c.description||c.action_required||'Corrective Action');
+    const sub  = escapeDashboardText([c.incident_number, (c.assignee_first_name&&c.assignee_last_name?`${c.assignee_first_name} ${c.assignee_last_name}`:null)].filter(Boolean).join(' · ') || '');
     return `<div style="display:flex;align-items:center;gap:7px;padding:5px 0;${border}font-size:10.5px"><div style="flex:1;line-height:1.4">${desc}<div style="font-size:9.5px;color:var(--muted)">${sub}</div></div><span class="chip ${chipCls(c)}">${chipLbl(c)}</span></div>`;
   }).join('');
 }
@@ -1858,6 +1917,10 @@ function renderActions(cas) {
 function renderSites(sites, workersBySite, incidentsBySite) {
   const el = document.getElementById('tbody-sites');
   if (!el) return;
+  if (!sites.length) {
+    el.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--a3);padding:14px 10px;font-size:11px">No site risk signals yet</td></tr>`;
+    return;
+  }
   const scoreToLevel = s => s>=8?'extreme':s>=6?'high':s>=4?'medium':'low';
   const riskChip = (score, sigCount) => {
     const lvl = scoreToLevel(score);
@@ -1873,6 +1936,55 @@ function renderSites(sites, workersBySite, incidentsBySite) {
     const incCount = incidentsBySite&&incidentsBySite[name]!=null?incidentsBySite[name]:null;
     return `<tr><td style="font-weight:600">${name}</td><td>${wCount}</td><td>—</td><td>${incCount!=null?`<span class="chip ${incCount>0?'rd':'gr'}">${incCount}</span>`:'—'}</td><td>—</td><td>—</td><td>${riskChip(score,sigCount)}</td><td>${statusChip(critCnt)}</td></tr>`;
   }).join('');
+}
+
+// Incident trend: 12 real month buckets ending this month, plus a severity legend.
+// Everything derives from the incident list — no fabricated history.
+function renderTrend(incList) {
+  const barsEl = document.getElementById('trend-bars');
+  const legEl  = document.getElementById('trend-legend');
+  const list = Array.isArray(incList) ? incList : [];
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Build 12 buckets keyed YYYY-M, oldest → current month.
+  const now = new Date();
+  const buckets = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: MON[d.getMonth()], count: 0, serious: 0 });
+  }
+  const idx = {}; buckets.forEach((b, i) => { idx[b.key] = i; });
+  // Severity legend tallies (across all incidents in the list).
+  const seriousSev = new Set(['fatality','critical','serious']);
+  let cSerious = 0, cMinor = 0, cFirst = 0, cNear = 0;
+  for (const inc of list) {
+    const sev = (inc.severity || '').toLowerCase();
+    if (seriousSev.has(sev)) cSerious++;
+    else if (sev === 'first_aid') cFirst++;
+    else if (sev === 'near_miss') cNear++;
+    else cMinor++;
+    const raw = inc.incident_date || inc.created_at;
+    if (!raw) continue;
+    const d = new Date(raw);
+    if (isNaN(d)) continue;
+    const k = `${d.getFullYear()}-${d.getMonth()}`;
+    if (k in idx) { buckets[idx[k]].count++; if (seriousSev.has(sev)) buckets[idx[k]].serious++; }
+  }
+  const max = Math.max(1, ...buckets.map(b => b.count));
+  if (barsEl) {
+    barsEl.innerHTML = buckets.map(b => {
+      const pct = b.count ? Math.max(8, Math.round((b.count / max) * 100)) : 2;
+      const color = b.serious ? 'var(--danger)' : b.count ? 'var(--accent)' : 'var(--border)';
+      const title = `${b.label}: ${b.count} incident${b.count!==1?'s':''}`;
+      return `<div class="trend-col" title="${title}"><div class="trend-bar" style="height:${pct}%;background:${color}"></div><div class="trend-label">${b.label}</div></div>`;
+    }).join('');
+  }
+  if (legEl) {
+    legEl.innerHTML =
+      `<span>Serious+ <b style="color:var(--danger)">${cSerious}</b></span>` +
+      `<span>Minor <b style="color:var(--warn)">${cMinor}</b></span>` +
+      `<span>First aid <b style="color:var(--accent)">${cFirst}</b></span>` +
+      `<span>Near miss <b style="color:var(--a3)">${cNear}</b></span>`;
+  }
 }
 
 function renderExpiring(credResults) {

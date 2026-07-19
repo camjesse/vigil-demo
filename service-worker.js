@@ -11,7 +11,7 @@
  *   - Google Fonts: cache-first (immutable). Failed navigation → /offline.html.
  * Bump CACHE / API_CACHE to invalidate; old caches are deleted on activate.
  */
-const CACHE = 'vigil-shell-v10';
+const CACHE = 'vigil-shell-v11';
 const API_CACHE = 'vigil-api-v1';
 const KEEP = [CACHE, API_CACHE];
 const PRECACHE = [
