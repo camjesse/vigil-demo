@@ -248,6 +248,26 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 .dash-copy{font-size:12.5px;color:var(--text2);line-height:1.55;max-width:620px}
 .dash-pulse{display:flex;align-items:center;gap:8px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.22);border-radius:8px;padding:9px 11px;min-width:210px;color:var(--a3);font-size:11px;font-weight:700}
 .dash-pulse strong{font-variant-numeric:tabular-nums;font-size:20px;color:var(--a3);line-height:1}
+/* First-run setup checklist */
+.onboard{background:var(--s1);border:1px solid rgba(0,194,255,.28);border-radius:8px;padding:14px;margin-bottom:14px}
+.onboard-hd{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.onboard-title{font-size:14px;font-weight:700;color:var(--text)}
+.onboard-prog{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.onboard-sub{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px;max-width:640px}
+.onboard-bar{height:4px;border-radius:3px;background:var(--s2);overflow:hidden;margin-bottom:12px}
+.onboard-bar span{display:block;height:100%;background:var(--a3);border-radius:3px;transition:width .3s}
+.onboard-steps{display:grid;gap:6px}
+.onboard-step{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:6px;background:var(--s2)}
+.onboard-step.done{opacity:.6;border-color:rgba(0,229,160,.25)}
+.onboard-tick{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);margin-top:1px}
+.onboard-step.done .onboard-tick{background:var(--a3);border-color:var(--a3);color:#04231a;font-weight:700}
+.onboard-step-body{flex:1;min-width:0}
+.onboard-step-title{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.35}
+.onboard-step.done .onboard-step-title{text-decoration:line-through}
+.onboard-step-desc{font-size:11px;color:var(--muted);line-height:1.45;margin-top:1px}
+.onboard-go{flex:none;background:none;border:1px solid var(--border);color:var(--accent);border-radius:5px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.onboard-go:hover{border-color:var(--accent)}
+.onboard-dismiss{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;margin-left:auto;font-family:inherit;text-decoration:underline}
 .priority-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .priority-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:10px;align-items:flex-start;min-height:86px}
 .priority-card.danger{border-color:rgba(255,69,69,.28);background:var(--s1)}
@@ -602,6 +622,10 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           <span>workers</span>
         </div>
       </section>
+
+      <!-- First-run guided setup. Every step is checked off from real data,
+           never from local flags, so it can't claim work that wasn't done. -->
+      <section class="onboard" id="onboard" style="display:none" aria-label="Get started"></section>
 
       <section class="priority-grid" aria-label="Today's priorities">
         <article class="priority-card danger">
@@ -1228,6 +1252,8 @@ function resetDashboardToNeutral() {
   ].forEach(([id,v]) => setEl(id, v));
   ['kpi-inspection-bar','kpi-capa-bar'].forEach(id => { const b=document.getElementById(id); if(b) b.style.width='0%'; });
   ['sb-badge-employees','sb-badge-incidents','sb-badge-ai'].forEach(id => setBadge(id, 0));
+  // Clears the hardcoded sample rows so a company with no workers never sees them.
+  renderExpiring([]);
 }
 
 const JUR_CONFIG = {
@@ -1298,7 +1324,7 @@ async function initDashboard() {
     const hdr = {'Authorization':`Bearer ${dashToken}`,'Content-Type':'application/json'};
     const apiGet = url => fetch(`${DASH_API}${url}`,{headers:hdr}).then(r=>r.ok?r.json():null).catch(()=>null);
 
-    const [incidents, incidentList, corrective, hazard, meetings, inspections, signals, riskDash, workers] = await Promise.all([
+    const [incidents, incidentList, corrective, hazard, meetings, inspections, signals, riskDash, workers, sitesRes] = await Promise.all([
       apiGet('/api/incidents/stats?hours_worked=94000'),
       apiGet('/api/incidents?limit=200'),
       apiGet('/api/corrective-actions?limit=100'),
@@ -1308,6 +1334,7 @@ async function initDashboard() {
       apiGet('/api/risk/signals/active'),
       apiGet('/api/risk/dashboard'),
       apiGet('/api/workers'),
+      apiGet('/api/sites'),
     ]);
 
     const workerArr = workers && (workers.workers || workers.data || (Array.isArray(workers) ? workers : []));
@@ -1378,17 +1405,20 @@ async function initDashboard() {
     renderSites(sites, workersBySite, incidentsBySite);
 
     // Credentials → expiring table + alert-ticker counts.
-    let expiredCreds = 0, expiringCreds = 0;
+    let expiredCreds = 0, expiringCreds = 0, totalCreds = 0;
     if (Array.isArray(workerArr) && workerArr.length > 0) {
       const credResults = await Promise.all(
         workerArr.map(w => apiGet(`/api/workers/${w.id}/credentials`).then(r=>({worker:w,creds:(r&&r.credentials)||[]})))
       );
       renderExpiring(credResults);
       const now = Date.now(), in30 = now + 30*24*3600*1000;
-      for (const {creds} of credResults) for (const c of creds) {
-        if (!c.expiry_date) continue;
-        const t = new Date(c.expiry_date).getTime();
-        if (t < now) expiredCreds++; else if (t <= in30) expiringCreds++;
+      for (const {creds} of credResults) {
+        totalCreds += creds.length;
+        for (const c of creds) {
+          if (!c.expiry_date) continue;
+          const t = new Date(c.expiry_date).getTime();
+          if (t < now) expiredCreds++; else if (t <= in30) expiringCreds++;
+        }
       }
     }
 
@@ -1408,6 +1438,28 @@ async function initDashboard() {
 
     // Incident trend: real 12-month buckets + severity legend from the incident list.
     renderTrend(incList);
+
+    // First-run setup: each step reflects real records, so it self-completes.
+    const siteArr   = (sitesRes && (sitesRes.sites || sitesRes.data || (Array.isArray(sitesRes) ? sitesRes : []))) || [];
+    const hazTotal  = (hazard && (hazard.total ?? hazard.totals?.total)) || 0;
+    const fieldWork = hazTotal + incList.length;
+    renderOnboarding([
+      { done: workerCount > 0, mod: 'employees',
+        title: 'Add your people', cta: 'Add workers',
+        desc: 'Build the roster first — incidents, permits and inspections all attach to a worker.' },
+      { done: siteArr.length > 0, mod: 'sites',
+        title: 'Set up your sites', cta: 'Add sites',
+        desc: 'Sites drive scoping and the site-risk table on this dashboard.' },
+      { done: totalCreds > 0, mod: 'employees',
+        title: 'Record tickets and certifications', cta: 'Add credentials',
+        desc: 'Vigil warns you before a ticket expires — but only for the ones it knows about.' },
+      { done: fieldWork > 0, mod: 'hazards',
+        title: 'Capture work in the field', cta: 'Start an FLHA',
+        desc: 'A hazard assessment, observation or incident gets real data flowing in.' },
+      { done: inspTotal > 0, mod: 'inspections',
+        title: 'Run your first inspection', cta: 'Go to inspections',
+        desc: 'Inspections feed the completion rate and generate corrective actions automatically.' },
+    ]);
   } catch(e) { console.warn('[Vigil Dashboard] init error:', e); }
 }
 
@@ -1884,6 +1936,50 @@ function renderPredictions(sigs) {
 }
 
 // The top alert ticker, built from the real counts (empty → "All clear").
+// ── FIRST-RUN SETUP CHECKLIST ─────────────────────────────────
+// Steps are derived from real API counts, so a step only ticks when the work
+// actually exists. Hidden once everything is done, or if the admin dismisses it.
+function onboardDismissKey() { return 'vigil_onboard_dismissed_' + (COMPANY_NAME || 'default'); }
+
+function dismissOnboarding() {
+  try { localStorage.setItem(onboardDismissKey(), '1'); } catch(_) {}
+  const el = document.getElementById('onboard');
+  if (el) el.style.display = 'none';
+}
+
+function renderOnboarding(steps) {
+  const el = document.getElementById('onboard');
+  if (!el) return;
+  const done = steps.filter(s => s.done).length;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem(onboardDismissKey()) === '1'; } catch(_) {}
+  // Nothing left to do, or the admin hid it — stay out of the way.
+  if (done === steps.length || dismissed) { el.style.display = 'none'; return; }
+
+  el.innerHTML = `
+    <div class="onboard-hd">
+      <div class="onboard-title">Get ${escapeDashboardText(COMPANY_NAME || 'your company')} set up</div>
+      <div class="onboard-prog">${done} of ${steps.length} complete</div>
+      <button class="onboard-dismiss" onclick="dismissOnboarding()">Hide this</button>
+    </div>
+    <p class="onboard-sub">Work through these once and the dashboard above fills in on its own. Each step ticks off automatically as the records land — nothing to mark done by hand.</p>
+    <div class="onboard-bar"><span style="width:${Math.round((done/steps.length)*100)}%"></span></div>
+    <div class="onboard-steps">
+      ${steps.map(s => `
+        <div class="onboard-step ${s.done ? 'done' : ''}">
+          <div class="onboard-tick">${s.done ? '✓' : ''}</div>
+          <div class="onboard-step-body">
+            <div class="onboard-step-title">${s.title}</div>
+            <div class="onboard-step-desc">${s.desc}</div>
+          </div>
+          ${s.done ? '' : `<button class="onboard-go" onclick="loadMod('${s.mod}')">${s.cta}</button>`}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  el.style.display = '';
+}
+
 function renderAlertTicker(items) {
   const el = document.getElementById('astrip-items');
   if (!el) return;
