@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Pipeline - Vigil HSE</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Vendor-operator pipeline console. Deliberately a STANDALONE page (not a
+   shell module): tenants must never see a Leads item in the sidebar. Access
+   is enforced server-side by LEADS_ADMIN_EMAILS — this page just renders. */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F4F7FA;--card:#FFF;--soft:#EDF2F7;--border:#CBD5E1;--b2:#D8E1EB;--text:#102033;--text2:#42566B;--muted:#64788D;--accent:#21B8E6;--accent-d:#0E7CA8;--ok:#0FA57C;--warn:#B45309;--danger:#DC2626}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px}
+.top{display:flex;align-items:center;gap:12px;padding:14px 22px;background:var(--card);border-bottom:1px solid var(--b2)}
+.mark{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#21B8E6,#19C995);display:grid;place-items:center;color:#04141B;font-weight:800;font-size:13px}
+.top h1{font-size:15px;font-weight:800}
+.top .sub{color:var(--muted);font-size:11px}
+.top a{margin-left:auto;color:var(--accent-d);text-decoration:none;font-weight:600;font-size:12px}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 22px 60px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--b2);border-radius:8px;padding:12px 14px}
+.stat .v{font-size:22px;font-weight:800}
+.stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-top:2px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:16px;padding:5px 12px;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#04141B}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--b2);border-radius:8px;overflow:hidden}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:9px 12px;border-bottom:1px solid var(--b2);background:var(--soft)}
+td{padding:10px 12px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr:hover td{background:#F8FBFE}
+.badge{display:inline-block;border-radius:10px;padding:2px 9px;font-size:10.5px;font-weight:700}
+.b-new{background:#E0F2FE;color:#075985}.b-contacted{background:#FEF3C7;color:#92400E}
+.b-demo_booked{background:#DCFCE7;color:#166534}.b-demo_done{background:#D1FAE5;color:#065F46}
+.b-won{background:#0FA57C;color:#fff}.b-lost{background:#FEE2E2;color:#991B1B}.b-unsubscribed{background:var(--soft);color:var(--muted)}
+select,textarea{font:inherit;border:1px solid var(--border);border-radius:6px;padding:5px 8px;background:#fff;color:var(--text)}
+textarea{width:100%;min-height:52px;font-size:12px}
+.meta{color:var(--muted);font-size:11px;line-height:1.5}
+.note{margin:40px auto;max-width:460px;background:var(--card);border:1px solid var(--b2);border-radius:10px;padding:26px;text-align:center}
+.note h2{font-size:16px;margin-bottom:8px}
+.note p{color:var(--text2);font-size:12.5px;line-height:1.6}
+.savebtn{margin-top:6px;border:none;background:var(--accent);color:#04141B;font-weight:700;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:11.5px}
+.savebtn:disabled{opacity:.5}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="mark">V</div>
+  <div><h1>Sales Pipeline</h1><div class="sub">Vendor console — leads from vigilhse.com</div></div>
+  <a href="vigil-demo.html">← Back to Vigil</a>
+</div>
+<div class="wrap" id="app"><div class="note"><h2>Loading…</h2></div></div>
+
+<script>
+(function () {
+  // vigil_api_override in localStorage lets local testing point at a dev API.
+  const API = localStorage.getItem('vigil_api_override') || 'https://vigil-production-17ca.up.railway.app';
+  const STATUSES = ['new', 'contacted', 'demo_booked', 'demo_done', 'won', 'lost'];
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem('vigil_session') || 'null'); } catch (e) {}
+  const app = document.getElementById('app');
+  let filter = '';
+  let leads = [];
+  let stats = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.token, ...(opts.headers || {}) },
+    });
+    if (!res.ok) throw Object.assign(new Error('HTTP ' + res.status), { status: res.status });
+    return res.json();
+  }
+
+  function denied(status) {
+    app.innerHTML = '<div class="note"><h2>' + (status === 401 ? 'Sign in required' : 'Not available') + '</h2>' +
+      '<p>' + (status === 401
+        ? 'Sign in to Vigil first, then reload this page.'
+        : 'This console is only available to the Vigil operator account.') + '</p></div>';
+  }
+
+  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-CA') : ''; }
+
+  function render() {
+    const shown = filter ? leads.filter((l) => l.status === filter) : leads;
+    const statRow = stats ? '<div class="stats">' +
+      ['new','contacted','demo_booked','won'].map((k) =>
+        '<div class="stat"><div class="v">' + (stats.by_status[k] || 0) + '</div><div class="l">' + k.replace('_',' ') + '</div></div>').join('') +
+      '<div class="stat"><div class="v">' + stats.last_7_days + '</div><div class="l">last 7 days</div></div></div>' : '';
+
+    app.innerHTML = statRow +
+      '<div class="filters">' +
+      ['', ...STATUSES, 'unsubscribed'].map((s) =>
+        '<button class="chip' + (filter === s ? ' on' : '') + '" data-f="' + s + '">' + (s || 'All') + '</button>').join('') +
+      '</div>' +
+      '<table><thead><tr><th>Lead</th><th>Source</th><th>Status</th><th>Nurture</th><th>Notes</th><th>Created</th></tr></thead><tbody>' +
+      shown.map((l) =>
+        '<tr data-id="' + l.id + '">' +
+        '<td><strong>' + esc(l.name || l.email) + '</strong>' +
+          '<div class="meta">' + esc(l.email) + (l.company ? ' · ' + esc(l.company) : '') + (l.phone ? ' · ' + esc(l.phone) : '') + '</div>' +
+          (l.message ? '<div class="meta">“' + esc(l.message).slice(0, 140) + '”</div>' : '') + '</td>' +
+        '<td class="meta">' + esc(l.source) + (l.utm && l.utm.utm_source ? '<br>' + esc(l.utm.utm_source) + (l.utm.utm_campaign ? ' / ' + esc(l.utm.utm_campaign) : '') : '') + '</td>' +
+        '<td><span class="badge b-' + l.status + '">' + l.status.replace('_',' ') + '</span>' +
+          (l.status !== 'unsubscribed'
+            ? '<br><select data-status style="margin-top:6px">' +
+              STATUSES.map((s) => '<option' + (s === l.status ? ' selected' : '') + '>' + s + '</option>').join('') + '</select>'
+            : '') + '</td>' +
+        '<td class="meta">stage ' + l.nurture_stage + '/3' + (l.nurture_paused ? '<br>paused' : '') + (l.demo_at ? '<br>demo ' + fmtDate(l.demo_at) : '') + '</td>' +
+        '<td><textarea data-notes placeholder="Notes…">' + esc(l.notes || '') + '</textarea><br><button class="savebtn" data-save>Save</button></td>' +
+        '<td class="meta">' + fmtDate(l.created_at) + '</td>' +
+        '</tr>').join('') +
+      (shown.length ? '' : '<tr><td colspan="6" class="meta" style="text-align:center;padding:26px">No leads' + (filter ? ' with status “' + filter + '”' : ' yet — they land here from the website, tools, and Calendly.') + '</td></tr>') +
+      '</tbody></table>';
+
+    app.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => { filter = c.dataset.f; render(); }));
+    app.querySelectorAll('[data-save]').forEach((btn) => btn.addEventListener('click', async () => {
+      const tr = btn.closest('tr');
+      const id = tr.dataset.id;
+      const body = { notes: tr.querySelector('[data-notes]').value };
+      const sel = tr.querySelector('[data-status]');
+      if (sel) body.status = sel.value;
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        await api('/api/leads/' + id, { method: 'PATCH', body: JSON.stringify(body) });
+        await load();
+      } catch (e) { alert('Save failed: ' + e.message); btn.disabled = false; btn.textContent = 'Save'; }
+    }));
+  }
+
+  async function load() {
+    const [list, s] = await Promise.all([api('/api/leads?limit=500'), api('/api/leads/stats')]);
+    leads = list.leads; stats = s; render();
+  }
+
+  if (!session || !session.token) { denied(401); return; }
+  load().catch((e) => denied(e.status || 500));
+})();
+</script>
+</body>
+</html>
