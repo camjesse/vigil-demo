@@ -1,5 +1,9 @@
 (function () {
-  const API_BASE = 'https://vigil-production-17ca.up.railway.app';
+  // Local-dev hook: set localStorage vigil_api_override to point the whole app
+  // at a local API (same pattern as vigil-leads.html). Prod users never set it.
+  let apiOverride = null;
+  try { apiOverride = window.localStorage.getItem('vigil_api_override'); } catch {}
+  const API_BASE = apiOverride || 'https://vigil-production-17ca.up.railway.app';
   const SESSION_KEY = 'vigil_session';
   const EMAIL_KEY = 'vigil_demo_email';
   const THEME_KEY = 'vigil_theme';
