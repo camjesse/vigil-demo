@@ -199,12 +199,16 @@ function openCreatePacket(){
 async function openPacket(id){
   const r=await api('/api/orientation/packets/'+id);
   const p=r.packet, items=r.items, s=r.stats;
+  // A packet with no required steps completes on one click having recorded
+  // nothing, so the backend refuses to assign it. Say so here instead of
+  // letting someone click into a 409.
+  const requiredCount=items.filter(i=>i.is_required).length;
   document.getElementById('view-packet').innerHTML=`
     <div class="page-hdr">
       <div><h1>${esc(p.title)}</h1><div class="page-sub">${esc(p.description||fmt(p.packet_type)+' orientation')}</div></div>
       <div class="actions">
         <button class="btn" onclick="showView('packets')">← All packets</button>
-        ${isElevated()?`<button class="btn" onclick="openAddItem('${p.id}')">＋ Add step</button><button class="btn primary" onclick="openAssign('${p.id}')">Assign to workers</button>`:''}
+        ${isElevated()?`<button class="btn" onclick="openAddItem('${p.id}')">＋ Add step</button><button class="btn primary" ${requiredCount?'':'disabled'} onclick="openAssign('${p.id}')">${requiredCount?'Assign to workers':'Add a step to assign'}</button>`:''}
       </div>
     </div>
     <div class="detail-grid">
@@ -213,6 +217,7 @@ async function openPacket(id){
       <div class="fact"><div class="fact-label">Complete</div><div class="fact-val">${s.total_complete}</div></div>
       <div class="fact"><div class="fact-label">Overdue</div><div class="fact-val">${s.total_overdue?`<span class="chip danger">${s.total_overdue}</span>`:'0'}</div></div>
     </div>
+    ${requiredCount?'':'<div class="note">This packet has no required steps, so it cannot be assigned and does not appear in gap reporting. Add at least one required step to put it to work.</div>'}
     ${p.training_program_id?'':'<div class="note">No training program is linked to this packet. Completions will be recorded here, but they will not flow into training expiry or gap reporting until you link one.</div>'}
     <div class="section-title">Steps</div>
     ${items.length?items.map((it,i)=>`
