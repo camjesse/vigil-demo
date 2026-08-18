@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orientation - Vigil HSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080B12;--s1:#0D121B;--s2:#111823;--s3:#17202D;--border:#202C3B;--b2:#2A394C;--text:#D7E3EE;--text2:#93A9BC;--muted:#617A90;--accent:#21B8E6;--ok:#19C995;--danger:#EF5A67;--warn:#F3B51B}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+button,input,select,textarea{font:inherit}.app{min-height:100%;display:flex;flex-direction:column}
+.topbar{height:58px;display:flex;align-items:center;padding:0 20px;gap:14px;background:var(--s1);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800}.mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--ok));display:grid;place-items:center;color:#061018}.module{font-size:11px;color:var(--muted);font-weight:600}.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:0}.nav{background:var(--s1);border-right:1px solid var(--border);padding:14px 8px}.nav-label{padding:8px 9px 5px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}.nav-item{width:100%;display:flex;align-items:center;gap:9px;border:1px solid transparent;background:none;color:var(--text2);min-height:36px;padding:8px 10px;border-radius:6px;cursor:pointer;text-align:left}.nav-item:hover{background:var(--s2);border-color:var(--border)}.nav-item.active{background:rgba(33,184,230,.09);border-color:rgba(33,184,230,.2);color:var(--accent)}
+.content{padding:22px;overflow:auto}.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid var(--border)}h1{font-size:22px}.page-sub{font-size:12px;color:var(--text2);margin-top:5px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--s2);color:var(--text);padding:0 12px;font-size:11px;font-weight:700;cursor:pointer}.btn:hover{border-color:var(--b2);background:var(--s3)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#061018}.btn.danger{color:#FCA5A5;border-color:rgba(239,90,103,.3);background:rgba(239,90,103,.07)}.btn.small{height:29px;padding:0 9px;font-size:10px}.btn:disabled{opacity:.5;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px}.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:700}.stat-val{font-variant-numeric:tabular-nums;font-size:23px;font-weight:800;margin-top:5px}.stat-sub{font-size:10px;color:var(--text2);margin-top:3px}
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.panel-hd{min-height:48px;display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap}.panel-title{font-size:12px;font-weight:700}.panel-hd .spacer{flex:1}.search,.select{height:32px;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:0 9px;font-size:11px;outline:none}.search:focus,.select:focus{border-color:var(--accent)}
+.panel-body{padding:13px}
+.table-wrap{overflow:auto}.tbl{width:100%;min-width:760px;border-collapse:collapse}.tbl th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}.tbl td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);vertical-align:middle}.tbl tr:last-child td{border-bottom:0}.tbl tr.clickable{cursor:pointer}.tbl tr.clickable:hover td{background:var(--s2)}.identity{color:var(--text);font-weight:700}.meta{font-size:9.5px;color:var(--muted);margin-top:2px}
+.chip{display:inline-flex;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--text2);font-size:9px;font-weight:700;white-space:nowrap}.chip.ok{color:#6EE7C1;background:rgba(25,201,149,.09)}.chip.warn{color:#FAD467;background:rgba(243,181,27,.09)}.chip.accent{color:var(--accent);background:rgba(33,184,230,.09)}.chip.danger{color:#FCA5A5;background:rgba(239,90,103,.09)}.chip.muted{color:var(--muted)}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:12px}.hidden{display:none!important}
+.detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.fact{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:11px}.fact-label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;margin-bottom:5px}.fact-val{font-size:12px}
+.section-title{font-size:12px;font-weight:700;margin:16px 0 8px}
+.step{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:7px}
+.step.done{border-color:rgba(25,201,149,.28);background:rgba(25,201,149,.05)}
+.step-num{width:22px;height:22px;flex-shrink:0;border-radius:50%;background:var(--s3);color:var(--muted);display:grid;place-items:center;font-size:10px;font-weight:800}
+.step.done .step-num{background:rgba(25,201,149,.15);color:#6EE7C1}
+.step-main{flex:1;min-width:0}.step-title{font-size:12px;font-weight:700;color:var(--text)}.step-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.step-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.note{font-size:10.5px;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:6px;padding:9px 11px;margin-bottom:12px;line-height:1.5}
+.quiz-q{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:11px;margin-bottom:8px}.quiz-q .qt{font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px}.quiz-opt{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);padding:4px 0;cursor:pointer}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,6,11,.78);display:grid;place-items:center;padding:18px;z-index:1000}.modal{width:min(600px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:18px}.modal h2{font-size:17px;margin-bottom:5px}.modal-copy{font-size:11px;color:var(--text2);margin-bottom:15px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);padding:8px 10px;outline:none}.field input,.field select{height:38px}.field textarea{min-height:80px;resize:vertical;line-height:1.5}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.field .hint{font-size:9.5px;color:var(--muted)}.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}.error{display:none;color:#FCA5A5;background:rgba(239,90,103,.08);border:1px solid rgba(239,90,103,.25);border-radius:6px;padding:8px;font-size:11px;margin-bottom:11px}.error.show{display:block}.toast{position:fixed;right:18px;bottom:18px;background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;font-size:11px;z-index:2000}
+.picker{max-height:230px;overflow:auto;border:1px solid var(--border);border-radius:6px;background:var(--s2);padding:6px}.pick{display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:5px;font-size:11px;color:var(--text2);cursor:pointer}.pick:hover{background:var(--s3)}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.nav{display:flex;border-right:0;border-bottom:1px solid var(--border);padding:6px;overflow:auto}.nav-label{display:none}.nav-item{width:auto;white-space:nowrap}.content{padding:14px}.stats{grid-template-columns:repeat(2,1fr)}.page-hdr{flex-direction:column}.detail-grid{grid-template-columns:1fr 1fr}.frow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="mark">V</div><div>VIGIL <span class="module">/ Orientation</span></div></div>
+    <div class="topbar-right"><button class="btn small" onclick="window.top.location.href='vigil-demo.html'">Back to dashboard</button></div>
+  </header>
+  <div class="shell">
+    <nav class="nav">
+      <div class="nav-label">Orientation</div>
+      <button class="nav-item active" data-view="packets" onclick="showView('packets')">Packets</button>
+      <button class="nav-item" data-view="runs" onclick="showView('runs')">In progress</button>
+      <button class="nav-item" data-view="gaps" onclick="showView('gaps')">Gaps</button>
+      <button class="nav-item" data-view="overrides" onclick="showView('overrides')">Overrides</button>
+    </nav>
+    <main class="content">
+
+      <section id="view-packets">
+        <div class="page-hdr">
+          <div><h1>Orientation Packets</h1><div class="page-sub">General, site, job, and supervisor orientations. Completion writes a training record, so expiry and gap reporting are handled by the training module.</div></div>
+          <div class="actions"><button class="btn primary" onclick="openCreatePacket()">＋ New packet</button></div>
+        </div>
+        <div class="stats" id="pk-stats"></div>
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Packets</span><span class="spacer"></span>
+            <select class="select" id="f-ptype" onchange="renderPackets()"><option value="">All types</option><option value="general">General</option><option value="site_specific">Site specific</option><option value="job_specific">Job specific</option><option value="supervisor">Supervisor</option></select>
+          </div>
+          <div class="table-wrap" id="pk-table"></div>
+        </div>
+      </section>
+
+      <section id="view-packet" class="hidden"></section>
+
+      <section id="view-runs" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Orientations In Progress</h1><div class="page-sub">Every open and completed run. Overdue means the packet's due date has passed with required items outstanding.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><span class="panel-title">Assignments</span><span class="spacer"></span>
+            <select class="select" id="f-rstatus" onchange="loadRuns()"><option value="">All statuses</option><option value="assigned">Assigned</option><option value="in_progress">In progress</option><option value="complete">Complete</option></select>
+            <select class="select" id="f-overdue" onchange="loadRuns()"><option value="">All</option><option value="true">Overdue only</option></select>
+          </div>
+          <div class="table-wrap" id="run-table"></div>
+        </div>
+      </section>
+
+      <section id="view-run" class="hidden"></section>
+
+      <section id="view-gaps" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Orientation Gaps</h1><div class="page-sub">Active workers with a required orientation that is missing or out of date. This is the list an auditor asks for.</div></div>
+        </div>
+        <div class="panel"><div class="table-wrap" id="gap-table"></div></div>
+      </section>
+
+      <section id="view-overrides" class="hidden">
+        <div class="page-hdr">
+          <div><h1>Gate Overrides</h1><div class="page-sub">Times a supervisor let someone start work before orientation was complete. Every entry names who authorised it and why.</div></div>
+          <div class="actions"><button class="btn" onclick="openOverride()">Record an override</button></div>
+        </div>
+        <div class="panel"><div class="table-wrap" id="ovr-table"></div></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<script src="vigil-auth.js?v=20260810-1"></script>
+<script>
+const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
+let token=null,session=null,packets=[],runs=[],workers=[],programs=[],docs=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=s=>String(s||'—').replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+const date=s=>s?new Date(s).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'—';
+const myRole=()=>session?.user?.role||session?.role;
+const isElevated=()=>['supervisor','manager','admin','superadmin'].includes(myRole());
+const myWorkerId=()=>session?.worker?.id||session?.user?.workerId||null;
+
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(body.error||`Request failed (${r.status})`),{body});return body}
+function toast(msg){const e=document.createElement('div');e.className='toast';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2800)}
+function showView(name){document.querySelectorAll('[id^=view-]').forEach(e=>e.classList.add('hidden'));document.getElementById('view-'+name).classList.remove('hidden');document.querySelectorAll('[data-view]').forEach(e=>e.classList.toggle('active',e.dataset.view===name));if(name==='runs')loadRuns();if(name==='gaps')loadGaps();if(name==='overrides')loadOverrides()}
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='VIGIL_THEME')document.documentElement.classList.toggle('light-mode',e.data.theme==='light')});
+
+const ITEM_TYPES=['document_ack','comprehension_check','supervisor_signoff','ppe_issue','site_tour','muster_walk','equipment_demo','acknowledgement'];
+const ITEM_HINT={
+  document_ack:'Worker reads and acknowledges a controlled document.',
+  comprehension_check:'Worker answers the document’s comprehension questions. A failed attempt does not count.',
+  supervisor_signoff:'A supervisor witnessed this and signs. Cannot be self-witnessed.',
+  ppe_issue:'PPE handed over and fitted.',
+  site_tour:'Physical walkthrough of the workplace.',
+  muster_walk:'Walked to the muster point and shown the alarm.',
+  equipment_demo:'Shown how to operate equipment safely.',
+  acknowledgement:'Generic confirmation step.',
+};
+const STATUS_CHIP={assigned:'muted',in_progress:'warn',complete:'ok',expired:'danger'};
+
+function modal(title,copy,fields,onSubmit,reload,width){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop"><form class="modal" ${width?`style="width:min(${width}px,100%)"`:''}><h2>${title}</h2><div class="modal-copy">${copy}</div><div class="error"></div>${fields}<div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn primary" type="submit">Save</button></div></form></div>`;
+  document.querySelector('.modal').onsubmit=async e=>{
+    e.preventDefault();const btn=e.target.querySelector('[type=submit]'),err=e.target.querySelector('.error');btn.disabled=true;
+    try{await onSubmit(new FormData(e.target),e.target);closeModal();if(reload)await reload()}
+    catch(x){err.textContent=x.message;err.classList.add('show');btn.disabled=false}
+  };
+}
+function closeModal(){document.getElementById('modal-root').innerHTML=''}
+const num=v=>{const n=Number(v);return Number.isFinite(n)&&String(v).trim()!==''?n:null};
+
+// ── Packets ───────────────────────────────────────────────────
+async function loadPackets(){
+  const r=await api('/api/orientation/packets?limit=250');
+  packets=r.packets||[];
+  renderPacketStats();renderPackets();
+}
+function renderPacketStats(){
+  const required=packets.filter(p=>p.is_required).length;
+  const open=packets.reduce((a,p)=>a+(p.open_count||0),0);
+  const done=packets.reduce((a,p)=>a+(p.completed_count||0),0);
+  document.getElementById('pk-stats').innerHTML=`
+    <div class="stat"><div class="stat-label">Packets</div><div class="stat-val">${packets.length}</div><div class="stat-sub">${required} required</div></div>
+    <div class="stat"><div class="stat-label">In progress</div><div class="stat-val">${open}</div><div class="stat-sub">open runs</div></div>
+    <div class="stat"><div class="stat-label">Completed</div><div class="stat-val">${done}</div><div class="stat-sub">all time</div></div>
+    <div class="stat"><div class="stat-label">Steps defined</div><div class="stat-val">${packets.reduce((a,p)=>a+(p.item_count||0),0)}</div><div class="stat-sub">across all packets</div></div>`;
+}
+function renderPackets(){
+  const t=document.getElementById('f-ptype').value;
+  const rows=packets.filter(p=>!t||p.packet_type===t);
+  document.getElementById('pk-table').innerHTML=rows.length?`<table class="tbl"><thead><tr><th>Packet</th><th>Type</th><th>Steps</th><th>Open</th><th>Completed</th><th>Expiry</th></tr></thead><tbody>${rows.map(p=>`
+    <tr class="clickable" onclick="openPacket('${p.id}')">
+      <td><div class="identity">${esc(p.title)}</div><div class="meta">${p.is_required?'Required':'Optional'}${p.site?' · '+esc(p.site):''}</div></td>
+      <td>${fmt(p.packet_type)}</td><td>${p.item_count||0}</td><td>${p.open_count||0}</td><td>${p.completed_count||0}</td>
+      <td>${p.validity_period_days?p.validity_period_days+' days':'<span class="chip muted">None</span>'}</td>
+    </tr>`).join('')}</tbody></table>`:'<div class="empty">No orientation packets yet. Create one to get started.</div>';
+}
+function openCreatePacket(){
+  modal('New orientation packet','A packet is an ordered checklist. Link a training program so completion lands in the training record and inherits its expiry reporting.',`
+    <div class="field"><label>Title</label><input name="title" required placeholder="New Worker Safety Orientation"></div>
+    <div class="field"><label>Description</label><textarea name="description" placeholder="Day one, before any unsupervised work."></textarea></div>
+    <div class="frow">
+      <div class="field"><label>Type</label><select name="packet_type">${['general','site_specific','job_specific','supervisor'].map(t=>`<option value="${t}">${fmt(t)}</option>`).join('')}</select></div>
+      <div class="field"><label>Training program</label><select name="training_program_id"><option value="">— none —</option>${programs.map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>Re-orientation after (days)</label><input name="validity_period_days" type="number" min="1" placeholder="leave blank = never expires"><span class="hint">There is no legislated orientation expiry; set a cadence you can defend.</span></div>
+      <div class="field"><label>Due within (days of assignment)</label><input name="due_within_days" type="number" min="0" value="0"><span class="hint">0 = before first work.</span></div>
+    </div>
+    <div class="field"><label>Site (site-specific packets)</label><input name="site" placeholder="e.g. Main Kitchen"></div>
+    <div class="field"><label>Job titles (job-specific packets, comma separated)</label><input name="job_titles" placeholder="Line Cook, Dishwasher"></div>
+  `,async f=>{
+    const jt=String(f.get('job_titles')||'').split(',').map(s=>s.trim()).filter(Boolean);
+    await api('/api/orientation/packets',{method:'POST',body:JSON.stringify({
+      title:f.get('title'),description:f.get('description')||null,packet_type:f.get('packet_type'),
+      training_program_id:f.get('training_program_id')||null,
+      validity_period_days:num(f.get('validity_period_days')),
+      due_within_days:num(f.get('due_within_days'))??0,
+      site:f.get('site')||null, job_titles:jt,
+    })});
+    toast('Packet created');
+  },loadPackets);
+}
+
+async function openPacket(id){
+  const r=await api('/api/orientation/packets/'+id);
+  const p=r.packet, items=r.items, s=r.stats;
+  document.getElementById('view-packet').innerHTML=`
+    <div class="page-hdr">
+      <div><h1>${esc(p.title)}</h1><div class="page-sub">${esc(p.description||fmt(p.packet_type)+' orientation')}</div></div>
+      <div class="actions">
+        <button class="btn" onclick="showView('packets')">← All packets</button>
+        ${isElevated()?`<button class="btn" onclick="openAddItem('${p.id}')">＋ Add step</button><button class="btn primary" onclick="openAssign('${p.id}')">Assign to workers</button>`:''}
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="fact"><div class="fact-label">Type</div><div class="fact-val">${fmt(p.packet_type)}</div></div>
+      <div class="fact"><div class="fact-label">Assigned</div><div class="fact-val">${s.total_assigned}</div></div>
+      <div class="fact"><div class="fact-label">Complete</div><div class="fact-val">${s.total_complete}</div></div>
+      <div class="fact"><div class="fact-label">Overdue</div><div class="fact-val">${s.total_overdue?`<span class="chip danger">${s.total_overdue}</span>`:'0'}</div></div>
+    </div>
+    ${p.training_program_id?'':'<div class="note">No training program is linked to this packet. Completions will be recorded here, but they will not flow into training expiry or gap reporting until you link one.</div>'}
+    <div class="section-title">Steps</div>
+    ${items.length?items.map((it,i)=>`
+      <div class="step">
+        <div class="step-num">${i+1}</div>
+        <div class="step-main">
+          <div class="step-title">${esc(it.title)}${it.is_required?'':' <span class="chip muted">Optional</span>'}</div>
+          <div class="step-sub">${fmt(it.item_type)}${it.document_title?' · '+esc(it.document_title):''} — ${esc(ITEM_HINT[it.item_type]||'')}</div>
+        </div>
+        ${isElevated()?`<div class="step-side"><button class="btn small danger" onclick="removeItem('${it.id}','${p.id}')">Remove</button></div>`:''}
+      </div>`).join(''):'<div class="empty">No steps yet. A packet with no steps cannot be completed.</div>'}
+  `;
+  showView('packet');
+}
+function openAddItem(packetId){
+  modal('Add a step','Step types carry different evidence weight. A supervisor sign-off is what an auditor asks about in a worker interview.',`
+    <div class="field"><label>Step type</label><select name="item_type" onchange="document.getElementById('doc-field').style.display=['document_ack','comprehension_check'].includes(this.value)?'flex':'none'">${ITEM_TYPES.map(t=>`<option value="${t}">${fmt(t)}</option>`).join('')}</select></div>
+    <div class="field"><label>Title</label><input name="title" required placeholder="Read the safety policy"></div>
+    <div class="field" id="doc-field" style="display:flex"><label>Document</label><select name="document_id"><option value="">— none —</option>${docs.map(d=>`<option value="${d.id}">${esc(d.title)}</option>`).join('')}</select><span class="hint">Required for comprehension checks.</span></div>
+    <div class="frow">
+      <div class="field"><label>Order</label><input name="order_index" type="number" min="0" value="0"></div>
+      <div class="field"><label>Required?</label><select name="is_required"><option value="true">Required</option><option value="false">Optional</option></select></div>
+    </div>
+  `,async f=>{
+    await api(`/api/orientation/packets/${packetId}/items`,{method:'POST',body:JSON.stringify({
+      item_type:f.get('item_type'),title:f.get('title'),document_id:f.get('document_id')||null,
+      order_index:num(f.get('order_index'))??0,is_required:f.get('is_required')==='true',
+    })});
+    toast('Step added');
+  },()=>openPacket(packetId));
+}
+async function removeItem(itemId,packetId){
+  await api('/api/orientation/items/'+itemId,{method:'DELETE'});
+  toast('Step removed');openPacket(packetId);
+}
+function openAssign(packetId){
+  modal('Assign orientation','Workers who already have an open run of this packet are skipped.',`
+    <div class="field"><label>Workers</label>
+      <div class="picker">${workers.map(w=>`<label class="pick"><input type="checkbox" name="w" value="${w.id}"> ${esc(w.first_name+' '+w.last_name)} <span class="chip muted">${esc(w.job_title||'—')}</span></label>`).join('')||'<div class="empty">No active workers.</div>'}</div>
+    </div>
+    <div class="field"><label>Due date (optional)</label><input name="due_date" type="date"><span class="hint">Leave blank to use the packet’s due-within setting.</span></div>
+  `,async (f,form)=>{
+    const ids=[...form.querySelectorAll('input[name=w]:checked')].map(e=>e.value);
+    if(!ids.length)throw new Error('Select at least one worker');
+    const r=await api(`/api/orientation/packets/${packetId}/assign`,{method:'POST',body:JSON.stringify({
+      worker_ids:ids, due_date:f.get('due_date')||null,
+    })});
+    toast(`${r.assigned} assigned${r.skipped?`, ${r.skipped} already open`:''}`);
+  },()=>openPacket(packetId),640);
+}
+
+// ── Runs ──────────────────────────────────────────────────────
+async function loadRuns(){
+  const st=document.getElementById('f-rstatus').value, od=document.getElementById('f-overdue').value;
+  const q=new URLSearchParams({limit:'250'});if(st)q.set('status',st);if(od)q.set('overdue',od);
+  const r=await api('/api/orientation/assignments?'+q);
+  runs=r.assignments||[];
+  document.getElementById('run-table').innerHTML=runs.length?`<table class="tbl"><thead><tr><th>Worker</th><th>Packet</th><th>Status</th><th>Progress</th><th>Due</th><th>Completed</th></tr></thead><tbody>${runs.map(a=>{
+    const overdue=['assigned','in_progress'].includes(a.status)&&a.due_date&&new Date(a.due_date)<new Date(new Date().toDateString());
+    return `<tr class="clickable" onclick="openRun('${a.id}')">
+      <td><div class="identity">${esc((a.first_name||'')+' '+(a.last_name||''))}</div><div class="meta">${esc(a.job_title||'—')}</div></td>
+      <td>${esc(a.packet_title)}<div class="meta">${fmt(a.packet_type)}</div></td>
+      <td><span class="chip ${STATUS_CHIP[a.status]||''}">${fmt(a.status)}</span></td>
+      <td>${a.items_completed||0} / ${a.items_required||0}</td>
+      <td>${overdue?`<span class="chip danger">${date(a.due_date)}</span>`:date(a.due_date)}</td>
+      <td>${date(a.completed_at)}</td>
+    </tr>`}).join('')}</tbody></table>`:'<div class="empty">No orientations match this filter.</div>';
+}
+
+async function openRun(id){
+  const r=await api('/api/orientation/assignments/'+id);
+  const a=r.assignment, items=r.items;
+  const mine=myWorkerId()&&myWorkerId()===a.worker_id;
+  const done=a.status==='complete';
+  document.getElementById('view-run').innerHTML=`
+    <div class="page-hdr">
+      <div><h1>${esc((a.first_name||'')+' '+(a.last_name||''))}</h1><div class="page-sub">${esc(a.packet_title)} — ${fmt(a.packet_type)} orientation</div></div>
+      <div class="actions">
+        <button class="btn" onclick="showView('runs')">← All orientations</button>
+        ${isElevated()&&!done?`<button class="btn primary" ${r.can_complete?'':'disabled'} onclick="finishRun('${a.id}')">${r.can_complete?'Mark orientation complete':'Steps outstanding'}</button>`:''}
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="fact"><div class="fact-label">Status</div><div class="fact-val"><span class="chip ${STATUS_CHIP[a.status]||''}">${fmt(a.status)}</span></div></div>
+      <div class="fact"><div class="fact-label">Due</div><div class="fact-val">${date(a.due_date)}</div></div>
+      <div class="fact"><div class="fact-label">Completed</div><div class="fact-val">${date(a.completed_at)}</div></div>
+      <div class="fact"><div class="fact-label">Expires</div><div class="fact-val">${a.expiry_date?date(a.expiry_date):'Does not expire'}</div></div>
+    </div>
+    ${done?(a.training_record_id
+      ? '<div class="note">Complete. A training record was written, so this now appears in training expiry and gap reporting.</div>'
+      : '<div class="note">Complete — but this packet has no linked training program, so nothing was written to the training record. Expiry and gap reporting will not pick it up.</div>'):''}
+    <div class="section-title">Checklist</div>
+    ${items.map((it,i)=>{
+      const isDone=!!it.completion_id;
+      let action='<span class="chip ok">Done</span>';
+      if(!isDone&&!done){
+        if(it.item_type==='supervisor_signoff'){
+          action=isElevated()?`<button class="btn small" onclick="signOff('${a.id}','${it.id}','${a.worker_id}')">Sign off</button>`:'<span class="chip muted">Supervisor</span>';
+        }else if(it.item_type==='comprehension_check'){
+          action=mine?`<button class="btn small" onclick="takeCheck('${a.id}','${it.id}','${it.document_id}')">Take the check</button>`:'<span class="chip muted">Worker completes</span>';
+        }else{
+          action=(mine||isElevated())?`<button class="btn small" onclick="tickItem('${a.id}','${it.id}')">Mark done</button>`:'<span class="chip muted">Worker completes</span>';
+        }
+      }
+      return `<div class="step ${isDone?'done':''}">
+        <div class="step-num">${isDone?'✓':i+1}</div>
+        <div class="step-main">
+          <div class="step-title">${esc(it.title)}${it.is_required?'':' <span class="chip muted">Optional</span>'}</div>
+          <div class="step-sub">${fmt(it.item_type)}${it.document_title?' · '+esc(it.document_title):''}${isDone?' · completed '+date(it.completed_at):''}</div>
+        </div>
+        <div class="step-side">${action}</div>
+      </div>`}).join('')}
+  `;
+  showView('run');
+}
+async function tickItem(runId,itemId){
+  try{await api(`/api/orientation/assignments/${runId}/items/${itemId}/complete`,{method:'POST',body:JSON.stringify({})});toast('Step complete');openRun(runId)}
+  catch(e){toast(e.message)}
+}
+function signOff(runId,itemId,workerId){
+  modal('Supervisor sign-off','You are recording that you personally witnessed this step. It cannot be self-witnessed.',`
+    <div class="field"><label>Witnessed by</label><select name="verified_by" required>${workers.filter(w=>w.id!==workerId).map(w=>`<option value="${w.id}" ${w.id===myWorkerId()?'selected':''}>${esc(w.first_name+' '+w.last_name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Notes</label><textarea name="notes" placeholder="Walked the kitchen, showed the muster point and the alarm pull."></textarea></div>
+  `,async f=>{
+    await api(`/api/orientation/assignments/${runId}/items/${itemId}/complete`,{method:'POST',body:JSON.stringify({
+      verified_by:f.get('verified_by'),notes:f.get('notes')||null,
+    })});
+    toast('Signed off');
+  },()=>openRun(runId));
+}
+async function takeCheck(runId,itemId,documentId){
+  const r=await api(`/api/documents/${documentId}/checks`);
+  const checks=r.checks||[];
+  if(!checks.length)return toast('This document has no comprehension questions yet');
+  const body=checks.map((c,i)=>`<div class="quiz-q"><div class="qt">${i+1}. ${esc(c.question_text)}</div>${
+    c.question_type==='true_false'
+      ? ['true','false'].map(v=>`<label class="quiz-opt"><input type="radio" name="q_${c.id}" value="${v}" required> ${fmt(v)}</label>`).join('')
+      : (c.options||[]).map(o=>`<label class="quiz-opt"><input type="radio" name="q_${c.id}" value="${esc(o)}" required> ${esc(o)}</label>`).join('')
+        || `<input class="search" style="width:100%;height:36px" name="q_${c.id}" required placeholder="Your answer">`
+  }</div>`).join('');
+  modal('Comprehension check','Answer in your own understanding. A failed attempt is recorded and does not complete the step.',body,async (f,form)=>{
+    const answers=checks.map(c=>({check_id:c.id,answer:String(new FormData(form).get('q_'+c.id)||'')}));
+    const run=await api(`/api/documents/${documentId}/checks/run`,{method:'POST',body:JSON.stringify({worker_id:myWorkerId(),answers})});
+    const res=run.result;
+    if(!res.passed)throw new Error(`Scored ${Math.round(res.score)}% — ${Math.round(res.passing_score)}% needed. Review the document and try again.`);
+    await api(`/api/orientation/assignments/${runId}/items/${itemId}/complete`,{method:'POST',body:JSON.stringify({comprehension_result_id:res.id})});
+    toast(`Passed with ${Math.round(res.score)}%`);
+  },()=>openRun(runId),620);
+}
+async function finishRun(runId){
+  modal('Complete this orientation','Name who actually delivered it. In a COR interview the auditor asks the worker who oriented them.',`
+    <div class="field"><label>Conducted by</label><select name="conducted_by">${workers.map(w=>`<option value="${w.id}" ${w.id===myWorkerId()?'selected':''}>${esc(w.first_name+' '+w.last_name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Notes</label><textarea name="notes"></textarea></div>
+  `,async f=>{
+    await api(`/api/orientation/assignments/${runId}/complete`,{method:'POST',body:JSON.stringify({
+      conducted_by:f.get('conducted_by')||null,notes:f.get('notes')||null,
+    })});
+    toast('Orientation complete');
+  },()=>openRun(runId));
+}
+
+// ── Gaps ──────────────────────────────────────────────────────
+async function loadGaps(){
+  const r=await api('/api/orientation/gaps?limit=400');
+  const g=r.gaps||[];
+  document.getElementById('gap-table').innerHTML=g.length?`<table class="tbl"><thead><tr><th>Worker</th><th>Missing packet</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody>${g.map(x=>`
+    <tr>
+      <td><div class="identity">${esc((x.first_name||'')+' '+(x.last_name||''))}</div><div class="meta">${esc(x.job_title||'—')}${x.site?' · '+esc(x.site):''}</div></td>
+      <td>${esc(x.packet_title)}</td><td>${fmt(x.packet_type)}</td>
+      <td>${x.assignment_id?`<span class="chip ${x.overdue?'danger':'warn'}">${x.overdue?'Overdue':fmt(x.assignment_status)}</span>`:'<span class="chip danger">Not assigned</span>'}</td>
+      <td class="row-actions">${x.assignment_id?`<button class="btn small" onclick="openRun('${x.assignment_id}')">Open</button>`:(isElevated()?`<button class="btn small" onclick="assignOne('${x.packet_id}','${x.worker_id}')">Assign</button>`:'')}</td>
+    </tr>`).join('')}</tbody></table>`:'<div class="empty">No gaps. Every active worker has their required orientations in date.</div>';
+}
+async function assignOne(packetId,workerId){
+  try{await api(`/api/orientation/packets/${packetId}/assign`,{method:'POST',body:JSON.stringify({worker_ids:[workerId]})});toast('Assigned');loadGaps()}
+  catch(e){toast(e.message)}
+}
+
+// ── Overrides ─────────────────────────────────────────────────
+async function loadOverrides(){
+  const r=await api('/api/orientation/overrides?limit=250');
+  const o=r.overrides||[];
+  document.getElementById('ovr-table').innerHTML=o.length?`<table class="tbl"><thead><tr><th>Worker</th><th>Gate</th><th>Reason</th><th>Authorised by</th><th>When</th></tr></thead><tbody>${o.map(x=>`
+    <tr><td class="identity">${esc((x.first_name||'')+' '+(x.last_name||''))}</td>
+    <td><span class="chip warn">${fmt(x.gate)}</span></td>
+    <td>${esc(x.reason)}</td>
+    <td>${esc((x.overridden_by_first_name||'')+' '+(x.overridden_by_last_name||''))}</td>
+    <td>${date(x.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No overrides recorded. Good — this list should stay short.</div>';
+}
+function openOverride(){
+  modal('Record a gate override','Use this when someone has to start before orientation is finished. The reason is audit evidence, so write what an auditor would need to understand the call.',`
+    <div class="field"><label>Worker</label><select name="worker_id" required>${workers.map(w=>`<option value="${w.id}">${esc(w.first_name+' '+w.last_name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Gate</label><select name="gate">${['flha','permit','shift_start','inspection'].map(g=>`<option value="${g}">${fmt(g)}</option>`).join('')}</select></div>
+    <div class="field"><label>Reason</label><textarea name="reason" required minlength="10" placeholder="Short-staffed dinner service; supervisor working directly alongside for the full shift."></textarea></div>
+  `,async f=>{
+    await api('/api/orientation/overrides',{method:'POST',body:JSON.stringify({
+      worker_id:f.get('worker_id'),gate:f.get('gate'),reason:f.get('reason'),
+    })});
+    toast('Override recorded');
+  },loadOverrides);
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+async function init(){
+  session=await getVigilSession();token=session.token;
+  const [w,p,d]=await Promise.all([
+    api('/api/workers?limit=400').catch(()=>({workers:[]})),
+    api('/api/training/programs?limit=200').catch(()=>({programs:[]})),
+    api('/api/documents?limit=250').catch(()=>({documents:[]})),
+  ]);
+  workers=(w.workers||[]).filter(x=>x.status==='active');
+  programs=p.programs||[];
+  docs=d.documents||[];
+  await loadPackets();
+}
+init().catch(e=>document.querySelector('.content').innerHTML=`<div class="empty">${esc(e.message)}</div>`);
+</script>
+</body>
+</html>

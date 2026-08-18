@@ -537,6 +537,9 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         <span class="sb-sec-arrow">▾</span>
       </div>
       <div class="sb-sec-items">
+        <div class="sb-item" id="sbi-orientation" onclick="loadMod('orientation')">
+          <span class="sb-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span><span class="sb-label">Orientation</span>
+        </div>
         <div class="sb-item" id="sbi-documents" onclick="loadMod('documents')">
           <span class="sb-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><span class="sb-label">Document Control</span>
         </div>
@@ -872,6 +875,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
   <iframe class="mframe" id="frm-integrations"  src="about:blank"></iframe>
   <iframe class="mframe" id="frm-emergency"     src="about:blank"></iframe>
   <iframe class="mframe" id="frm-documents"     src="about:blank"></iframe>
+  <iframe class="mframe" id="frm-orientation"   src="about:blank"></iframe>
   <iframe class="mframe" id="frm-contractors"   src="about:blank"></iframe>
   <iframe class="mframe" id="frm-reports"       src="about:blank"></iframe>
   <div class="soon-outer" id="soon-outer"><div class="soon-inner" id="soon-inner"></div></div>
@@ -898,6 +902,7 @@ const MODS = {
   jhsc:         {src:'vigil-jhsc-meetings.html',       label:'JHSC & Safety Meetings'},
   emergency:    {src:'vigil-emergency.html',           label:'Emergency Access'},
   documents:    {src:'vigil-documents.html',           label:'Document Control'},
+  orientation:  {src:'vigil-orientation.html',         label:'Orientation'},
   contractors:  {src:'vigil-contractors.html',         label:'Contractor Management'},
   cor:          {src:'vigil-audit-readiness.html',     label:'COR Audit'},
   ai:           {src:'vigil-predictive-ai.html',       label:'Predictive AI'},
