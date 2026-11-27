@@ -701,7 +701,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="init()">↺ Retry</button>
 </div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 // ============================================================
 // API CONFIG & AUTH
@@ -1275,7 +1275,7 @@ function openDrawer(mode, empId) {
       </div>
       <div class="form-group">
         <div class="form-label">Start Date</div>
-        <input class="form-input" id="f-start" type="date" value="${emp?.startDate || new Date().toISOString().split('T')[0]}">
+        <input class="form-input" id="f-start" type="date" value="${emp?.startDate || vigilLocalDate()}">
       </div>
     </div>
     <div class="form-grid">

@@ -68,7 +68,7 @@ button,input,select{font:inherit}.app{min-height:100%;display:flex;flex-directio
     <div id="report"><div class="empty">Loading executive report…</div></div>
   </main>
 </div>
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 const API=window.VIGIL_API_BASE;let token=null,session=null,sites=[],data=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -166,7 +166,7 @@ async function init(){
   try{sites=(await api('/api/sites')).sites}catch(e){sites=[]}
   $('scope').innerHTML='<option value="">Company-wide</option>'+treeOrder(sites).map(s=>`<option value="${s.id}">${' '.repeat(s.depth*3)}${esc(s.name)}</option>`).join('');
   const to=new Date(),from=new Date(new Date().setFullYear(to.getFullYear()-1));
-  $('to').value=to.toISOString().slice(0,10);$('from').value=from.toISOString().slice(0,10);
+  $('to').value=vigilLocalDate(to);$('from').value=vigilLocalDate(from);
   await load();
 }
 init().catch(e=>$('report').innerHTML=`<div class="empty">${esc(e.message)}</div>`);

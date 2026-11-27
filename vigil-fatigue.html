@@ -406,10 +406,10 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 // ─── DATA ─────────────────────────────────────────────────────
-function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
+function rd(d){const x=new Date();x.setDate(x.getDate()+d);return vigilLocalDate(x)}
 function fmtDate(dt){return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
 function fmtTime(dt){return new Date(dt).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}
 
@@ -644,7 +644,7 @@ function mapApiDataToDrivers(workers, shifts, fatigueData, highRisk, compliance,
       driveHoursToday,
       onDutyToday,
       consecutiveDays,
-      lastOffDuty: latestShift.shift_date || new Date().toISOString().split('T')[0],
+      lastOffDuty: latestShift.shift_date || vigilLocalDate(),
       lastOffDurationHrs,
       status: dispatchable ? 'Available' : 'Off Duty',
       currentDutyStatus: dispatchable ? 'Available' : 'Off Duty',
@@ -1243,7 +1243,7 @@ async function doOverride(id){
     overrides.push({
       id:'OV-'+String(overrides.length+1).padStart(3,'0'),
       driver:d?.name||'Unknown',
-      date:new Date().toISOString().split('T')[0],
+      date:vigilLocalDate(),
       reason, measures,
       approvedBy:'HSE Manager',
       blockReasons:d?.dispatchBlockReasons||[],

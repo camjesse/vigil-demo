@@ -728,7 +728,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 <div id="toast"></div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script src="vigil-crypto.js?v=20260705-1"></script>
 <script src="vigil-offline.js?v=20260705-2"></script>
 <script>
@@ -1010,7 +1010,7 @@ async function init() {
   if (rfb) rfb.value = LOGGED_IN.name;
   document.getElementById('f-reported-by-id').value = LOGGED_IN.id;
   // Default date to today
-  const today = new Date().toISOString().split('T')[0];
+  const today = vigilLocalDate();
   document.getElementById('f-date').value = today;
 
   renderKPIs();
@@ -1293,6 +1293,37 @@ async function showDetail(id) {
   renderDetail(inc, detail || {});
 }
 
+// Who must be told, how fast, and where the rule comes from. Decision support
+// only: the wording on screen always says to confirm with the regulator.
+function reportingDutiesHtml(ro) {
+  if (!ro) return '';
+  if (!ro.required) {
+    return ro.unsupported_note
+      ? `<div style="margin-bottom:12px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2)">${escHtml(ro.unsupported_note)}</div>`
+      : '';
+  }
+  const rows = (ro.obligations || []).map(o => {
+    const rules = o.rules || [];
+    const detailRows = rules.length ? rules.map(r => `
+      <div style="font-size:11.5px;color:var(--text2);margin-top:4px">
+        <strong>${escHtml(r.deadline)}</strong>${r.phone ? ` · ${escHtml(r.phone)}` : ''}<br>
+        ${escHtml(r.how || '')}<br>
+        <span style="color:var(--muted)">${escHtml(r.citation)}</span>
+      </div>`).join('') : `<div style="font-size:11.5px;color:var(--text2);margin-top:4px">${escHtml(o.deadline_guidance || '')}</div>`;
+    return `
+      <div style="padding:8px 0;border-top:1px solid var(--border)">
+        <div style="font-size:12.5px;font-weight:700">${escHtml(o.body)} ${o.reported ? '<span class="chip ok">Reported</span>' : '<span class="chip danger">Not yet reported</span>'}</div>
+        ${detailRows}
+      </div>`;
+  }).join('');
+  return `
+    <div style="margin-bottom:12px;padding:12px 14px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.05);border-radius:8px">
+      <div style="font-size:13px;font-weight:800;margin-bottom:2px">Reporting duties</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px">${escHtml(ro.disclaimer || 'Decision support only. Confirm with the regulator.')}${ro.rules_reviewed === false ? ' This rule set is a draft and has not been signed off yet.' : ''}</div>
+      ${rows}
+    </div>`;
+}
+
 function renderDetail(inc, detail = {}) {
   const incCapas = capas.filter(c => c.incident_id === inc.id);
   const acknowledgements = detail.acknowledgements || [];
@@ -1373,6 +1404,7 @@ function renderDetail(inc, detail = {}) {
     : '<div class="desc-box">No responder has acknowledged this incident yet.</div>';
 
   document.getElementById('detail-content').innerHTML = `
+    ${reportingDutiesHtml(detail.regulatory_obligations)}
     <div class="detail-hdr">
       <div>
         <div class="detail-num">${escHtml(inc.incident_number)}</div>
@@ -1543,7 +1575,7 @@ function resetForm() {
   // Reset all inputs
   ['f-date','f-time','f-location','f-department','f-job-title','f-description','f-immediate-actions','f-worker-search'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.value = id === 'f-date' ? new Date().toISOString().split('T')[0] : '';
+    if (el) el.value = id === 'f-date' ? vigilLocalDate() : '';
   });
   ['f-site','f-injury-type','f-treatment'].forEach(id => {
     const el = document.getElementById(id);
@@ -1822,12 +1854,15 @@ async function submitIncident() {
   else if (formData.treatment_type === 'first_aid') severity = 'first_aid';
   else if (formData.treatment_type === 'medical_aid') severity = 'minor';
   else if (formData.treatment_type === 'hospitalization' || formData.was_lost_time) severity = 'serious';
-  else if (formData.treatment_type === 'fatality') severity = 'critical';
+  else if (formData.treatment_type === 'fatality') severity = 'fatality';
 
-  const timeStr = formData.incident_time || '00:00';
-  const incidentDateISO = formData.incident_date
-    ? `${formData.incident_date}T${timeStr}:00.000Z`
-    : null;
+  // The date and time typed here are local to the person reporting. With a
+  // time, send the exact instant. With a date only, send the calendar date and
+  // let the server place it in the site's time zone.
+  const incidentDateISO = !formData.incident_date ? null
+    : (formData.incident_time
+        ? new Date(`${formData.incident_date}T${formData.incident_time}`).toISOString()
+        : formData.incident_date);
   const titleStr = (formData.description || '').trim().split(/\s+/).slice(0, 8).join(' ') || fmt(formData.incident_type) + ' incident';
 
   const payload = {

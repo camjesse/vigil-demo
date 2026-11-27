@@ -414,6 +414,19 @@
     });
   }
 
+  // Dates for form defaults and "today" checks come from the device's own
+  // clock and time zone, never from UTC. At 6 pm in Alberta, UTC is already
+  // tomorrow.
+  const pad2 = (n) => String(n).padStart(2, '0');
+  window.vigilLocalDate = function vigilLocalDate(d) {
+    const x = d instanceof Date ? d : new Date();
+    return `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`;
+  };
+  window.vigilLocalDateTime = function vigilLocalDateTime(d) {
+    const x = d instanceof Date ? d : new Date();
+    return `${window.vigilLocalDate(x)}T${pad2(x.getHours())}:${pad2(x.getMinutes())}`;
+  };
+
   window.getVigilSession = async function getVigilSession() {
     if (currentSession) return currentSession;
     if (pendingSession) return pendingSession;

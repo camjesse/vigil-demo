@@ -424,7 +424,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- TOAST -->
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 // ─── API ──────────────────────────────────────────────────────
 const API_BASE = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
@@ -466,7 +466,7 @@ function hideApiError() {
 }
 
 // ─── DATA ─────────────────────────────────────────────────────
-function rd(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]}
+function rd(d){const x=new Date();x.setDate(x.getDate()+d);return vigilLocalDate(x)}
 function fmtDate(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
 function fmtDateShort(dt){if(!dt) return '—'; return new Date(dt).toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
 
@@ -519,7 +519,7 @@ function mapAsset(a, assetDefects=[]) {
 }
 
 function mapMaintenance(m) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = vigilLocalDate();
   let status = 'Upcoming';
   if (m.status === 'in_progress') status = 'Due Today';
   else if (m.scheduled_date && m.scheduled_date < today) status = 'Overdue';
@@ -976,7 +976,7 @@ async function completeMaint(id){
   const m=maintenance.find(x=>x.id===id);
   if(!m||!m._uuid){showToast('error','Could not find that work order');return;}
   try{
-    await apiFetch(`/api/fleet/maintenance/${m._uuid}/complete`,{method:'POST',body:JSON.stringify({completed_date:new Date().toISOString().split('T')[0]})});
+    await apiFetch(`/api/fleet/maintenance/${m._uuid}/complete`,{method:'POST',body:JSON.stringify({completed_date:vigilLocalDate()})});
     showToast('success',`${id} marked complete — service record updated`);
     await loadData();renderAll();
   }catch(e){showToast('error','Could not complete: '+e.message);}
