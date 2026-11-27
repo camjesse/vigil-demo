@@ -344,10 +344,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         </select>
         <select id="f-site" onchange="renderTable()">
           <option value="">All Sites</option>
-          <option value="Calgary Hub HQ">Calgary Hub HQ</option>
-          <option value="Edmonton Hub">Edmonton Hub</option>
-          <option value="Site B Pipeline">Site B Pipeline</option>
-          <option value="Red Deer Terminal">Red Deer Terminal</option>
         </select>
         <input type="text" id="f-search" placeholder="Search observations…" oninput="renderTable()" style="flex:1;min-width:140px">
       </div>
@@ -367,7 +363,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div>
           <div class="form-title">Report an Observation</div>
-          <div class="form-sub">Northern Express Transport — Target: under 60 seconds</div>
+          <div class="form-sub">Target: under 60 seconds</div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
@@ -409,12 +405,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Site <span class="req">*</span></label>
             <select class="form-select" id="f-form-site">
-              <option value="">— Select site —</option>
-              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
-              <option value="Edmonton Hub">Edmonton Hub</option>
-              <option value="Site B Pipeline">Site B Pipeline</option>
-              <option value="Red Deer Terminal">Red Deer Terminal</option>
-              <option value="Highway / En Route">Highway / En Route</option>
+              <option value="">Loading sites...</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0">
@@ -637,7 +628,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script src="vigil-crypto.js?v=20260705-1"></script>
 <script src="vigil-offline.js?v=20260705-2"></script>
 <script>
@@ -658,6 +649,19 @@ let moduleReady = false;
 let pendingModuleAction = null;
 
 // ── API ────────────────────────────────────────────────────────
+// Fill a site <select> from GET /api/sites (the signed-in company's own sites).
+// `sites` is null when the request failed: say so instead of showing an empty list.
+function fillSiteSelect(id, sites, placeholder) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  sel.innerHTML = '';
+  const add = (value, text) => { const o = document.createElement('option'); o.value = value; o.textContent = text; sel.appendChild(o); };
+  add('', sites ? placeholder : 'Could not load sites. Try again.');
+  const seen = new Set();
+  (sites || []).map(s => (s && s.name ? String(s.name).trim() : '')).filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach(n => { const k = n.toLowerCase(); if (!seen.has(k)) { seen.add(k); add(n, n); } });
+}
 async function apiGet(path) {
   try {
     const r = await fetch(API + path, {headers:{Authorization:'Bearer '+token}});
@@ -875,20 +879,24 @@ async function init() {
   token = await getVigilToken();
   if (!token) { toast('Auth failed','danger'); return; }
 
-  const [obsData, statsData, actionData, trustData, silenceData, workersData] = await Promise.all([
+  const [obsData, statsData, actionData, trustData, silenceData, workersData, siteData] = await Promise.all([
     apiGet('/api/observations?limit=100'),
     apiGet('/api/observations/stats'),
     apiGet('/api/observations/stats/actionable'),
     apiGet('/api/observations/stats/trust-indicators'),
     apiGet('/api/observations/silence/active'),
     apiGet('/api/workers?limit=100'),
+    apiGet('/api/sites'),
   ]);
+  fillSiteSelect('f-form-site', siteData && siteData.sites, 'Select site');
+  fillSiteSelect('f-site', siteData && siteData.sites, 'All Sites');
 
   observations   = (obsData&&obsData.observations) || [];
   stats          = (statsData) || {};
   actionableStats= (actionData&&actionData.stats) || {};
   trustIndicators= (trustData&&trustData.trust_indicators) || {};
   silenceRecords = (silenceData&&silenceData.records) || [];
+  silenceLoadFailed = !silenceData;
   workers        = (workersData&&workersData.workers) || [];
 
   document.getElementById('worker-pill').textContent = `${workers.length} Workers`;
@@ -1075,8 +1083,14 @@ function renderBySiteChart() {
 }
 
 // ── SILENCE ALERT ──────────────────────────────────────────────
+let silenceLoadFailed = false;
 function renderSilenceAlert() {
   const el = document.getElementById('silence-card');
+  if (silenceLoadFailed) {
+    // A failed request is not "all sites active".
+    el.innerHTML = `<div class="card" style="border-color:rgba(239,68,68,.25)"><div style="font-size:12px;font-weight:700;color:var(--danger)">Could not load. Try again.</div></div>`;
+    return;
+  }
   if (!silenceRecords.length) {
     el.innerHTML = `
       <div class="card" style="background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)">

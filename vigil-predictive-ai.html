@@ -369,7 +369,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 const API = window.VIGIL_API_BASE;
 
@@ -382,6 +382,9 @@ let activeSignalId     = null;
 let pendingActionId    = null;
 let moduleReady        = false;
 let pendingModuleAction = null;
+
+let riskLoadFailed = false;
+const RISK_LOAD_ERROR = '<div style="border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:24px;text-align:center;font-size:13px;font-weight:700;color:var(--danger)">Could not load. Try again.</div>';
 
 // ── API ────────────────────────────────────────────────────────
 async function apiGet(path) {
@@ -566,6 +569,8 @@ async function init() {
   signals     = (sigsRes && sigsRes.signals)         || [];
   dashData    = dashRes || {};
   predictions = (predsRes && predsRes.predictions)   || [];
+  // A failed request must never render as "no risk signals" or "all clear".
+  riskLoadFailed = !sigsRes || !dashRes;
 
   renderHero();
   renderKPIs();
@@ -625,6 +630,7 @@ function handleModuleAction(action) {
 // ── HERO ───────────────────────────────────────────────────────
 function renderHero() {
   const el = document.getElementById('hero-section');
+  if (riskLoadFailed) { el.innerHTML = RISK_LOAD_ERROR; return; }
   const risk = companyRisk(signals);
   const summ = dashData.signal_summary || {};
   const trend = summ.resolved_7d > (summ.new_24h||0) ? 'improving'
@@ -659,6 +665,7 @@ function renderKPIs() {
   const s    = dashData.signal_summary || {};
   const sites = dashData.top_sites_at_risk || [];
   const strip = document.getElementById('kpi-strip');
+  if (riskLoadFailed) { strip.innerHTML = ''; return; }
 
   const critical = s.critical || 0;
   const active   = s.active   || 0;
@@ -696,6 +703,7 @@ function renderKPIs() {
 function renderSignals() {
   const el = document.getElementById('signals-board');
   const badge = document.getElementById('signal-count-badge');
+  if (riskLoadFailed) { badge.innerHTML = ''; el.innerHTML = RISK_LOAD_ERROR; return; }
   badge.innerHTML = `<span class="chip ${signals.length>0?'warn':'ok'}">${signals.length} active</span>`;
 
   if (!signals.length) {
@@ -834,7 +842,9 @@ function renderSignalTypes() {
 function buildAlertStrip() {
   const parts = [];
   const critical = signals.filter(s=>s.severity==='critical');
-  if (critical.length) {
+  if (riskLoadFailed) {
+    parts.push(`<span style="color:var(--danger)">Could not load. Try again.</span>`);
+  } else if (critical.length) {
     parts.push(`<span style="color:var(--danger);font-weight:700">${critical.length} critical signal${critical.length>1?'s':''}</span>`);
     parts.push(`<span style="color:var(--text2)">${critical[0].title.slice(0,60)}</span>`);
   } else if (signals.length) {
@@ -1134,6 +1144,7 @@ async function loadReport() {
   el.innerHTML = `<div class="loading-wrap"><div class="spinner"></div></div>`;
 
   const res = await apiGet('/api/risk/reports');
+  if (!res || riskLoadFailed) { el.innerHTML = RISK_LOAD_ERROR; return; }
   const reports = (res && res.reports) || [];
 
   if (!reports.length) {

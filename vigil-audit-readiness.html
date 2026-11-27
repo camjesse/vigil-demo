@@ -227,7 +227,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 
@@ -357,6 +357,9 @@ function gauge(score, big) {
 }
 
 // ── INIT ───────────────────────────────────────────────────────
+let loadFailed = {metrics:false, gaps:false, findings:false};
+const LOAD_ERROR_HTML = '<div style="border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:20px;text-align:center;font-size:12px;font-weight:700;color:var(--danger)">Could not load. Try again.</div>';
+
 async function init() {
   session = await getVigilSession();
   token = session.token;
@@ -369,7 +372,7 @@ async function init() {
     apiGet('/api/audit/frameworks'),
     apiGet('/api/audit/dashboard'),
     apiGet('/api/audit/stats'),
-    apiGet('/api/audit/metrics/current?hours_worked=94000'),
+    apiGet('/api/audit/metrics/current'),
     apiGet('/api/audit/findings/open'),
   ]);
 
@@ -378,6 +381,12 @@ async function init() {
   statsData  = statsRes || {};
   metrics    = metricsRes || {};
   findings   = (findingsRes && findingsRes.findings) || [];
+  // A failed request must never render as "no gaps" or "audit-ready".
+  loadFailed = {
+    metrics:  !metricsRes,
+    gaps:     !statsRes || !dashRes,
+    findings: !findingsRes,
+  };
 
   // Collect evidence from first framework
   if (frameworks.length) {
@@ -386,6 +395,7 @@ async function init() {
   }
 
   renderHero();
+  window.applyVigilCompanyName && window.applyVigilCompanyName();
   renderFrameworks();
   renderMetrics();
   renderEvidence();
@@ -457,7 +467,7 @@ function renderHero() {
   el.innerHTML = `
     <div style="flex-shrink:0">${gauge(overall, true)}</div>
     <div class="hero-info">
-      <div class="hero-title">Northern Express Transport</div>
+      <div class="hero-title" data-vigil-company></div>
       <div class="hero-sub">COR Alberta · Audit Readiness Platform · ${new Date().getFullYear()} Audit Cycle</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         ${frameworks.map(f => `${fwChip(f.status)}<span style="font-size:11px;color:var(--text2);margin-right:4px">${f.framework_code}</span>`).join('')}
@@ -539,9 +549,11 @@ function renderFrameworks() {
 // ── METRICS STRIP ──────────────────────────────────────────────
 function renderMetrics() {
   const el = document.getElementById('metrics-wrap');
-  if (metrics.ltifr == null) { el.innerHTML = ''; return; }
+  if (loadFailed.metrics) { el.innerHTML = LOAD_ERROR_HTML; return; }
 
   const m     = metrics;
+  // Rates come from real hours on shift logs. With no hours recorded there is no rate to show.
+  const hasRates = m.ltifr != null && m.trir != null;
   const ltifr = parseFloat(m.ltifr || 0);
   const trir  = parseFloat(m.trir  || 0);
   const tc    = parseFloat(m.training_compliance_rate    || 0);
@@ -561,13 +573,13 @@ function renderMetrics() {
     <div class="metric-strip">
       <div class="metric-tile">
         <div class="metric-label">LTIFR</div>
-        <div class="metric-val" style="color:${mc('ltifr',ltifr)}">${ltifr>100?ltifr.toFixed(0):ltifr.toFixed(2)}</div>
-        <div class="metric-sub">${lowHours?`${m.hours_worked}h worked`:'per 200k hrs'}</div>
+        <div class="metric-val" style="color:${hasRates?mc('ltifr',ltifr):'var(--muted)'}">${!hasRates?'-':ltifr>100?ltifr.toFixed(0):ltifr.toFixed(2)}</div>
+        <div class="metric-sub">${!hasRates?'Enter hours worked to calculate':lowHours?`${parseInt(m.hours_worked)||0}h worked`:'per 200k hrs'}</div>
       </div>
       <div class="metric-tile">
         <div class="metric-label">TRIR</div>
-        <div class="metric-val" style="color:${mc('trir',trir)}">${trir>100?trir.toFixed(0):trir.toFixed(2)}</div>
-        <div class="metric-sub">${lowHours?'low hours — demo':'per 200k hrs'}</div>
+        <div class="metric-val" style="color:${hasRates?mc('trir',trir):'var(--muted)'}">${!hasRates?'-':trir>100?trir.toFixed(0):trir.toFixed(2)}</div>
+        <div class="metric-sub">${!hasRates?'Enter hours worked to calculate':lowHours?`${parseInt(m.hours_worked)||0}h worked`:'per 200k hrs'}</div>
       </div>
       <div class="metric-tile">
         <div class="metric-label">Training Compliance</div>
@@ -660,9 +672,11 @@ function renderGaps() {
   const raw  = (statsData.top_gaps || []).concat(dashData.priority_gaps || []);
   const gaps = raw.filter((g,i) => raw.findIndex(x => x.element_code === g.element_code) === i);
 
-  let html = `<div class="card-title">Priority Gaps <span>${gaps.length} identified</span></div>`;
+  let html = `<div class="card-title">Priority Gaps <span>${loadFailed.gaps && !gaps.length ? '' : gaps.length + ' identified'}</span></div>`;
 
-  if (!gaps.length) {
+  if (loadFailed.gaps && !gaps.length) {
+    html += LOAD_ERROR_HTML;
+  } else if (!gaps.length) {
     html += `<div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:20px;text-align:center">
       <div style="margin-bottom:6px;color:var(--ok)"><svg style="width:22px;height:22px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>
       <div style="font-size:12px;font-weight:700;color:var(--ok)">No priority gaps</div>
@@ -702,10 +716,12 @@ function renderFindings() {
   const el = document.getElementById('findings-card');
   let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div class="card-title" style="margin-bottom:0">Open Findings &amp; Non-Conformances</div>
-    <span class="chip ${findings.length>0?'warn':'ok'}">${findings.length} open</span>
+    ${loadFailed.findings ? '' : `<span class="chip ${findings.length>0?'warn':'ok'}">${findings.length} open</span>`}
   </div>`;
 
-  if (!findings.length) {
+  if (loadFailed.findings) {
+    html += LOAD_ERROR_HTML;
+  } else if (!findings.length) {
     html += `<div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:20px;text-align:center">
       <div style="margin-bottom:6px;color:var(--ok)"><svg style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/> </svg></div>
       <div style="font-size:12px;font-weight:700;color:var(--ok)">No open findings</div>

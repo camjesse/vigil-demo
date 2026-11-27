@@ -284,14 +284,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
   <div class="topbar-center">
     <div class="breadcrumb">
-      <span>Northern Express Transport</span>
+      <span data-vigil-company></span>
       <span style="color:var(--border)">›</span>
       <b>Field Hazard Intelligence</b>
     </div>
   </div>
   <div class="topbar-right">
     <div class="lpill"><div class="pd"></div><span id="worker-pill">— Workers</span></div>
-    <div class="co-tag">Northern Express Transport</div>
+    <div class="co-tag" data-vigil-company></div>
     <button class="btn btn-primary" onclick="showPanel('form')">Start FLHA</button>
   </div>
 </header>
@@ -431,7 +431,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div>
           <div class="form-title">Start a Field Hazard Assessment</div>
-          <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+          <div class="form-sub" data-vigil-company></div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
@@ -493,12 +493,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
           <div class="form-group" style="margin-bottom:0">
             <label class="form-label">Site <span class="req">*</span></label>
             <select class="form-select" id="f-site">
-              <option value="">— Select site —</option>
-              <option value="Calgary Hub HQ">Calgary Hub HQ</option>
-              <option value="Edmonton Hub">Edmonton Hub</option>
-              <option value="Site B Pipeline">Site B Pipeline</option>
-              <option value="Red Deer Terminal">Red Deer Terminal</option>
-              <option value="Highway / En Route">Highway / En Route</option>
+              <option value="">Loading sites...</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0">
@@ -663,7 +658,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 </div>
 <div id="toast"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script src="vigil-crypto.js?v=20260705-1"></script>
 <script src="vigil-offline.js?v=20260705-2"></script>
 <script>
@@ -699,6 +694,19 @@ let moduleReady = false;
 let pendingModuleAction = null;
 
 // ── HELPERS ───────────────────────────────────────────────────
+// Fill a site <select> from GET /api/sites (the signed-in company's own sites).
+// `sites` is null when the request failed: say so instead of showing an empty list.
+function fillSiteSelect(id, sites, placeholder) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  sel.innerHTML = '';
+  const add = (value, text) => { const o = document.createElement('option'); o.value = value; o.textContent = text; sel.appendChild(o); };
+  add('', sites ? placeholder : 'Could not load sites. Try again.');
+  const seen = new Set();
+  (sites || []).map(s => (s && s.name ? String(s.name).trim() : '')).filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach(n => { const k = n.toLowerCase(); if (!seen.has(k)) { seen.add(k); add(n, n); } });
+}
 async function apiGet(path) {
   const r = await fetch(API + path, {headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}});
   if (!r.ok) return null;
@@ -796,13 +804,15 @@ async function init() {
   }
   LOGGED_IN = {id:session.worker.id, name:session.worker.name};
 
-  const [asmtData, tmplData, statsData, todayData, workerData] = await Promise.all([
+  const [asmtData, tmplData, statsData, todayData, workerData, siteData] = await Promise.all([
     apiGet('/api/hazard/assessments?limit=100'),
     apiGet('/api/hazard/templates?limit=50'),
     apiGet('/api/hazard/stats'),
     apiGet('/api/hazard/stats/today'),
     apiGet('/api/workers?limit=100'),
+    apiGet('/api/sites').catch(() => null),
   ]);
+  fillSiteSelect('f-site', siteData && siteData.sites, 'Select site');
 
   assessments = (asmtData && asmtData.assessments) || [];
   templates   = (tmplData && tmplData.templates)   || [];

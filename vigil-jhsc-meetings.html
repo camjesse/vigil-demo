@@ -20,7 +20,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="app">
   <header class="topbar">
     <div class="brand"><div class="mark">V</div><div><div class="title">JHSC & Safety Meetings</div><div class="sub">Meeting minutes, attendance, recommendations, and action tracking</div></div></div>
-    <div class="actions"><span class="pill live">● Live API</span><span class="pill" id="worker-pill">Workers</span><span class="pill">Northern Express Transport Ltd</span></div>
+    <div class="actions"><span class="pill live">● Live API</span><span class="pill" id="worker-pill">Workers</span><span class="pill" data-vigil-company></span></div>
   </header>
 
   <main class="panels">
@@ -78,7 +78,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <div class="modal-back" id="modal"><div class="modal"><div class="modal-head" id="modal-title"></div><div class="modal-body" id="modal-body"></div><div class="modal-foot" id="modal-foot"></div></div></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token='', session=null, meetings=[], stats={}, engagement={}, recommendations=[], workers=[], actionItems=[], current=null, focusActionId=null, focusActionIntent='open', pendingAction=null;

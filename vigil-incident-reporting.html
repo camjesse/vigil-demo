@@ -263,14 +263,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
   <div class="topbar-center">
     <div class="breadcrumb">
-      <span>Northern Express Transport</span>
+      <span data-vigil-company></span>
       <span style="color:var(--border)">›</span>
       <b>Incidents</b>
     </div>
   </div>
   <div class="topbar-right">
     <div class="lpill"><div class="pd"></div><span id="worker-pill">— Workers</span></div>
-    <div class="co-tag">Northern Express Transport</div>
+    <div class="co-tag" data-vigil-company></div>
     <button class="btn btn-primary" onclick="showPanel('form')">Report Incident</button>
   </div>
 </header>
@@ -390,7 +390,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         <div style="flex:1;display:flex;align-items:center;gap:10px">
           <div>
             <div class="form-title">Report an Incident</div>
-            <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+            <div class="form-sub" data-vigil-company></div>
           </div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="flex-shrink:0;color:var(--muted)">Cancel</button>
@@ -728,7 +728,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
 <div id="toast"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script src="vigil-crypto.js?v=20260705-1"></script>
 <script src="vigil-offline.js?v=20260705-2"></script>
 <script>
@@ -768,6 +768,10 @@ function fmt(str) {
 }
 function escHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Ids go into inline handlers and id attributes. Keep only id-safe characters.
+function safeId(id) {
+  return String(id ?? '').replace(/[^A-Za-z0-9_-]/g, '');
 }
 
 // ── FILE UPLOADS ──────────────────────────────────────────────
@@ -927,7 +931,7 @@ function sevChip(s) {
     fatality:   ['danger','Fatality'],
   };
   const [cls, lbl] = map[s] || ['muted', fmt(s)];
-  return `<span class="chip ${cls}">${lbl}</span>`;
+  return `<span class="chip ${cls}">${escHtml(lbl)}</span>`;
 }
 function typeChip(t) {
   const map = {
@@ -949,7 +953,7 @@ function typeChip(t) {
     other:           ['muted','Other'],
   };
   const [cls, lbl] = map[t] || ['muted', fmt(t)];
-  return `<span class="chip ${cls}">${lbl}</span>`;
+  return `<span class="chip ${cls}">${escHtml(lbl)}</span>`;
 }
 function statusChip(s) {
   const map = {
@@ -961,12 +965,12 @@ function statusChip(s) {
     closed:             ['muted','Closed'],
   };
   const [cls, lbl] = map[s] || ['muted', fmt(s)];
-  return `<span class="chip ${cls}">${lbl}</span>`;
+  return `<span class="chip ${cls}">${escHtml(lbl)}</span>`;
 }
 function priorityChip(p) {
   const map = {critical:['danger','Critical'],high:['orange','High'],medium:['warn','Medium'],low:['accent','Low']};
   const [cls, lbl] = map[p] || ['muted', fmt(p)];
-  return `<span class="chip ${cls}">${lbl}</span>`;
+  return `<span class="chip ${cls}">${escHtml(lbl)}</span>`;
 }
 
 // ── INIT ──────────────────────────────────────────────────────
@@ -983,7 +987,7 @@ async function init() {
   const [incData, capaData, statsData, workerData, siteData, deptData] = await Promise.all([
     apiGet('/api/incidents?limit=100'),
     apiGet('/api/corrective-actions?limit=100'),
-    apiGet('/api/incidents/stats?hours_worked=94000'),
+    apiGet('/api/incidents/stats'),
     apiGet('/api/workers?limit=100'),
     apiGet('/api/sites'),
     apiGet('/api/sites/departments'),
@@ -1134,9 +1138,9 @@ function renderChart() {
     const color = m.lost_time_count > 0 ? '#EF4444' : '#3B82F6';
     if (barH > 0) {
       bars += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2" fill="${color}" opacity=".8">
-        <title>${lbl}: ${m.count} incident${m.count !== 1 ? 's' : ''}${m.lost_time_count ? ` (${m.lost_time_count} LTI)` : ''}</title>
+        <title>${lbl}: ${escHtml(m.count)} incident${m.count !== 1 ? 's' : ''}${m.lost_time_count ? ` (${escHtml(m.lost_time_count)} LTI)` : ''}</title>
       </rect>`;
-      if (m.count > 0) bars += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" fill="#8AAAC4" font-size="9" font-family="Inter">${m.count}</text>`;
+      if (m.count > 0) bars += `<text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" fill="#8AAAC4" font-size="9" font-family="Inter">${escHtml(m.count)}</text>`;
     }
     labels += `<text x="${x + barW/2}" y="${H - 2}" text-anchor="middle" fill="#4A6880" font-size="9" font-family="Inter">${lbl}</text>`;
   });
@@ -1149,7 +1153,7 @@ function renderChart() {
   const legendHtml = byType.map(t => `
     <div class="chart-leg-item">
       <div class="chart-leg-dot" style="background:${typeColors[t.incident_type] || '#4A6880'}"></div>
-      ${fmt(t.incident_type)}: <b style="color:var(--text)">${t.count}</b>
+      ${escHtml(fmt(t.incident_type))}: <b style="color:var(--text)">${escHtml(t.count)}</b>
     </div>
   `).join('');
   document.getElementById('chart-legend').innerHTML = legendHtml;
@@ -1185,19 +1189,19 @@ function renderIncidentsTable(filtered) {
     </thead>
     <tbody>
       ${list.map(i => `
-        <tr class="clickable" onclick="showDetail('${i.id}')">
-          <td><b style="color:var(--accent);font-variant-numeric:tabular-nums;font-size:11px">${i.incident_number}</b></td>
+        <tr class="clickable" onclick="showDetail('${safeId(i.id)}')">
+          <td><b style="color:var(--accent);font-variant-numeric:tabular-nums;font-size:11px">${escHtml(i.incident_number)}</b></td>
           <td style="max-width:220px">
-            <div style="font-weight:500;line-height:1.35">${i.title}</div>
-            <div style="font-size:9.5px;color:var(--muted)">${i.worker_involved_first_name ? i.worker_involved_first_name + ' ' + i.worker_involved_last_name : ''}</div>
+            <div style="font-weight:500;line-height:1.35">${escHtml(i.title)}</div>
+            <div style="font-size:9.5px;color:var(--muted)">${escHtml(i.worker_involved_first_name ? i.worker_involved_first_name + ' ' + i.worker_involved_last_name : '')}</div>
           </td>
           <td>${typeChip(i.incident_type)}</td>
           <td>${sevChip(i.severity)}</td>
-          <td style="font-size:10.5px;color:var(--text2)">${i.site || '—'}</td>
+          <td style="font-size:10.5px;color:var(--text2)">${escHtml(i.site || '—')}</td>
           <td style="font-size:10.5px;color:var(--text2)">${fmtShortDate(i.incident_date)}</td>
           <td>${statusChip(i.workflow_status)}</td>
           <td onclick="event.stopPropagation()">
-            <button class="btn btn-ghost btn-sm" onclick="showDetail('${i.id}')">View →</button>
+            <button class="btn btn-ghost btn-sm" onclick="showDetail('${safeId(i.id)}')">View →</button>
           </td>
         </tr>
       `).join('')}
@@ -1233,17 +1237,17 @@ function renderCapaList() {
   el.innerHTML = openCapas.map(c => {
     const due = daysUntil(c.due_date);
     const dueStr = c.is_overdue
-      ? `<span class="overdue-days">${c.days_overdue}d overdue</span>`
+      ? `<span class="overdue-days">${escHtml(c.days_overdue)}d overdue</span>`
       : due != null ? `<span style="font-size:10px;color:var(--muted)">Due ${fmtShortDate(c.due_date)}</span>` : '';
     const assignee = c.assignee_first_name ? `${c.assignee_first_name} ${c.assignee_last_name}` : '—';
     return `<div style="display:flex;align-items:flex-start;gap:9px;padding:10px 14px;border-bottom:1px solid var(--border)">
       <div style="width:7px;height:7px;border-radius:50%;background:${c.is_overdue ? 'var(--danger)' : c.priority === 'high' || c.priority === 'critical' ? 'var(--warn)' : 'var(--accent)'};margin-top:4px;flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:11.5px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title}</div>
+        <div style="font-size:11.5px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(c.title)}</div>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           ${priorityChip(c.priority)}
-          <span style="font-size:9.5px;color:var(--muted)">${c.incident_number || ''}</span>
-          <span style="font-size:9.5px;color:var(--muted)">→ ${assignee}</span>
+          <span style="font-size:9.5px;color:var(--muted)">${escHtml(c.incident_number || '')}</span>
+          <span style="font-size:9.5px;color:var(--muted)">→ ${escHtml(assignee)}</span>
           ${dueStr}
         </div>
       </div>
@@ -1330,23 +1334,23 @@ function renderDetail(inc, detail = {}) {
     ['Lost Time', inc.was_lost_time ? `Yes — ${inc.lost_time_days || 0}d` : 'No'],
     ['Recordable', inc.was_recordable ? 'Yes' : 'No'],
     ['Regulatory Reportable', inc.is_regulatory_reportable ? 'Yes' : 'No'],
-  ].map(([k, v]) => `<div class="detail-fact"><div class="detail-fact-lbl">${k}</div><div class="detail-fact-val">${v}</div></div>`).join('');
+  ].map(([k, v]) => `<div class="detail-fact"><div class="detail-fact-lbl">${escHtml(k)}</div><div class="detail-fact-val">${escHtml(v)}</div></div>`).join('');
 
   const capasHtml = incCapas.length === 0
     ? `<div class="empty-state" style="padding:16px 0"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/> <path d="m9 14 2 2 4-4"/> </svg></div>No CAPAs linked yet</div>`
     : incCapas.map(c => {
         const dot = c.status === 'completed' ? 'var(--ok)' : c.is_overdue ? 'var(--danger)' : 'var(--warn)';
         const assignee = c.assignee_first_name ? `${c.assignee_first_name} ${c.assignee_last_name}` : '—';
-        const dueLabel = c.is_overdue ? `<span class="overdue-days">${c.days_overdue}d overdue</span>` : `Due ${fmtShortDate(c.due_date)}`;
-        return `<div class="capa-item ${focusedCapaId === c.id ? 'workflow-focus' : ''}" id="capa-${c.id}">
+        const dueLabel = c.is_overdue ? `<span class="overdue-days">${escHtml(c.days_overdue)}d overdue</span>` : `Due ${fmtShortDate(c.due_date)}`;
+        return `<div class="capa-item ${focusedCapaId === c.id ? 'workflow-focus' : ''}" id="capa-${safeId(c.id)}">
           <div class="capa-dot" style="background:${dot}"></div>
           <div class="capa-info">
-            <div class="capa-title">${c.title}</div>
-            <div class="capa-meta">${priorityChip(c.priority)} &nbsp;→ ${assignee} &nbsp;${dueLabel}</div>
-            ${c.description ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px;line-height:1.5">${c.description}</div>` : ''}
+            <div class="capa-title">${escHtml(c.title)}</div>
+            <div class="capa-meta">${priorityChip(c.priority)} &nbsp;→ ${escHtml(assignee)} &nbsp;${dueLabel}</div>
+            ${c.description ? `<div style="font-size:10.5px;color:var(--text2);margin-top:4px;line-height:1.5">${escHtml(c.description)}</div>` : ''}
             ${c.completion_notes ? `<div style="font-size:10.5px;color:var(--ok);margin-top:5px;line-height:1.5">Completion: ${escHtml(c.completion_notes)} · ${(c.completion_evidence_urls || []).length} evidence link(s)</div>` : ''}
           </div>
-          <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyCapa('${c.id}','${inc.id}')">Verify</button>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${c.id}','${inc.id}')">Submit completion</button>`}</div>
+          <div class="capa-status">${c.status === 'verified' ? `<span class="chip ok">Verified</span>` : c.status === 'completed' ? `<button class="btn btn-primary btn-sm" onclick="verifyCapa('${safeId(c.id)}','${safeId(inc.id)}')">Verify</button>` : `<button class="btn btn-ok btn-sm" onclick="completeCapa('${safeId(c.id)}','${safeId(inc.id)}')">Submit completion</button>`}</div>
         </div>`;
       }).join('');
   const docUrls = ((detail.incident && detail.incident.document_urls) || inc.document_urls || []).filter(Boolean);
@@ -1354,12 +1358,14 @@ function renderDetail(inc, detail = {}) {
     <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
       <span>Attachments (${docUrls.length})</span>
       <button class="btn btn-sm" onclick="document.getElementById('inc-attach-input').click()" id="inc-attach-btn">${ICON_CLIP} Add file</button>
-      <input id="inc-attach-input" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,application/pdf,.doc,.docx,.xls,.xlsx,video/mp4,video/quicktime" style="display:none" onchange="addIncidentAttachment('${inc.id}',this)">
+      <input id="inc-attach-input" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,application/pdf,.doc,.docx,.xls,.xlsx,video/mp4,video/quicktime" style="display:none" onchange="addIncidentAttachment('${safeId(inc.id)}',this)">
     </div>
     <div class="desc-box" style="display:flex;flex-direction:column;gap:6px">
       ${docUrls.length ? docUrls.map((u,i) => u.startsWith('/api/files/')
         ? `<a href="#" data-url="${escHtml(u)}" onclick="openIncidentAttachment(event,this)" style="font-size:11.5px;color:var(--accent)">Attachment ${i+1}</a>`
-        : `<a href="${escHtml(u)}" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);word-break:break-all">${escHtml(u)}</a>`).join('')
+        : /^https:\/\//i.test(u)
+          ? `<a href="${escHtml(u)}" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;color:var(--accent);word-break:break-all">${escHtml(u)}</a>`
+          : `<span style="font-size:11.5px;color:var(--text2);word-break:break-all">${escHtml(u)}</span>`).join('')
         : '<span style="font-size:11px;color:var(--muted)">No files attached yet.</span>'}
     </div>`;
   const acknowledgementsHtml = acknowledgements.length
@@ -1369,8 +1375,8 @@ function renderDetail(inc, detail = {}) {
   document.getElementById('detail-content').innerHTML = `
     <div class="detail-hdr">
       <div>
-        <div class="detail-num">${inc.incident_number}</div>
-        <div class="detail-title">${inc.title}</div>
+        <div class="detail-num">${escHtml(inc.incident_number)}</div>
+        <div class="detail-title">${escHtml(inc.title)}</div>
         <div class="detail-badges">
           ${typeChip(inc.incident_type)}
           ${sevChip(inc.severity)}
@@ -1394,18 +1400,18 @@ function renderDetail(inc, detail = {}) {
 
     <div id="incident-response-section" style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px;gap:10px">
       <div class="section-title" style="margin:0">Response & Acknowledgement</div>
-      <button class="btn ${acknowledgedByMe ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="acknowledgeIncident('${inc.id}')" ${acknowledgedByMe ? 'disabled' : ''}>${acknowledgedByMe ? 'You acknowledged' : 'Acknowledge incident'}</button>
+      <button class="btn ${acknowledgedByMe ? 'btn-ghost' : 'btn-primary'} btn-sm" onclick="acknowledgeIncident('${safeId(inc.id)}')" ${acknowledgedByMe ? 'disabled' : ''}>${acknowledgedByMe ? 'You acknowledged' : 'Acknowledge incident'}</button>
     </div>
     ${acknowledgementsHtml}
 
-    ${inc.description ? `<div class="section-title">Description</div><div class="desc-box">${inc.description}</div>` : ''}
-    ${inc.immediate_actions ? `<div class="section-title">Immediate Actions</div><div class="desc-box">${inc.immediate_actions}</div>` : ''}
-    ${inc.root_cause_summary ? `<div class="section-title">Root Cause Summary</div><div class="desc-box">${inc.root_cause_summary}</div>` : ''}
+    ${inc.description ? `<div class="section-title">Description</div><div class="desc-box">${escHtml(inc.description)}</div>` : ''}
+    ${inc.immediate_actions ? `<div class="section-title">Immediate Actions</div><div class="desc-box">${escHtml(inc.immediate_actions)}</div>` : ''}
+    ${inc.root_cause_summary ? `<div class="section-title">Root Cause Summary</div><div class="desc-box">${escHtml(inc.root_cause_summary)}</div>` : ''}
     ${attachmentsHtml}
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:10px">
       <div class="section-title" style="margin:0">Corrective Actions (${incCapas.length})</div>
-      <button class="btn btn-ghost btn-sm" onclick="toggleAddCapaForm('${inc.id}')">+ Add CAPA</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleAddCapaForm('${safeId(inc.id)}')">+ Add CAPA</button>
     </div>
     ${capasHtml}
 
@@ -1454,7 +1460,7 @@ function renderDetail(inc, detail = {}) {
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-ghost btn-sm" onclick="toggleAddCapaForm()">Cancel</button>
-        <button class="btn btn-ok btn-sm" onclick="submitCapa('${inc.id}')">+ Submit CAPA</button>
+        <button class="btn btn-ok btn-sm" onclick="submitCapa('${safeId(inc.id)}')">+ Submit CAPA</button>
       </div>
     </div>
   `;
@@ -1484,7 +1490,9 @@ async function completeCapa(id, incidentId) {
 }
 
 async function verifyCapa(id, incidentId) {
-  const notes = prompt('Verification notes for this completed CAPA:') || 'Verified from incident workflow';
+  const entered = prompt('Verification notes for this completed CAPA:');
+  if (entered === null) return; // Cancel: do not verify
+  const notes = entered.trim() || 'Verified from incident workflow';
   const result = await apiPost(`/api/corrective-actions/${id}/verify`, {verification_notes: notes});
   if (!result.ok) return toast(result.data?.error || 'Could not verify CAPA', 'danger');
   toast('CAPA verified', 'ok');
@@ -1658,15 +1666,21 @@ function workerSearch(val) {
   const matches = workers.filter(w => `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)).slice(0, 8);
   if (!matches.length) { ac.style.display = 'none'; return; }
   ac.innerHTML = matches.map(w => `
-    <div class="ac-item" onclick="selectWorker('${w.id}','${w.first_name} ${w.last_name}','${w.job_title || ''}','${w.department || ''}')">
-      <div class="ac-name">${w.first_name} ${w.last_name}</div>
-      <div class="ac-sub">${w.job_title || ''} · ${w.site || ''}</div>
+    <div class="ac-item" onclick="selectWorker('${safeId(w.id)}')">
+      <div class="ac-name">${escHtml(w.first_name)} ${escHtml(w.last_name)}</div>
+      <div class="ac-sub">${escHtml(w.job_title || '')} · ${escHtml(w.site || '')}</div>
     </div>
   `).join('');
   ac.style.display = 'block';
 }
 
-function selectWorker(id, name, jobTitle, dept) {
+// Takes the worker id only and looks the rest up, so names like O'Brien work.
+function selectWorker(id) {
+  const w = workers.find(x => String(x.id) === String(id));
+  if (!w) return;
+  const name = `${w.first_name} ${w.last_name}`;
+  const jobTitle = w.job_title || '';
+  const dept = w.department || '';
   document.getElementById('f-worker-search').value = name;
   document.getElementById('f-worker-id').value = id;
   document.getElementById('f-job-title').value = jobTitle;
@@ -1683,15 +1697,18 @@ function capaWorkerSearch(val) {
   const matches = workers.filter(w => `${w.first_name} ${w.last_name}`.toLowerCase().includes(q)).slice(0, 6);
   if (!matches.length) { ac.style.display = 'none'; return; }
   ac.innerHTML = matches.map(w => `
-    <div class="ac-item" onclick="selectCapaWorker('${w.id}','${w.first_name} ${w.last_name}')">
-      <div class="ac-name">${w.first_name} ${w.last_name}</div>
-      <div class="ac-sub">${w.job_title || ''} · ${w.site || ''}</div>
+    <div class="ac-item" onclick="selectCapaWorker('${safeId(w.id)}')">
+      <div class="ac-name">${escHtml(w.first_name)} ${escHtml(w.last_name)}</div>
+      <div class="ac-sub">${escHtml(w.job_title || '')} · ${escHtml(w.site || '')}</div>
     </div>
   `).join('');
   ac.style.display = 'block';
 }
 
-function selectCapaWorker(id, name) {
+function selectCapaWorker(id) {
+  const w = workers.find(x => String(x.id) === String(id));
+  if (!w) return;
+  const name = `${w.first_name} ${w.last_name}`;
   document.getElementById('capa-assignee-search').value = name;
   document.getElementById('capa-assignee-id').value = id;
   document.getElementById('capa-worker-ac').style.display = 'none';
@@ -1740,7 +1757,7 @@ function updateBodySelected() {
     el.innerHTML = '<div class="body-none">Click a region on the diagram</div>';
   } else {
     el.innerHTML = [...bodySelected].map(r =>
-      `<div class="body-tag">${r} <span onclick="removeBodyRegion('${r}')" style="cursor:pointer;margin-left:4px;opacity:.7">×</span></div>`
+      `<div class="body-tag">${escHtml(r)} <span onclick="removeBodyRegion('${escHtml(r)}')" style="cursor:pointer;margin-left:4px;opacity:.7">×</span></div>`
     ).join('');
   }
 }
@@ -1782,8 +1799,8 @@ function renderReview() {
   ];
   document.getElementById('review-content').innerHTML = sections.map(sec => `
     <div class="review-section">
-      <div class="review-title">${sec.title}</div>
-      ${sec.rows.map(([k, v]) => `<div class="review-row"><span class="rk">${k}</span><span class="rv">${v}</span></div>`).join('')}
+      <div class="review-title">${escHtml(sec.title)}</div>
+      ${sec.rows.map(([k, v]) => `<div class="review-row"><span class="rk">${escHtml(k)}</span><span class="rv">${escHtml(v)}</span></div>`).join('')}
     </div>
   `).join('');
 }

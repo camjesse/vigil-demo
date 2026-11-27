@@ -17,7 +17,7 @@
   <header class="topbar">
     <div class="logo"><div class="logo-mark">V</div><div><div class="logo-title">Investigations</div><div class="logo-sub">Root Cause & Learning System</div></div></div>
     <div class="topbar-center">Vigil HSE / Core Safety / Investigations</div>
-    <div class="topbar-right"><span class="live-pill">● Live API</span><span class="co-tag">Northern Express Transport Ltd</span></div>
+    <div class="topbar-right"><span class="live-pill">● Live API</span><span class="co-tag" data-vigil-company></span></div>
   </header>
   <main class="main">
     <section class="panel" id="panel-dashboard"><div class="panel-pad">
@@ -45,7 +45,7 @@
 </div>
 
 <div class="form-overlay" id="modal"><div class="modal"><div class="modal-hdr"><div class="modal-title" id="modal-title"></div><button class="btn btn-sm" style="margin-left:auto" onclick="closeModal()">&times;</button></div><div class="modal-body" id="modal-body"></div><div class="modal-foot" id="modal-foot"></div></div></div>
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
 const STAGES=['initiated','planning','evidence_collection','analysis','report_draft','report_review','approved','closed'];
