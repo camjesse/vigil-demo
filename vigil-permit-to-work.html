@@ -398,9 +398,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div id="form-success" style="display:none">
         <div class="success-banner">
           <div style="margin-bottom:10px;color:var(--ok)"><svg style="width:40px;height:40px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
-          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:6px">Permit Issued</div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:6px">Submitted for issue</div>
           <div style="font-size:22px;font-family:var(--font-head);color:var(--ok);font-weight:800;margin-bottom:12px" id="success-permit-num"></div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:16px">The permit is now active. Workers may begin once signed on.</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Not issued yet. A supervisor other than you must walk down the site and issue this permit before work starts.</div>
           <div style="display:flex;gap:8px;justify-content:center">
             <button class="btn btn-ghost" onclick="cancelForm()">Back to Dashboard</button>
             <button class="btn btn-primary" id="success-view-btn">View Permit →</button>
@@ -502,8 +502,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <span style="display:inline-flex;color:var(--warn)"><svg style="width:26px;height:26px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M14 6a6 6 0 0 1 6 6v3"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><rect x="2" y="15" width="20" height="4" rx="1"/></svg></span>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--warn);margin-bottom:2px">Field Walk-Down Required</div>
-              <div style="font-size:11.5px;color:var(--text2)">The permit issuer must physically walk down the job site before this permit can be issued. This cannot be skipped.</div>
+              <div style="font-size:14px;font-weight:700;color:var(--warn);margin-bottom:2px">Your declaration as requester</div>
+              <div style="font-size:11.5px;color:var(--text2)">Confirm you have checked the work area and the controls above with your crew. A supervisor other than you then walks down the site and issues the permit. You cannot issue your own permit.</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
@@ -511,16 +511,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
               <input type="checkbox" id="f-verified" onchange="toggleVerify(this.checked)">
               <span class="toggle-slider"></span>
             </label>
-            <span style="font-size:12.5px;font-weight:600" id="verify-label">I have NOT walked down the job site</span>
+            <span style="font-size:12.5px;font-weight:600" id="verify-label">I have NOT checked the work area</span>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Field Verification Notes <span class="req">*</span></label>
-          <textarea class="form-textarea" id="f-verify-notes" rows="3" placeholder="Describe your site walkdown — conditions observed, confirmations made, any concerns noted…" disabled></textarea>
-          <div class="form-hint">Required before permit can be issued.</div>
+          <label class="form-label">Requester notes <span class="req">*</span></label>
+          <textarea class="form-textarea" id="f-verify-notes" rows="3" placeholder="What you checked, what you saw, anything the issuer should look at." disabled></textarea>
+          <div class="form-hint">Saved with your signature as requester.</div>
         </div>
         <div class="form-group">
-          <label class="form-label">Issuer Name</label>
+          <label class="form-label">Signing as requester</label>
           <input type="text" class="form-input" id="f-issuer-name" value="Signed-in user" disabled>
         </div>
         <div class="form-nav">
@@ -528,30 +528,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
           </div>
-          <button class="btn btn-primary" onclick="goStep(5)">Next: Review &amp; Issue →</button>
+          <button class="btn btn-primary" onclick="goStep(5)">Next: Review &amp; Submit →</button>
         </div>
       </div>
 
       <!-- STEP 5: REVIEW & ISSUE -->
       <div class="form-section" id="step-5">
         <div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:14px 16px;margin-bottom:16px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Permit Summary — Review Before Issuing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">Permit summary. Review before submitting</div>
           <div id="review-summary"></div>
         </div>
         <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px;margin-bottom:16px">
-          <div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:4px">Field Verification Confirmed</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:4px">Requester declaration</div>
           <div style="font-size:11px;color:var(--text2)" id="review-verify-note"></div>
         </div>
         <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;margin-bottom:20px">
-          <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:3px">Issuing this permit confirms you have authority to authorize this work</div>
-          <div style="font-size:10.5px;color:var(--text2)">All control verifications above are your responsibility. This action is logged and timestamped.</div>
+          <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:3px">Submitting signs this permit request in your name</div>
+          <div style="font-size:10.5px;color:var(--text2)">Work cannot start until a supervisor other than you has walked down the site and issued the permit. Your signature is recorded with the time.</div>
         </div>
         <div class="form-nav">
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
             <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
           </div>
-          <button class="btn btn-ok" id="issue-btn" onclick="submitAndIssuePermit()">Issue Permit</button>
+          <button class="btn btn-ok" id="issue-btn" onclick="submitAndIssuePermit()">Submit for issue</button>
         </div>
       </div>
 
@@ -575,7 +575,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token = null;
@@ -1281,8 +1281,8 @@ function toggleVerify(checked) {
   box.className = 'verify-box' + (checked ? ' done' : '');
   notes.disabled = !checked;
   lbl.textContent = checked
-    ? 'I confirm I have physically walked down the job site'
-    : 'I have NOT walked down the job site';
+    ? 'I confirm I have checked the work area and these controls with my crew'
+    : 'I have NOT checked the work area';
   lbl.style.color = checked ? 'var(--ok)' : 'var(--text2)';
 }
 
@@ -1320,7 +1320,7 @@ function renderReviewSummary() {
     </div>`).join('');
 
   document.getElementById('review-verify-note').textContent =
-    `"${formData.verifyNotes||'Field walkdown completed.'}"`;
+    `"${formData.verifyNotes||'Work area checked.'}"`;
 }
 
 // ── STEP NAVIGATION ────────────────────────────────────────────
@@ -1339,9 +1339,9 @@ function goStep(n, silent) {
       if (!selectedLeadId) { toast('Select a worker lead','danger'); return; }
     }
     if (formStep === 4) {
-      if (!fieldVerified) { toast('Confirm you have completed the field walk-down','danger'); return; }
+      if (!fieldVerified) { toast('Confirm you have checked the work area','danger'); return; }
       if (!formData.verifyNotes || formData.verifyNotes.length < 5) {
-        toast('Enter field verification notes','danger'); return;
+        toast('Enter your requester notes','danger'); return;
       }
     }
   }
@@ -1403,7 +1403,7 @@ async function submitAndIssuePermit() {
   if (!createRes.ok || !createRes.data?.permit) {
     const err = createRes.data?.error || createRes.data?.message || `HTTP ${createRes.status}`;
     toast(`Failed to create permit: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = 'Issue Permit';
+    btn.disabled = false; btn.textContent = 'Submit for issue';
     return;
   }
   const pid = createRes.data.permit.id;
@@ -1414,7 +1414,16 @@ async function submitAndIssuePermit() {
   if (!controlsRes.ok) {
     const err = controlsRes.data?.error || `HTTP ${controlsRes.status}`;
     toast(`Control verification failed to save: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = 'Issue Permit';
+    btn.disabled = false; btn.textContent = 'Submit for issue';
+    return;
+  }
+
+  btn.textContent = 'Signing…';
+  const signRes = await apiPost(`/api/permits/${pid}/signatories`, {role:'requester', comments: formData.verifyNotes});
+  if (!signRes.ok && signRes.status !== 409) {
+    const err = signRes.data?.error || `HTTP ${signRes.status}`;
+    toast(`Your requester signature was not saved: ${err}`, 'danger');
+    btn.disabled = false; btn.textContent = 'Submit for issue';
     return;
   }
 
@@ -1423,30 +1432,7 @@ async function submitAndIssuePermit() {
   if (!submitRes.ok) {
     const err = submitRes.data?.error || `HTTP ${submitRes.status}`;
     toast(`Submit failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = 'Issue Permit';
-    return;
-  }
-
-  btn.textContent = 'Reviewing…';
-  await apiPost(`/api/permits/${pid}/review`, {});
-
-  btn.textContent = 'Field verifying…';
-  const fvRes = await apiPost(`/api/permits/${pid}/field-verify`, {
-    notes: formData.verifyNotes
-  });
-  if (!fvRes.ok) {
-    const err = fvRes.data?.error || `HTTP ${fvRes.status}`;
-    toast(`Field verify failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = 'Issue Permit';
-    return;
-  }
-
-  btn.textContent = 'Issuing…';
-  const issueRes = await apiPost(`/api/permits/${pid}/issue`, {});
-  if (!issueRes.ok) {
-    const err = issueRes.data?.error || issueRes.data?.message || `HTTP ${issueRes.status}`;
-    toast(`Issue failed: ${err}`, 'danger');
-    btn.disabled = false; btn.textContent = 'Issue Permit';
+    btn.disabled = false; btn.textContent = 'Submit for issue';
     return;
   }
 
@@ -1497,7 +1483,7 @@ function resetForm() {
   const now = new Date();
   const start = new Date(now.getTime()+3600000);
   const end   = new Date(now.getTime()+39600000);
-  const iso = d => d.toISOString().slice(0,16);
+  const iso = d => vigilLocalDateTime(d);
   const sf = document.getElementById('f-start');
   const ef = document.getElementById('f-end');
   if (sf) sf.value = iso(start);
@@ -1513,7 +1499,7 @@ function resetForm() {
   if (vl) { vl.textContent = 'I have NOT walked down the job site'; vl.style.color=''; }
 
   const ib = document.getElementById('issue-btn');
-  if (ib) { ib.disabled=false; ib.textContent='Issue Permit'; }
+  if (ib) { ib.disabled=false; ib.textContent='Submit for issue'; }
 
   renderTypeGrid();
   goStep(1, true);
@@ -1532,6 +1518,7 @@ async function viewPermit(id) {
   }
   const p = res.permit;
   const cfg = PERMIT_TYPES[p.permit_type]||{name:fmt(p.permit_type)};
+  const evidence = await loadPermitEvidence(p);
 
   const WORKFLOW = ['draft','submitted','reviewed','issued','active','closed'];
   const wfIdx = WORKFLOW.indexOf(p.status);
@@ -1669,14 +1656,12 @@ async function viewPermit(id) {
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-warn btn-sm" onclick="suspendPermit('${p.id}')">⏸ Suspend</button>
       ${canExtend_?`<button class="btn btn-ghost btn-sm" onclick="requestExtension('${p.id}')">Request 4h extension</button>`:''}
-      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">Close Permit</button>
     </div>${extensionHtml}` :
     isSuspended_ ? `
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <div style="padding:8px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:7px;font-size:11.5px;color:var(--warn)">
         ⏸ Suspended: ${p.suspension_reason||'No reason given'}
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="closePermit('${p.id}')">Close Permit</button>
     </div>` : '';
 
   el.innerHTML = `
@@ -1698,6 +1683,8 @@ async function viewPermit(id) {
       </div>
       ${wfHtml}
     </div>
+
+    ${nextStepHtml(p, evidence)}
 
     <!-- DETAIL GRID -->
     <div class="detail-grid" style="margin-bottom:12px">
@@ -1757,7 +1744,152 @@ async function viewPermit(id) {
     <div class="card">
       ${ctrlHtml}${simopsHtml}${sigsHtml}${crewHtml}${revalHtml}${closeoutHtml}
     </div>` : ''}
+
+    ${signatureTrailHtml(evidence.signatures)}
   `;
+}
+
+// ── WHO DOES WHAT NEXT ─────────────────────────────────────────
+// A permit needs more than one person. The requester signs and submits. A
+// supervisor who is not the requester reviews, walks down the site and issues.
+// Close-out needs the worker lead and then a different person as issuer.
+const ROLE_LABELS = {
+  requester:'Requester', worker_lead:'Worker lead', permit_issuer:'Permit issuer', area_authority:'Area authority',
+  hse_reviewer:'HSE reviewer', gas_tester:'Gas tester', fire_watch:'Fire watch',
+  confined_space_attendant:'Confined space attendant', equipment_owner:'Equipment owner',
+  isolation_authority:'Isolation authority', lift_supervisor:'Lift supervisor', signal_person:'Signal person',
+  rescue_standby:'Rescue standby', simops_coordinator:'SIMOPS coordinator',
+};
+const roleLabel = r => ROLE_LABELS[r] || fmt(r);
+const ELEVATED = ['superadmin','admin','manager','supervisor'];
+
+async function loadPermitEvidence(p) {
+  const [session, required, sigs, closeout] = await Promise.all([
+    (typeof getVigilSession === 'function' ? getVigilSession().catch(()=>null) : null),
+    apiGet(`/api/permits/${p.id}/signatories/required`),
+    apiGet(`/api/records/permit/${p.id}/signatures`),
+    ['issued','active','revalidated','suspended','expired','closed'].includes(p.status)
+      ? apiGet(`/api/permits/${p.id}/closeout`) : null,
+  ]);
+  const myWorkerId = session?.worker?.id || session?.user?.worker_id || null;
+  return {
+    myWorkerId,
+    elevated: ELEVATED.includes(session?.user?.role),
+    isRequester: !!myWorkerId && p.requested_by === myWorkerId,
+    isLead: !!myWorkerId && (p.requested_by === myWorkerId || p.worker_lead === myWorkerId),
+    missingRoles: ((required && required.required_roles) || []).filter(r => !r.signed && r.role !== 'permit_issuer').map(r => r.role),
+    signatures: (sigs && sigs.signatures) || [],
+    closeout: closeout && closeout.closeout,
+  };
+}
+
+function nextStepHtml(p, ev) {
+  const id = p.id;
+  const btn = (label, fn, cls='btn-primary') => `<button class="btn ${cls} btn-sm" onclick="${fn}">${esc(label)}</button>`;
+  const wait = t => `<div style="font-size:12px;color:var(--text2)">${esc(t)}</div>`;
+  const signButtons = ev.missingRoles.map(r => btn(`Sign as ${roleLabel(r)}`, `signPermitRole('${id}','${r}')`, 'btn-ghost')).join(' ');
+  let title = '', body = '';
+
+  if (p.status === 'draft') {
+    title = 'Next: the requester signs and submits';
+    body = ev.isRequester
+      ? `${ev.missingRoles.includes('requester') ? btn('Sign as Requester', `signPermitRole('${id}','requester')`, 'btn-ghost') : ''} ${btn('Submit for issue', `permitStep('${id}','submit','Submitted for issue')`)}`
+      : wait('Waiting for the requester to sign and submit this permit.');
+  } else if (p.status === 'submitted') {
+    title = 'Next: a supervisor reviews';
+    body = ev.isRequester ? wait('Waiting for a supervisor other than you to review this permit. You cannot review your own request.')
+      : ev.elevated ? btn('Mark as reviewed', `permitStep('${id}','review','Permit reviewed')`)
+      : wait('Waiting for a supervisor to review this permit.');
+  } else if (p.status === 'reviewed') {
+    title = 'Next: signatures, site walk-down, then issue';
+    const parts = [];
+    if (ev.missingRoles.length) {
+      parts.push(`<div style="font-size:12px;color:var(--warn);margin-bottom:6px">Still to sign: ${ev.missingRoles.map(r=>esc(roleLabel(r))).join(', ')}. Each person signs in under their own login.</div>${signButtons}`);
+    }
+    if (ev.isRequester) parts.push(wait('A supervisor other than you walks down the site and issues this permit.'));
+    else if (ev.elevated) {
+      parts.push(!p.issuer_verified_field
+        ? btn('Record site walk-down', `fieldVerifyPermit('${id}')`)
+        : (ev.missingRoles.length ? wait('Site walk-down recorded. The permit can be issued once everyone above has signed.')
+                                   : btn('Issue permit', `permitStep('${id}','issue','Permit issued')`, 'btn-ok')));
+    } else parts.push(wait('Waiting for a supervisor to walk down the site and issue this permit.'));
+    body = parts.join('<div style="height:8px"></div>');
+  } else if (p.status === 'issued') {
+    title = 'Next: start work';
+    body = ev.elevated ? btn('Start work (activate)', `permitStep('${id}','activate','Permit active')`, 'btn-ok') : wait('Issued. A supervisor activates the permit when work starts.');
+  }
+
+  // Close-out: worker lead, then a different person as issuer, then close.
+  let closeHtml = '';
+  if (['issued','active','revalidated','suspended','expired'].includes(p.status)) {
+    const co = ev.closeout || {};
+    const leadDone = !!co.worker_lead_signoff, issuerDone = !!co.issuer_signoff;
+    const tick = (done, text) => `<div style="font-size:12px;color:${done?'var(--ok)':'var(--muted)'}">${done?'\u2713':'\u25CB'} ${esc(text)}</div>`;
+    let action = '';
+    if (!leadDone) action = ev.isLead ? btn('Sign off as worker lead', `permitStep('${id}','closeout/worker-lead-signoff','Worker lead sign-off recorded')`, 'btn-ghost')
+                                       : wait('Waiting for the worker lead or requester to sign off.');
+    else if (!issuerDone) action = (ev.elevated && co.worker_lead_signoff !== ev.myWorkerId)
+      ? btn('Accept area back and complete close-out', `permitStep('${id}','closeout/complete','Close-out completed')`)
+      : wait('Waiting for a supervisor other than the worker lead to accept the area back.');
+    else action = btn('Close permit', `closePermit('${id}')`, 'btn-ok');
+    closeHtml = `
+      <div class="section-title"${title?'':' style="margin-top:0"'}>Close-out when the work is finished</div>
+      ${tick(leadDone, 'Worker lead: work complete, area safe')}
+      ${tick(issuerDone, 'Issuer: area accepted back')}
+      <div style="margin-top:8px">${action}</div>`;
+  }
+  if (['closed','cancelled'].includes(p.status)) {
+    title = 'This permit is ' + p.status + ' and locked';
+    body = wait('It is kept as it was. New work needs a new permit.');
+  }
+  if (!title && !closeHtml) return '';
+  return `
+    <div class="card" style="margin-bottom:12px">
+      ${title ? `<div class="section-title" style="margin-top:0">${esc(title)}</div><div>${body}</div>` : ''}
+      ${closeHtml}
+    </div>`;
+}
+
+function signatureTrailHtml(sigs) {
+  if (!sigs.length) return '';
+  const MEANING = {
+    signed:'Signed', field_verified:'Site walk-down', reviewed:'Reviewed', issued:'Issued', revalidated:'Revalidated',
+    closeout_worker_lead_signoff:'Close-out: worker lead', closeout_issuer_signoff:'Close-out: issuer', closed:'Closed',
+  };
+  return `
+    <div class="card" style="margin-top:12px">
+      <div class="section-title" style="margin-top:0">Signature record (${sigs.length})</div>
+      ${sigs.map(g => `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:7px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;font-size:12px">
+        <span style="font-weight:600">${esc(g.signer_name)}</span>
+        <span style="color:var(--text2)">${esc(MEANING[g.meaning] || fmt(g.meaning))}${g.signing_role ? ' as ' + esc(roleLabel(g.signing_role)) : ''}</span>
+        ${g.comments ? `<span style="color:var(--muted)">${esc(g.comments)}</span>` : ''}
+        <span style="margin-left:auto;font-size:10.5px;color:var(--muted)" title="Record fingerprint ${esc(g.record_hash)}">${esc(fmtDate(g.signed_at))} · ${esc(String(g.record_hash||'').slice(0,10))}</span>
+      </div>`).join('')}
+      <div style="font-size:10.5px;color:var(--muted);margin-top:6px">Each signature is taken from the signed-in person and stores a fingerprint of the permit as it stood at that moment.</div>
+    </div>`;
+}
+
+async function permitStep(id, step, okMessage) {
+  const res = await apiPost(`/api/permits/${id}/${step}`, {});
+  if (res.ok) { toast(okMessage, 'ok'); viewPermit(id); refreshPermitLists(); }
+  else toast(res.data?.error || 'That step could not be completed', 'danger');
+}
+
+async function signPermitRole(id, role) {
+  if (!confirm(`Sign this permit as ${roleLabel(role)}? Your name and the time are recorded.`)) return;
+  const res = await apiPost(`/api/permits/${id}/signatories`, {role});
+  if (res.ok) { toast(`Signed as ${roleLabel(role)}`, 'ok'); viewPermit(id); }
+  else toast(res.data?.error || 'Signature not saved', 'danger');
+}
+
+async function fieldVerifyPermit(id) {
+  const notes = prompt('Site walk-down notes (what you checked and saw):');
+  if (notes === null) return;
+  if (notes.trim().length < 5) { toast('Enter walk-down notes', 'danger'); return; }
+  const res = await apiPost(`/api/permits/${id}/field-verify`, {notes: notes.trim()});
+  if (res.ok) { toast('Site walk-down recorded', 'ok'); viewPermit(id); }
+  else toast(res.data?.error || 'Walk-down not saved', 'danger');
 }
 
 // ── PERMIT ACTIONS ─────────────────────────────────────────────

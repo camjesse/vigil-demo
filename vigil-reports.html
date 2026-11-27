@@ -98,7 +98,7 @@ button,input,select,textarea{font:inherit}.app{min-height:100%;display:flex;flex
   </div>
 </div>
 <div id="modal-root"></div>
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 const API=window.VIGIL_API_BASE||'https://vigil-production-17ca.up.railway.app';
 let token=null,session=null,catalog=[],lastResult=null,lastSavedId=null;
@@ -145,7 +145,7 @@ async function exportCurrent(){
   try{
     let id=lastSavedId;
     if(!id){
-      const name=val('b-name')||'Report '+new Date().toISOString().slice(0,10);
+      const name=val('b-name')||'Report '+vigilLocalDate();
       const saved=await api('/api/reports',{method:'POST',body:JSON.stringify({...buildSpec(),name})});
       id=saved.report.id; lastSavedId=id; toast('Saved as "'+name+'" and exporting');
     }
@@ -161,7 +161,7 @@ async function interpret(){
   const msg=document.getElementById('ai-msg');
   if(!prompt){toast('Describe the report first');return}
   try{
-    const today=new Date().toISOString().slice(0,10);
+    const today=vigilLocalDate();
     const r=await api('/api/reports/interpret',{method:'POST',body:JSON.stringify({prompt,today})});
     msg.className='ai-msg show'+(r.matched?'':' warn');
     msg.textContent=r.message;

@@ -78,7 +78,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <div class="modal-back" id="modal"><div class="modal"><div class="modal-head" id="modal-title"></div><div class="modal-body" id="modal-body"></div><div class="modal-foot" id="modal-foot"></div></div></div>
 
-<script src="vigil-auth.js?v=20261126-1"></script>
+<script src="vigil-auth.js?v=20261127-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token='', session=null, meetings=[], stats={}, engagement={}, recommendations=[], workers=[], actionItems=[], current=null, focusActionId=null, focusActionIntent='open', pendingAction=null;
@@ -173,7 +173,7 @@ function renderActions(){
   $('action-list').innerHTML=rows.map(a=>actionCard(a)).join('');
 }
 function actionCard(a){
-  const overdue=a.is_overdue||((a.due_date&&new Date(a.due_date)<new Date(new Date().toISOString().slice(0,10)))&&['open','in_progress'].includes(a.status));
+  const overdue=a.is_overdue||((a.due_date&&new Date(a.due_date)<new Date(vigilLocalDate()))&&['open','in_progress'].includes(a.status));
   return `<div class="item ${focusActionId===a.id?'focus':''} ${overdue?'overdue':''}" id="action-${a.id}"><div class="item-top"><div class="item-title">${esc(a.title)}</div><div class="actions">${['open','in_progress'].includes(a.status)?`<button class="btn btn-sm btn-ok" onclick="completeAction('${a.id}')">Complete</button>`:''}${a.status==='completed'?`<button class="btn btn-sm btn-primary" onclick="verifyAction('${a.id}')">Verify</button>`:''}</div></div><div class="item-copy">${esc(a.description||a.parent_title||'Meeting action')}<br>${chip(a.priority||'meeting')} ${chip(a.status)} <span class="meta">Due ${date(a.due_date)} · ${esc([a.assignee_first_name,a.assignee_last_name].filter(Boolean).join(' ')||'Unassigned')}</span></div></div>`;
 }
 function renderEngagement(){
