@@ -253,7 +253,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-pill" id="conflict-pill">— SIMOPS</div>
   </div>
   <div class="topbar-right">
-    <div class="topbar-pill" id="worker-pill">Northern Express</div>
+    <div class="topbar-pill" id="worker-pill"></div>
     <button class="btn btn-primary btn-sm" onclick="showPanel('form')">+ New Permit</button>
   </div>
 </div>
@@ -376,7 +376,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div>
           <div class="form-title">New Permit to Work</div>
-          <div class="form-sub">Northern Express Transport — Vigil HSE</div>
+          <div class="form-sub" data-vigil-company></div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="cancelForm()" style="color:var(--muted)">Cancel</button>
       </div>
@@ -575,7 +575,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 const API = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
 let token = null;
@@ -599,11 +599,18 @@ let moduleReady = false;
 let pendingModuleAction = null;
 
 // ── API ────────────────────────────────────────────────────────
+// Set when the latest permit list or dashboard request failed. The board and
+// alert strip then show an error, never "All clear".
+const permitLoadFail = {list:false, dash:false};
+const PERMIT_LOAD_ERROR = '<div class="empty-state" style="color:var(--danger)">Could not load. Try again.</div>';
 async function apiGet(path) {
+  const key = path.startsWith('/api/permits?') ? 'list' : path === '/api/permits/dashboard' ? 'dash' : null;
   try {
     const r = await fetch(API + path, {headers:{Authorization:'Bearer '+token}});
+    if (key) permitLoadFail[key] = !r.ok;
+    if (!r.ok) return null;
     return await r.json();
-  } catch(e) { return null; }
+  } catch(e) { if (key) permitLoadFail[key] = true; return null; }
 }
 async function apiPost(path, body) {
   try {
@@ -831,6 +838,7 @@ function renderKPIs() {
 function renderPermitBoard() {
   const el = document.getElementById('permit-board');
   const label = document.getElementById('active-count-label');
+  if (permitLoadFail.list || permitLoadFail.dash) { el.innerHTML = PERMIT_LOAD_ERROR; label.textContent = ''; return; }
   if (!activePermits.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>No active permits right now<div class="empty-sub">All clear</div></div>`;
     label.textContent = '';
@@ -940,7 +948,8 @@ function buildAlertStrip() {
   const pending = permits.filter(p=>p.status==='submitted'||p.status==='reviewed').length;
   if (pending) parts.push(`<span style="color:var(--cyan)">${pending} pending review</span>`);
 
-  if (!parts.length) parts.push(`<span style="color:var(--muted)">All clear</span>`);
+  if (permitLoadFail.list || permitLoadFail.dash) { parts.length = 0; parts.push(`<span style="color:var(--danger)">Could not load. Try again.</span>`); }
+  else if (!parts.length) parts.push(`<span style="color:var(--muted)">All clear</span>`);
 
   document.getElementById('astrip-content').innerHTML =
     parts.join('<span class="asep">·</span>');
@@ -962,6 +971,7 @@ function renderPermitsTable() {
     return true;
   });
 
+  if (permitLoadFail.list || permitLoadFail.dash) { el.innerHTML = PERMIT_LOAD_ERROR; return; }
   if (!rows.length) {
     el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></div>No permits match filters</div>`;
     return;
@@ -1052,21 +1062,26 @@ function workerSearch(val, field) {
   ).slice(0,6);
   if (!matches.length) { ac.style.display='none'; return; }
   ac.innerHTML = matches.map(w=>`
-    <div class="ac-item" onclick="selectWorker('${w.id}','${w.first_name} ${w.last_name}','${w.job_title||''}','${field}')">
-      <div class="ac-name">${w.first_name} ${w.last_name}</div>
-      <div class="ac-sub">${w.job_title||''} · ${w.site||''}</div>
+    <div class="ac-item" onclick="selectWorker('${String(w.id).replace(/[^A-Za-z0-9_-]/g,'')}','${field === 'lead' ? 'lead' : ''}')">
+      <div class="ac-name">${esc(w.first_name)} ${esc(w.last_name)}</div>
+      <div class="ac-sub">${esc(w.job_title||'')} · ${esc(w.site||'')}</div>
     </div>
   `).join('');
   ac.style.display='block';
 }
 
-function selectWorker(id, name, title, field) {
+// Takes the worker id only and looks the name up, so names like O'Brien work.
+function selectWorker(id, field) {
+  const w = workers.find(x => String(x.id) === String(id));
+  if (!w) return;
+  const name = `${w.first_name} ${w.last_name}`;
+  const title = w.job_title || '';
   if (field==='lead') {
     selectedLeadId = id;
     document.getElementById('f-lead-search').value = name;
     const sel = document.getElementById('lead-selected');
     sel.style.display = 'flex';
-    sel.innerHTML = `<span><strong>${name}</strong> — ${title}</span><button class="btn btn-ghost btn-sm" onclick="clearLead()" style="padding:2px 6px">&times;</button>`;
+    sel.innerHTML = `<span><strong>${esc(name)}</strong> — ${esc(title)}</span><button class="btn btn-ghost btn-sm" onclick="clearLead()" style="padding:2px 6px">&times;</button>`;
   }
   document.getElementById(`${field}-ac`).style.display = 'none';
 }
@@ -1784,7 +1799,9 @@ async function requestExtension(id) {
 }
 
 async function approveExtension(id) {
-  const note = prompt('Approval note (optional):') || '';
+  const entered = prompt('Approval note (optional):');
+  if (entered === null) return; // Cancel: do not approve
+  const note = entered || '';
   const res = await apiPost(`/api/permits/${id}/extension/approve`, {note});
   if (res.ok) { toast('Extension approved','ok'); viewPermit(id); refreshPermitLists(); }
   else toast(res.data?.error||'Approval failed','danger');

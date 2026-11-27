@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Vigil HSE — Northern Express Transport</title>
+<title>Vigil HSE</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0D121B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -422,7 +422,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
       <button class="jt-btn mx" title="Coming Soon" onclick="toast('Mexico support coming in Phase 2')">MX</button>
     </div>
     <div class="lpill" id="pill-workers"><div class="pd"></div><span id="workers-count">247</span> Workers</div>
-    <div class="co-tag" id="coTag">Northern Express Transport</div>
+    <div class="co-tag" id="coTag"></div>
     <div class="notif-wrap">
       <button class="notif-btn" title="Notifications" onclick="toggleNotifications(event)"><svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10.268 21a2 2 0 0 0 3.464 0" /> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /> </svg><span class="notif-count" id="notif-count">0</span></button>
       <div class="notif-panel" id="notif-panel" onclick="event.stopPropagation()">
@@ -649,7 +649,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
             <button class="priority-link" onclick="loadMod('incidents')">Review CAPA register</button>
           </div>
         </article>
-        <article class="priority-card ai">
+        <article class="priority-card ai" data-mod="ai">
           <div class="priority-icon">AI</div>
           <div>
             <div class="priority-label">Risk window</div>
@@ -706,7 +706,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
           </div>
         </article>
 
-        <article class="ops-panel">
+        <article class="ops-panel" data-mod="ai">
           <div class="ops-head">
             <div class="ops-title">AI risk predictions</div>
             <button class="ops-action" onclick="loadMod('ai')">View all</button>
@@ -772,7 +772,7 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
         <article class="ops-panel wide">
           <div class="ops-head">
             <div class="ops-title">Site safety health</div>
-            <button class="ops-action" onclick="loadMod('ai')">Risk heatmap</button>
+            <button class="ops-action" data-mod="ai" onclick="loadMod('ai')">Risk heatmap</button>
           </div>
           <div class="table-wrap">
             <table class="dash-table">
@@ -884,10 +884,28 @@ html.light-mode .pm{background:var(--s2);border-color:rgba(155,109,255,.2)}
 </div><!-- /body -->
 </div><!-- /shell -->
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script src="vigil-crypto.js?v=20260705-1"></script>
 <script src="vigil-offline.js?v=20260705-2"></script>
 <script>
+// ── HIDDEN MODULES ────────────────────────────────────────────
+// Hidden until wired to real data, audit 2026-11-25.
+// Remove an id from this list to turn that module back on (sidebar item,
+// dashboard tiles and quick links tagged data-mod, and loadMod all follow it).
+// Ids: fleet = Fleet & Equipment, fatigue = Hours & Fatigue, ai = Predictive AI.
+// Work Alone and Emergency muster have no page or link in this web app, so
+// there is nothing to hide for them here.
+const HIDDEN_MODULES = ['fleet', 'fatigue', 'ai'];
+function isHiddenModule(id) { return HIDDEN_MODULES.includes(id); }
+function applyHiddenModules() {
+  HIDDEN_MODULES.forEach(id => {
+    const item = document.getElementById('sbi-' + id);
+    if (item) item.style.display = 'none';
+    document.querySelectorAll('[data-mod="' + id + '"]').forEach(el => { el.style.display = 'none'; });
+  });
+}
+applyHiddenModules();
+
 // ── MODULE CONFIG ─────────────────────────────────────────────
 const MODS = {
   employees:    {src:'vigil-employee-registry.html',   label:'Employee Registry'},
@@ -1032,6 +1050,7 @@ function loadMod(id, action) {
   if (cur === id) { if (actionPayload) sendModuleAction(id, actionPayload); closeMobileSidebar(); return; }
   const m = MODS[id];
   if (!m) return;
+  if (isHiddenModule(id)) { toast('This module is not available yet'); return; }
   if (window.matchMedia('(max-width: 900px)').matches) {
     const url = new URL(m.src, window.location.href);
     url.searchParams.set('mobile', '1');
@@ -1249,11 +1268,11 @@ function applyCompanyName(name) {
 // Clear the seeded demo numbers before real data loads, so a slow or failed
 // fetch never leaves another company's fake figures on screen.
 function resetDashboardToNeutral() {
-  [['kpi-trif','0.0'],['kpi-ltif','0.0'],['kpi-lost-days','0'],['kpi-nearmiss','0'],
+  [['kpi-trif','-'],['kpi-ltif','-'],['kpi-lost-days','0'],['kpi-nearmiss','0'],
    ['kpi-inspection','0%'],['kpi-inspection-sub','0/0 done'],['kpi-capa','—'],['kpi-capa-sub','0 overdue'],
    ['kpi-jha','0'],['kpi-talks','0'],['workers-count','0'],['workers-count-dashboard','0'],
    // Clear the fabricated year-over-year notes — there's no real comparison baseline.
-   ['kpi-trif-sub','200,000-hour basis'],['kpi-ltif-sub','200,000-hour basis']
+   ['kpi-trif-sub',''],['kpi-ltif-sub','']
   ].forEach(([id,v]) => setEl(id, v));
   ['kpi-inspection-bar','kpi-capa-bar'].forEach(id => { const b=document.getElementById(id); if(b) b.style.width='0%'; });
   ['sb-badge-employees','sb-badge-incidents','sb-badge-ai'].forEach(id => setBadge(id, 0));
@@ -1263,11 +1282,11 @@ function resetDashboardToNeutral() {
 
 const JUR_CONFIG = {
   ca: {
-    label:'Canada', coTag:'Northern Express Transport',
+    label:'Canada', coTag:'',
     terms:{wcb:'WCB',whmis:'WHMIS',licence:'Class 1 / Class 3 Licence',licenceShort:'Class 1',hazcom:'WHMIS 2015',medCert:'TC Medical Certificate',regulator:'OHS Act',inspection:'CVIP',hos_drive:'13h',hos_weekly:'70h / 7-day cycle',hos_reset:'36h off-duty reset',hos_onduty:'14h on-duty limit',envRegulator:'AEP / Environment Canada',envPermit:'EPEA Operating Approval',envWaste:'Alberta Manifest',envSpillLine:'AEP Emergency Line: 1-800-222-6514',envInventory:'NPRI',safetyCommittee:'JHSC',workerComp:'WCB',operatingAuth:'Safety Fitness Certificate',roadConditions:'Alberta 511',corLabel:'COR (Alberta)',osha:'OHS Act'}
   },
   us: {
-    label:'United States', coTag:'Northern Express Transport',
+    label:'United States', coTag:'',
     terms:{wcb:"Workers' Comp",whmis:'HazCom / GHS',licence:'CDL Class A / Class B',licenceShort:'CDL Class A',hazcom:'HazCom 2012 (GHS)',medCert:'DOT Physical (MCSA-5875)',regulator:'OSHA',inspection:'DOT Annual Inspection',hos_drive:'11h',hos_weekly:'60h/7-day or 70h/8-day cycle',hos_reset:'34h restart provision',hos_onduty:'14h on-duty limit',envRegulator:'EPA / State DEQ',envPermit:'Title V Air Permit / State Permit',envWaste:'EPA Uniform Hazardous Waste Manifest',envSpillLine:'EPA National Response Center: 1-800-424-8802',envInventory:'TRI (Toxic Release Inventory)',safetyCommittee:'Safety Committee',workerComp:"Workers' Compensation",operatingAuth:'FMCSA Operating Authority (MC #)',roadConditions:'State 511 / FHWA Road Conditions',corLabel:'OSHA VPP / Internal Audit',osha:'OSHA'}
   }
 };
@@ -1322,7 +1341,7 @@ async function initDashboard() {
     if (!dashToken) return;
     applyCompanyName(session.companyName || session.user?.company_name);
     resetDashboardToNeutral();
-    document.getElementById('sbi-admin')?.classList.toggle('hidden', !['admin','superadmin'].includes(session.user?.role));
+    { const adminItem = document.getElementById('sbi-admin'); if (adminItem) adminItem.style.display = ['admin','superadmin'].includes(session.user?.role) ? '' : 'none'; }
     loadNotifications();
     loadActionCenter();
 
@@ -1330,7 +1349,7 @@ async function initDashboard() {
     const apiGet = url => fetch(`${DASH_API}${url}`,{headers:hdr}).then(r=>r.ok?r.json():null).catch(()=>null);
 
     const [incidents, incidentList, corrective, hazard, meetings, inspections, signals, riskDash, workers, sitesRes] = await Promise.all([
-      apiGet('/api/incidents/stats?hours_worked=94000'),
+      apiGet('/api/incidents/stats'),
       apiGet('/api/incidents?limit=200'),
       apiGet('/api/corrective-actions?limit=100'),
       apiGet('/api/hazard/stats'),
@@ -1355,14 +1374,21 @@ async function initDashboard() {
     const lostDays   = inc.total_lost_time_days || 0;
     const incList = (incidentList && (incidentList.incidents || incidentList.data)) || [];
     const openIncidents = incList.filter(i => !['closed','void','resolved'].includes((i.workflow_status||'').toLowerCase())).length;
-    const estHours   = Math.max(workerCount, 1) * 2000;
-    const trif = rates.trir  != null ? (+rates.trir).toFixed(1)  : ((recordable/estHours)*200000).toFixed(1);
-    const ltif = rates.ltifr != null ? (+rates.ltifr).toFixed(1) : ((ltiCount/estHours)*200000).toFixed(1);
+    // Rates need a real hours-worked figure. No guessed denominator: show a dash until one exists.
+    const trif = rates.trir  != null ? (+rates.trir).toFixed(1)  : '-';
+    const ltif = rates.ltifr != null ? (+rates.ltifr).toFixed(1) : '-';
     setEl('kpi-trif', trif);
     setEl('kpi-ltif', ltif);
+    setEl('kpi-trif-sub', rates.trir  != null ? '200,000-hour basis' : 'Enter hours worked to calculate');
+    setEl('kpi-ltif-sub', rates.ltifr != null ? '200,000-hour basis' : 'Enter hours worked to calculate');
     setEl('kpi-lost-days', lostDays);
     setEl('kpi-lost-days-sub', `${ltiCount} LTI incident${ltiCount!==1?'s':''}`);
     setEl('kpi-nearmiss', nearMiss);
+    if (incidents === null) {
+      // Stats request failed: show an error, not zeros.
+      ['kpi-trif','kpi-ltif','kpi-lost-days','kpi-nearmiss'].forEach(id => setEl(id, '-'));
+      ['kpi-trif-sub','kpi-ltif-sub','kpi-lost-days-sub'].forEach(id => setEl(id, 'Could not load. Try again.'));
+    }
 
     // Needs-assignment priority card, from real open incidents.
     if (openIncidents > 0) {
@@ -1378,7 +1404,7 @@ async function initDashboard() {
     setEl('kpi-capa-sub', `${casOverdue} overdue`);
     const capaBar = document.getElementById('kpi-capa-bar'); if (capaBar) capaBar.style.width = `${casPct || 0}%`;
     setEl('prio-capa-title', casOverdue > 0 ? 'CAPA closure is behind target' : 'Corrective actions on track');
-    renderActions(cas);
+    if (corrective === null) renderLoadError('card-capa'); else renderActions(cas);
 
     const inspTotal = (inspections && inspections.total_inspections) || 0;
     const inspDone  = ((inspections && inspections.by_status)||[]).find(s=>s.status==='completed');
@@ -1395,7 +1421,7 @@ async function initDashboard() {
     setEl('kpi-talks', ttRow ? (ttRow.total || ttRow.completed || 0) : 0);
 
     const sigList = (signals && signals.signals) || [];
-    renderPredictions(sigList.slice(0,3));
+    if (signals === null) renderLoadError('card-predictions'); else renderPredictions(sigList.slice(0,3));
     if (sigList.length > 0) {
       const top = sigList[0];
       setEl('prio-risk-title', `${top.title || top.signal_type || 'Elevated risk'}${top.site ? ' — ' + top.site : ''}`);
@@ -1407,15 +1433,18 @@ async function initDashboard() {
     const incidentsBySite = {};
     ((incidents && incidents.by_site)||[]).forEach(s=>{if(s.site)incidentsBySite[s.site]=s.count;});
     const sites = (riskDash && riskDash.top_sites_at_risk) || [];
-    renderSites(sites, workersBySite, incidentsBySite);
+    if (riskDash === null) renderLoadError('tbody-sites', 8); else renderSites(sites, workersBySite, incidentsBySite);
 
     // Credentials → expiring table + alert-ticker counts.
     let expiredCreds = 0, expiringCreds = 0, totalCreds = 0;
+    let credsFailed = workers === null;
+    if (credsFailed) renderLoadError('tbody-expiring', 3);
     if (Array.isArray(workerArr) && workerArr.length > 0) {
       const credResults = await Promise.all(
-        workerArr.map(w => apiGet(`/api/workers/${w.id}/credentials`).then(r=>({worker:w,creds:(r&&r.credentials)||[]})))
+        workerArr.map(w => apiGet(`/api/workers/${w.id}/credentials`).then(r=>{ if (r === null) credsFailed = true; return {worker:w,creds:(r&&r.credentials)||[]}; }))
       );
-      renderExpiring(credResults);
+      // A failed credential call is not "all current": show an error instead.
+      if (credsFailed) renderLoadError('tbody-expiring', 3); else renderExpiring(credResults);
       const now = Date.now(), in30 = now + 30*24*3600*1000;
       for (const {creds} of credResults) {
         totalCreds += creds.length;
@@ -1434,7 +1463,9 @@ async function initDashboard() {
       casOverdue    && { color:'var(--warn)',   mod:'incidents', text:`${casOverdue} CAPA overdue` },
       sigList.length && { color:'var(--purple)', mod:'ai', text:`${sigList[0].title || 'Elevated risk signal'}${sigList[0].site ? ' — ' + sigList[0].site : ''}` },
       expiringCreds && { color:'var(--warn)',   mod:'employees', text:`${expiringCreds} credential${expiringCreds!==1?'s':''} expiring 30d` },
-    ].filter(Boolean));
+    ].filter(it => it && !isHiddenModule(it.mod)),
+    // "All clear" only when every source behind the ticker loaded.
+    credsFailed || incidentList === null || corrective === null || (signals === null && !isHiddenModule('ai')));
 
     // Sidebar count badges reflect the same real numbers.
     setBadge('sb-badge-employees', expiredCreds + expiringCreds);
@@ -1985,9 +2016,25 @@ function renderOnboarding(steps) {
   el.style.display = '';
 }
 
-function renderAlertTicker(items) {
+// Error state for a dashboard card whose request failed. Never an empty or "all clear" state.
+function renderLoadError(id, colspan) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const msg = 'Could not load. Try again.';
+  el.innerHTML = colspan
+    ? `<tr><td colspan="${colspan}" style="text-align:center;color:var(--danger);padding:14px 10px;font-size:11px">${msg}</td></tr>`
+    : `<div style="text-align:center;color:var(--danger);padding:16px 10px;font-size:11px">${msg}</div>`;
+}
+
+function renderAlertTicker(items, loadFailed) {
   const el = document.getElementById('astrip-items');
   if (!el) return;
+  if (loadFailed) {
+    el.innerHTML = items.map(it =>
+      `<div class="ai-item" style="color:${it.color}" onclick="loadMod('${it.mod}')"><div class="ad" style="background:${it.color}"></div>${escapeDashboardText(it.text)}</div><span class="asep">·</span>`
+    ).join('') + `<div class="ai-item" style="color:var(--danger)"><div class="ad" style="background:currentColor"></div>Could not load. Try again.</div>`;
+    return;
+  }
   if (!items.length) {
     el.innerHTML = `<div class="ai-item" style="color:var(--ok,#10b981)"><div class="ad" style="background:currentColor"></div>All clear</div>`;
     return;

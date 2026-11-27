@@ -1,8 +1,14 @@
 (function () {
   // Local-dev hook: set localStorage vigil_api_override to point the whole app
-  // at a local API (same pattern as vigil-leads.html). Prod users never set it.
+  // at a local API. Honoured only on a local dev host. On any other host the
+  // key is ignored and removed, so a script cannot redirect logins (audit 2026-11-25, B1).
   let apiOverride = null;
-  try { apiOverride = window.localStorage.getItem('vigil_api_override'); } catch {}
+  try {
+    const host = window.location.hostname;
+    const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost');
+    if (isLocalHost) apiOverride = window.localStorage.getItem('vigil_api_override');
+    else window.localStorage.removeItem('vigil_api_override');
+  } catch {}
   const API_BASE = apiOverride || 'https://vigil-production-17ca.up.railway.app';
   const SESSION_KEY = 'vigil_session';
   const EMAIL_KEY = 'vigil_demo_email';
@@ -47,6 +53,7 @@
       .vigil-security-btn{height:27px;border-radius:6px;border:1px solid var(--border,#263648);background:transparent;color:var(--text2,#93A9BC);padding:0 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
       .vigil-security-btn:hover{color:var(--accent,#21B8E6);border-color:rgba(33,184,230,.35)}
       .vigil-mobile-dashboard{display:none}
+      [data-vigil-company]:empty{display:none}
       html.light-mode{--bg:#F4F7FA!important;--s1:#FFFFFF!important;--s2:#EDF2F7!important;--s3:#E2E8F0!important;--s4:#D8E1EB!important;--border:#CBD5E1!important;--border2:#B8C5D3!important;--b2:#B8C5D3!important;--b3:#A7B6C7!important;--text:#102033!important;--text2:#42566B!important;--muted:#64788D!important}
       html.light-mode body,html.light-mode .app,html.light-mode .shell,html.light-mode .main,html.light-mode .main-area,html.light-mode .content,html.light-mode .panel,html.light-mode .panels{color:var(--text)!important}
       html.light-mode .topbar,html.light-mode .hdr{background:var(--s1)!important}
@@ -74,6 +81,7 @@
     window.sessionStorage.removeItem(SESSION_KEY);
     document.documentElement.classList.add('vigil-authenticated');
     renderSessionControl(session);
+    applyCompanyName();
     if (session.requiresPasswordChange && !document.querySelector('[data-vigil-security]')) {
       window.setTimeout(() => openSecurityDialog(
         'Set your password',
@@ -145,14 +153,26 @@
     const displayName = session.worker?.name || email;
     const role = session.user?.role ? ` · ${session.user.role}` : '';
     control.innerHTML = `
-      <span class="vigil-session-user" title="${email}${role}">${displayName}</span>
+      <span class="vigil-session-user"></span>
       <button class="vigil-security-btn" type="button">Security</button>
       <button class="vigil-logout-btn" type="button">Log out</button>
     `;
+    const userLabel = control.querySelector('.vigil-session-user');
+    userLabel.title = `${email}${role}`;
+    userLabel.textContent = displayName;
     control.querySelector('.vigil-security-btn').addEventListener('click', () => window.openVigilSecurity());
     control.querySelector('.vigil-logout-btn').addEventListener('click', () => window.logoutVigil());
     host.appendChild(control);
   }
+
+  // Fill every [data-vigil-company] element with the signed-in company's name.
+  // Pages mark the spot and leave it blank until the session loads, so no
+  // other company's name is ever shown.
+  function applyCompanyName() {
+    const name = (currentSession && currentSession.companyName) || '';
+    document.querySelectorAll('[data-vigil-company]').forEach((el) => { el.textContent = name; });
+  }
+  window.applyVigilCompanyName = applyCompanyName;
 
   function renderMobileDashboardButton() {
     const params = new URLSearchParams(window.location.search);
@@ -177,8 +197,8 @@
     backdrop.innerHTML = `
       <form class="vigil-auth-card">
         <div class="vigil-auth-brand"><div class="vigil-auth-mark">V</div><div class="vigil-auth-brand-name">Account Security</div></div>
-        <div class="vigil-auth-title">${title}</div>
-        <div class="vigil-auth-copy">${copy}</div>
+        <div class="vigil-auth-title"></div>
+        <div class="vigil-auth-copy"></div>
         <div class="vigil-auth-error" role="alert"></div>
         <div class="vigil-auth-field">
           <label for="vigil-current-password">Current password</label>
@@ -199,6 +219,8 @@
       </form>
     `;
 
+    backdrop.querySelector('.vigil-auth-title').textContent = title;
+    backdrop.querySelector('.vigil-auth-copy').textContent = copy;
     const form = backdrop.querySelector('form');
     const currentInput = backdrop.querySelector('#vigil-current-password');
     const newInput = backdrop.querySelector('#vigil-new-password');
@@ -266,10 +288,10 @@
           <div class="vigil-auth-brand"><div class="vigil-auth-mark">V</div><div class="vigil-auth-brand-name">VIGIL HSE</div></div>
           <div class="vigil-auth-title">Sign in</div>
           <div class="vigil-auth-copy">Use your Vigil account to access the safety operations workspace.</div>
-          <div class="vigil-auth-error${message ? ' show' : ''}" role="alert">${message || ''}</div>
+          <div class="vigil-auth-error" role="alert"></div>
           <div class="vigil-auth-field">
             <label for="vigil-auth-email">Email</label>
-            <input id="vigil-auth-email" type="email" autocomplete="username" value="${savedEmail.replace(/"/g, '&quot;')}" required>
+            <input id="vigil-auth-email" type="email" autocomplete="username" required>
           </div>
           <div class="vigil-auth-field">
             <label for="vigil-auth-password">Password</label>
@@ -288,7 +310,7 @@
           <div data-sso-panel style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0">
             <div class="vigil-auth-field">
               <label for="vigil-auth-sso-slug">Company ID (from your invite link)</label>
-              <input id="vigil-auth-sso-slug" type="text" autocomplete="organization" placeholder="e.g. northern-express-transport">
+              <input id="vigil-auth-sso-slug" type="text" autocomplete="organization" placeholder="e.g. your-company-name">
             </div>
             <div class="vigil-auth-actions">
               <button class="vigil-auth-btn" type="button" data-sso-go>Continue to sign-in provider</button>
@@ -301,6 +323,9 @@
       const emailInput = backdrop.querySelector('#vigil-auth-email');
       const passwordInput = backdrop.querySelector('#vigil-auth-password');
       const errorBox = backdrop.querySelector('.vigil-auth-error');
+      // Message can come from ?sso_error= in the URL: text only, never HTML.
+      if (message) { errorBox.textContent = String(message); errorBox.classList.add('show'); }
+      emailInput.value = savedEmail;
       const submitButton = backdrop.querySelector('[type="submit"]');
       const forgotButton = backdrop.querySelector('[data-forgot]');
       const ssoToggle = backdrop.querySelector('[data-sso-toggle]');

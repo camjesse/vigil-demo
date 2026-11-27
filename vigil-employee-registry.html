@@ -362,7 +362,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     </div>
   </div>
   <div class="topbar-right">
-    <div class="company-badge">Northern Express Transport Ltd.</div>
+    <div class="company-badge" data-vigil-company></div>
     <div class="user-dot" id="signed-in-user-dot" title="Signed-in user">?</div>
   </div>
 </div>
@@ -385,8 +385,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <span id="noncompliantCount">0</span> workers non-compliant
   </div>
   <div style="margin-left:auto;display:flex;gap:8px">
-    <button class="btn btn-warn btn-sm" onclick="notifyAll()">Notify All</button>
-    <button class="btn btn-ghost btn-sm" onclick="exportReport()">Export Report</button>
+    <button class="btn btn-warn btn-sm" disabled title="Not available yet">Notify All</button>
+    <button class="btn btn-ghost btn-sm" disabled title="Not available yet">Export Report</button>
   </div>
 </div>
 
@@ -489,8 +489,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <div class="card-hdr">
       <div class="card-title">Workers — <span id="rosterCount">0</span> shown</div>
       <div style="display:flex;gap:8px">
-        <div class="card-action" onclick="exportReport()">Export CSV</div>
-        <div class="card-action" onclick="notifyAll()" style="color:var(--warn)">Notify Non-Compliant</div>
+        <div class="card-action" title="Not available yet" style="cursor:not-allowed;opacity:.5">Export CSV</div>
+        <div class="card-action" title="Not available yet" style="cursor:not-allowed;opacity:.5">Notify Non-Compliant</div>
       </div>
     </div>
     <div style="overflow-x:auto">
@@ -528,7 +528,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Compliance Alerts</div>
       <div class="page-sub">Expired credentials requiring immediate action</div>
     </div>
-    <button class="btn btn-warn" onclick="notifyAll()">Send All Notifications</button>
+    <button class="btn btn-warn" disabled title="Not available yet">Send All Notifications</button>
   </div>
   <div id="alertsList"></div>
 </div>
@@ -540,7 +540,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Expiring Within 30 Days</div>
       <div class="page-sub">Proactive credential management — act before expiry</div>
     </div>
-    <button class="btn btn-warn" onclick="notifyAll()">Notify All</button>
+    <button class="btn btn-warn" disabled title="Not available yet">Notify All</button>
   </div>
   <div id="expiringList"></div>
 </div>
@@ -552,7 +552,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Compliance Dashboard</div>
       <div class="page-sub">Overall credential health across your workforce</div>
     </div>
-    <button class="btn btn-ghost" onclick="exportReport()">Export Report</button>
+    <button class="btn btn-ghost" disabled title="Not available yet">Export Report</button>
   </div>
   <div id="dashboardContent"></div>
 </div>
@@ -594,7 +594,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <div class="page-title">Notification Settings</div>
       <div class="page-sub">Configure when and how compliance alerts are sent</div>
     </div>
-    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    <button class="btn btn-primary" disabled title="Not available yet">Save Settings</button>
   </div>
   <div class="card">
     <div class="card-hdr"><div class="card-title">Alert Thresholds</div></div>
@@ -701,7 +701,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="init()">↺ Retry</button>
 </div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 // ============================================================
 // API CONFIG & AUTH
@@ -1210,7 +1210,7 @@ function openEmployeeDetail(empId) {
   const nameEsc = emp.name.replace(/'/g, "\\'");
   document.getElementById('drawerFooter').innerHTML = `
     <button class="btn btn-primary" onclick="openDrawer('edit','${emp.id}')">Edit Record</button>
-    <button class="btn btn-warn" onclick="sendNotification('${emp.id}')">Send Notification</button>
+    <button class="btn btn-warn" disabled title="Not available yet">Send Notification</button>
     <button class="btn btn-ghost" onclick="exportEmployeeData('${emp._uuid}')">Export data</button>
     ${emp.status === 'active'
       ? `<button class="btn btn-ghost" style="color:var(--warn)" onclick="archiveEmployee('${emp._uuid}','${nameEsc}')">Archive employee</button>`
@@ -1518,7 +1518,7 @@ function renderAlertsPanel() {
             <span class="chip red" style="margin-left:8px">Non-Compliant</span>
           </div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-warn btn-sm" onclick="sendNotification('${emp.id}')">Notify</button>
+            <button class="btn btn-warn btn-sm" disabled title="Not available yet">Notify</button>
             <button class="btn btn-ghost btn-sm" onclick="openEmployeeDetail('${emp.id}');showPanel('roster')">View Record</button>
           </div>
         </div>
@@ -1575,7 +1575,7 @@ function renderExpiringPanel() {
                 <td>${new Date(r.cred.expiry).toLocaleDateString('en-CA')}</td>
                 <td>${r.status === 'critical' ? `<span class="chip warn">${r.days}d left</span>` : `<span class="chip blue">${r.days}d left</span>`}</td>
                 <td><div style="display:flex;gap:5px">
-                  <button class="btn btn-warn btn-xs" onclick="sendNotification('${r.emp.id}')">Notify</button>
+                  <button class="btn btn-warn btn-xs" disabled title="Not available yet">Notify</button>
                   <button class="btn btn-ghost btn-xs" onclick="openDrawer('edit','${r.emp.id}');showPanel('roster')">Update</button>
                 </div></td>
               </tr>
@@ -1671,23 +1671,12 @@ function showPanel(id) {
   if (id === 'dashboard') renderDashboard();
 }
 
-function sendNotification(empId) {
-  const emp = employees.find(e => e.id === empId);
-  showToast('success', 'Notification sent to ' + emp.name + ' and their supervisor');
-}
-
-function notifyAll() {
-  const count = employees.filter(e => overallCompliance(e).status !== 'compliant').length;
-  showToast('success', `Notifications sent to ${count} non-compliant workers and supervisors`);
-}
-
-function exportReport() {
-  showToast('success', 'Compliance report exported — check your downloads');
-}
-
-function saveSettings() {
-  showToast('success', 'Notification settings saved');
-}
+// Notifications, the compliance export and notification settings are not wired
+// to the API yet. Their buttons are disabled and nothing here claims success.
+function sendNotification() {}
+function notifyAll() {}
+function exportReport() {}
+function saveSettings() {}
 
 function showToast(type, msg) {
   const toast = document.getElementById('toast');

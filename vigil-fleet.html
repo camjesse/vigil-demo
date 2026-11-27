@@ -223,7 +223,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
     <div><span class="logo-name">VIGIL</span><span class="logo-mod">/ Fleet & Equipment</span></div>
   </div>
   <div class="topbar-right">
-    <div class="co-badge">Northern Express Transport Ltd.</div>
+    <div class="co-badge" data-vigil-company></div>
     <div class="user-dot">C</div>
   </div>
 </div>
@@ -282,7 +282,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
   <div class="stats" id="dashStats"></div>
 
-  <div class="alert wx" id="roadAlert"><strong>Active Road Advisory:</strong> Hwy 2 Southbound (Red Deer–Calgary) — Black ice reported. <span style="color:var(--accent);cursor:pointer" onclick="showPanel('roads')">View conditions →</span> Journey plans have been updated for affected routes.</div>
+  <div class="alert wx" id="roadAlert" style="display:none"></div>
 
   <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
     <div>
@@ -369,9 +369,9 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- ===== ROAD CONDITIONS ===== -->
 <div class="panel" id="panel-roads">
   <div class="page-hdr">
-    <div><div class="page-title">Road Conditions <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--warn);margin-left:8px">511 Live Feed</span></div>
-    <div class="page-sub">Alberta 511 · BC DriveBC · Manitoba 511 · Route-matched to active fleet</div></div>
-    <button class="btn btn-yw btn-sm" onclick="issueAdvisory()">Issue Driver Advisory</button>
+    <div><div class="page-title">Road Conditions <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--warn);margin-left:8px">Not connected</span></div>
+    <div class="page-sub">No road report feed is connected yet</div></div>
+    <button class="btn btn-yw btn-sm" disabled title="Not available yet">Issue Driver Advisory</button>
   </div>
   <div id="roadsPanel"></div>
 </div>
@@ -380,7 +380,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <div class="panel" id="panel-journey">
   <div class="page-hdr">
     <div><div class="page-title">Journey Plans</div><div class="page-sub">Pre-trip route approval · Check-in schedule · Weather acknowledgement</div></div>
-    <button class="btn btn-p btn-sm" onclick="openNewJourneyPlan()">+ New Journey Plan</button>
+    <button class="btn btn-p btn-sm" disabled title="Not available yet">+ New Journey Plan</button>
   </div>
   <div id="journeyPanel"></div>
 </div>
@@ -424,7 +424,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 <!-- TOAST -->
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
-<script src="vigil-auth.js?v=20260810-1"></script>
+<script src="vigil-auth.js?v=20261126-1"></script>
 <script>
 // ─── API ──────────────────────────────────────────────────────
 const API_BASE = window.VIGIL_API_BASE || 'https://vigil-production-17ca.up.railway.app';
@@ -501,15 +501,16 @@ function mapAsset(a, assetDefects=[]) {
     site: a.site || '—',
     odometer: a.odometer_km || 0,
     lastService: a.last_service_date || null,
-    nextService: a.next_service_date || rd(90),
+    nextService: a.next_service_date || null,
     nextServiceKm: a.next_service_km || null,
     pretripToday: 'Pending',
     pretripScore: null,
     deficiencies: openDefects.map(d => d.title),
     certs: {
-      cvip:         a.next_inspection_date  || rd(365),
-      insurance:    a.insurance_expiry      || rd(365),
-      registration: a.registration_expiry   || rd(365),
+      // A missing date stays missing. It shows as "Not recorded" and exports blank.
+      cvip:         a.next_inspection_date  || null,
+      insurance:    a.insurance_expiry      || null,
+      registration: a.registration_expiry   || null,
     },
     notes: a.notes || '',
     color: '#00C2FF',
@@ -530,7 +531,7 @@ function mapMaintenance(m) {
     unit: m.asset_name || m.asset_number || '—',
     type: m.title || m.maintenance_type || 'Service',
     priority: 'Medium',
-    dueDate: m.scheduled_date || rd(14),
+    dueDate: m.scheduled_date || null,
     status,
     estimatedHours: '—',
     cost: m.cost || 0,
@@ -651,20 +652,11 @@ window.addEventListener('message', e => {
 let vehicles = [];
 let maintenance = [];
 
-let journeyPlans = [
-  {id:'JP-018',driver:'Diallo Mensah',unit:'Unit 08',origin:'Calgary Hub',dest:'Fort McMurray',route:'Hwy 2 N → Hwy 63 N',departure:new Date(new Date().setHours(5,30,0,0)),eta:'14:30',distance:'746 km',checkIns:['08:00','11:00','14:00'],routeStatus:'clear',fatigue:'Low',approved:true,approvedBy:'Sandra Larsson'},
-  {id:'JP-017',driver:'Ana Reyes',unit:'Unit 22',origin:'Calgary Hub',dest:'Red Deer',route:'Hwy 2 N',departure:new Date(new Date().setHours(8,0,0,0)),eta:'10:30',distance:'148 km',checkIns:['09:15'],routeStatus:'advisory',fatigue:'Low',approved:true,approvedBy:'Sandra Larsson'},
-  {id:'JP-016',driver:'Patrick Whitehorse',unit:'Unit 05',origin:'Red Deer',dest:'Calgary Hub',route:'Hwy 2 S',departure:new Date(new Date().setHours(14,0,0,0)),eta:'16:00',distance:'148 km',checkIns:['15:00'],routeStatus:'advisory',fatigue:'High',approved:false,approvedBy:''},
-];
+// No journey plan or equipment certification feed exists yet. These stay empty
+// until they load from the API. Never seed them with literals.
+let journeyPlans = [];
 
-const EQUIPMENT = [
-  {id:'EQ-001',name:'Overhead Crane — Bay 1',type:'Crane',site:'Calgary Hub',cert:rd(25),lastInsp:rd(-60),status:'Active',capacity:'5 Tonne'},
-  {id:'EQ-002',name:'Forklift #1 — 4,000 lb',type:'Forklift',site:'Calgary Hub',cert:rd(180),lastInsp:rd(-14),status:'Active',capacity:'4,000 lb'},
-  {id:'EQ-003',name:'Harness Set #1',type:'Fall Protection',site:'Calgary Hub',cert:rd(300),lastInsp:rd(-7),status:'Active',capacity:'N/A'},
-  {id:'EQ-004',name:'Harness Set #3',type:'Fall Protection',site:'Calgary Hub',cert:rd(-3),lastInsp:rd(-4),status:'Out of Service',capacity:'N/A'},
-  {id:'EQ-005',name:'Forklift #2 — 6,000 lb',type:'Forklift',site:'Edmonton Hub',cert:rd(210),lastInsp:rd(-21),status:'Active',capacity:'6,000 lb'},
-  {id:'EQ-006',name:'Chain Hoist — 2 Tonne',type:'Lifting Equipment',site:'Site B',cert:rd(45),lastInsp:rd(-90),status:'Inspection Due',capacity:'2,000 kg'},
-];
+const EQUIPMENT = [];
 
 // ─── UTILITIES ────────────────────────────────────────────────
 function statusChip(s){
@@ -672,8 +664,11 @@ function statusChip(s){
   return`<span class="chip ${m[s]||'gy'}">${s}</span>`;
 }
 function roadStatusColor(s){return{clear:'var(--a3)',caution:'var(--warn)',advisory:'var(--danger)'}[s]||'var(--muted)'}
-function daysUntil(dt){return Math.round((new Date(dt)-new Date())/86400000)}
-function certColor(dt){const d=daysUntil(dt);return d<0?'var(--danger)':d<30?'var(--warn)':d<60?'var(--accent)':'var(--a3)'}
+function daysUntil(dt){if(!dt) return null;return Math.round((new Date(dt)-new Date())/86400000)}
+function certColor(dt){if(!dt) return 'var(--muted)';const d=daysUntil(dt);return d<0?'var(--danger)':d<30?'var(--warn)':d<60?'var(--accent)':'var(--a3)'}
+// Missing dates: say so, and never colour them as fine or overdue.
+function dateOrNotRecorded(dt,short){return dt?(short?fmtDateShort(dt):fmtDate(dt)):'Not recorded'}
+function dueColor(dt,warnDays){if(!dt) return 'var(--muted)';const d=daysUntil(dt);return d<0?'var(--danger)':d<warnDays?'var(--warn)':'var(--text)'}
 function odomPct(v){if(!v.nextServiceKm||!v.odometer) return 0;return Math.min(98,Math.round((v.odometer/v.nextServiceKm)*100))}
 
 // ─── RENDER STATS ─────────────────────────────────────────────
@@ -683,7 +678,7 @@ function renderStats(){
   const available=vehicles.filter(v=>v.status==='Available').length;
   const restricted=vehicles.filter(v=>v.status==='Restricted').length;
   const serviceDue=vehicles.filter(v=>v.status==='Service Due'||maintenance.some(m=>m.vehId===v.id&&(m.status==='Overdue'||m.status==='Due Today'))).length;
-  const certExpiring=vehicles.filter(v=>Object.values(v.certs).some(c=>daysUntil(c)<30)).length;
+  const certExpiring=vehicles.filter(v=>Object.values(v.certs).some(c=>c&&daysUntil(c)<30)).length;
 
   document.getElementById('dashStats').innerHTML=`
     <div class="sc bl"><div class="sl">Total Fleet</div><div class="sv bl">${total}</div><div class="sn">Active vehicles</div></div>
@@ -714,7 +709,7 @@ function renderFleetTable(){
       <td style="font-size:11.5px">${v.driver||'<span style="color:var(--muted)">Unassigned</span>'}</td>
       <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.site}</td>
       <td>${v.pretripToday==='Pass'?'<span class="chip gr">Pass</span>':v.pretripToday==='Pass w/ Note'?'<span class="chip yw">Pass*</span>':v.pretripToday==='Fail'?'<span class="chip rd">Fail</span>':'<span class="chip gy">Pending</span>'}</td>
-      <td style="font-size:11px;color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</td>
+      <td style="font-size:11px;color:${dueColor(v.nextService,14)}">${dateOrNotRecorded(v.nextService,true)}</td>
       <td>${route?`<span class="chip ${route.status==='clear'?'gr':route.status==='advisory'?'rd':'yw'}">${route.status==='advisory'?'Advisory':route.status==='caution'?'Caution':'Clear'}</span>`:'<span class="chip gy">N/A</span>'}</td>
       <td>${statusChip(v.status)}</td>
     </tr>`;
@@ -731,7 +726,7 @@ function renderMaintDue(){
       <div class="mr-icon" style="background:${m.status==='Urgent'||m.status==='Overdue'?'rgba(255,69,69,.1)':m.status==='Due Today'?'rgba(255,184,0,.1)':'rgba(0,194,255,.08)'}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
       <div class="mr-body">
         <div class="mr-title">${m.unit} — ${m.type}</div>
-        <div class="mr-meta">Due: <span style="color:${m.status==='Overdue'||m.status==='Urgent'?'var(--danger)':m.status==='Due Today'?'var(--warn)':'var(--text)'}">${fmtDate(m.dueDate)}</span> · Est. ${m.estimatedHours}h${m.cost>0?' · $'+m.cost.toLocaleString():''}</div>
+        <div class="mr-meta">Due: <span style="color:${m.status==='Overdue'||m.status==='Urgent'?'var(--danger)':m.status==='Due Today'?'var(--warn)':'var(--text)'}">${dateOrNotRecorded(m.dueDate)}</span> · Est. ${m.estimatedHours}h${m.cost>0?' · $'+m.cost.toLocaleString():''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
         ${statusChip(m.status)}
@@ -765,12 +760,14 @@ function renderCertExpiring(){
   const rows=[];
   vehicles.forEach(v=>{
     Object.entries(v.certs).forEach(([type,dt])=>{
+      if(!dt) return; // not recorded: listed in the Certifications panel, not counted as current
       const d=daysUntil(dt);
       if(d<60) rows.push({unit:v.unit,type:type.toUpperCase(),expiry:dt,days:d});
     });
   });
   rows.sort((a,b)=>a.days-b.days);
-  if(rows.length===0){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px">All certifications current</div>';return;}
+  const missingCerts=vehicles.some(v=>Object.values(v.certs).some(c=>!c));
+  if(rows.length===0){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:12px">'+(missingCerts?'Some certification dates are not recorded':'All certifications current')+'</div>';return;}
   el.innerHTML=`<table class="tbl"><thead><tr><th>Unit</th><th>Cert Type</th><th>Expires</th></tr></thead><tbody>
     ${rows.slice(0,6).map(r=>`<tr>
       <td style="font-weight:600">${r.unit}</td>
@@ -789,7 +786,7 @@ function renderFleetRegistry(filter=''){
   el.innerHTML=filtered.map(v=>{
     const pct=odomPct(v);
     const hasMaint=maintenance.some(m=>m.vehId===v.id&&m.status!=='Complete');
-    const certIssue=Object.values(v.certs).some(c=>daysUntil(c)<30);
+    const certIssue=Object.values(v.certs).some(c=>c&&daysUntil(c)<30);
     return`
     <div class="veh-card ${v.status==='Restricted'?'restricted':v.status==='Service Due'?'service-due':v.status==='Dispatched'?'active':''}" onclick="openVehicleDetail('${v.id}')">
       <div class="veh-top">
@@ -812,7 +809,7 @@ function renderFleetRegistry(filter=''){
           <div class="vm-lbl">Pre-Trip Today</div>
         </div>
         <div class="vm-item">
-          <div class="vm-val" style="color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</div>
+          <div class="vm-val" style="color:${dueColor(v.nextService,14)}">${dateOrNotRecorded(v.nextService,true)}</div>
           <div class="vm-lbl">Next Service</div>
         </div>
         <div class="vm-item">
@@ -828,7 +825,7 @@ function renderFleetRegistry(filter=''){
       ${certIssue?`<div class="alert yw" style="margin-bottom:8px;padding:7px 10px">Certification expiring within 30 days — renewal required</div>`:''}
       <div class="veh-footer">
         <button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">View Details</button>
-        ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="event.stopPropagation();dispatchVehicle('${v.id}')">Dispatch →</button>`:''}
+        ${v.status==='Available'?`<button class="btn btn-p btn-sm" disabled title="Not available yet" onclick="event.stopPropagation()">Dispatch →</button>`:''}
         ${v.status==='Restricted'?`<button class="btn btn-rd btn-sm" onclick="event.stopPropagation()">Restricted</button>`:''}
         ${v.status==='Service Due'?`<button class="btn btn-yw btn-sm" onclick="event.stopPropagation();openAddMaintenance('${v.id}')">Schedule Service</button>`:''}
         <div style="margin-left:auto;font-size:10px;color:var(--muted)">${v.plate} · VIN ${v.vin.slice(-6)}</div>
@@ -863,7 +860,7 @@ function openVehicleDetail(id){
     <div id="vd-info">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
         <div class="vm-item"><div class="vm-val" style="color:${v.pretripToday==='Pass'?'var(--a3)':v.pretripToday==='Fail'?'var(--danger)':'var(--warn)'}">${v.pretripToday||'Pending'}</div><div class="vm-lbl">Pre-Trip Today</div></div>
-        <div class="vm-item"><div class="vm-val" style="color:${daysUntil(v.nextService)<0?'var(--danger)':daysUntil(v.nextService)<14?'var(--warn)':'var(--text)'}">${fmtDateShort(v.nextService)}</div><div class="vm-lbl">Next Service</div></div>
+        <div class="vm-item"><div class="vm-val" style="color:${dueColor(v.nextService,14)}">${dateOrNotRecorded(v.nextService,true)}</div><div class="vm-lbl">Next Service</div></div>
         <div class="vm-item"><div class="vm-val">${v.odometer.toLocaleString()}</div><div class="vm-lbl">Odometer (km)</div></div>
       </div>
       <div class="sec-lbl" style="margin-top:0">Vehicle Information</div>
@@ -886,7 +883,7 @@ function openVehicleDetail(id){
           <div class="mr-icon" style="background:rgba(0,194,255,.08)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
           <div class="mr-body">
             <div class="mr-title">${m.type}</div>
-            <div class="mr-meta">Due: ${fmtDate(m.dueDate)} · ${m.estimatedHours}h · ${m.cost>0?'$'+m.cost.toLocaleString():'Cost TBD'}</div>
+            <div class="mr-meta">Due: ${dateOrNotRecorded(m.dueDate)} · ${m.estimatedHours}h · ${m.cost>0?'$'+m.cost.toLocaleString():'Cost TBD'}</div>
             ${m.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${m.notes}</div>`:''}
           </div>
           ${statusChip(m.status)}
@@ -899,6 +896,7 @@ function openVehicleDetail(id){
       <div class="alert bl">All certifications must be current for vehicle to be legally operated. Expired certifications restrict the vehicle from service immediately.</div>
       ${Object.entries(v.certs).map(([type,dt])=>{
         const d=daysUntil(dt);
+        if(d===null) return`<div class="maint-row"><div class="mr-body"><div class="mr-title">${type.toUpperCase()}</div><div class="mr-meta">Expires: Not recorded</div></div><span class="chip gy">Not recorded</span></div>`;
         return`<div class="maint-row" style="border-color:${d<0?'rgba(255,69,69,.25)':d<30?'rgba(255,184,0,.2)':'var(--border)'}">
           <div class="mr-icon" style="background:rgba(155,109,255,.1)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg></div>
           <div class="mr-body">
@@ -912,26 +910,13 @@ function openVehicleDetail(id){
 
     <!-- HISTORY -->
     <div id="vd-history" style="display:none">
-      <div>
-        ${[
-          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',title:'Scheduled Service — 275k km',date:rd(-18),color:'rgba(0,194,255,.1)',tc:'var(--accent)'},
-          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',title:'Pre-Trip Inspection — Pass',date:rd(-1),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
-          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',title:'Pre-Trip Inspection — Pass',date:rd(0),color:'rgba(0,229,160,.1)',tc:'var(--a3)'},
-          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>',title:'CVIP Certificate Renewed',date:rd(-180),color:'rgba(155,109,255,.1)',tc:'var(--purple)'},
-          {icon:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',title:'Tire Replacement — Front Axle',date:rd(-65),color:'rgba(255,184,0,.1)',tc:'var(--warn)'},
-        ].map(h=>`
-          <div class="tl-item">
-            <div class="tl-dot" style="background:${h.color};color:${h.tc}">${h.icon}</div>
-            <div class="tl-body"><div class="tl-title">${h.title}</div><div class="tl-meta">${fmtDate(h.date)}</div></div>
-          </div>
-        `).join('')}
-      </div>
+      <div style="text-align:center;padding:24px;color:var(--muted)">No data yet</div>
     </div>
   `;
 
   document.getElementById('drawerFooter').innerHTML=`
     <button class="btn btn-g btn-sm" onclick="exportVehicleRecord('${id}')">Export Record</button>
-    ${v.status==='Available'?`<button class="btn btn-p btn-sm" onclick="dispatchVehicle('${id}')">Dispatch →</button>`:''}
+    ${v.status==='Available'?`<button class="btn btn-p btn-sm" disabled title="Not available yet">Dispatch →</button>`:''}
     ${v.status==='Restricted'?`<button class="btn btn-g btn-sm" onclick="closeDrawer();openAddMaintenance('${id}')">Open Work Order</button>`:''}
     <button class="btn btn-g" style="margin-left:auto" onclick="closeDrawer()">Close</button>
   `;
@@ -975,7 +960,7 @@ function renderMaintPanel(){
             <td style="font-weight:600">${m.unit}</td>
             <td>${m.type}</td>
             <td><span class="chip ${m.priority==='Critical'?'rd':m.priority==='High'?'or':m.priority==='Medium'?'yw':'bl'}">${m.priority}</span></td>
-            <td style="color:${daysUntil(m.dueDate)<0?'var(--danger)':daysUntil(m.dueDate)<7?'var(--warn)':'var(--text)'};font-weight:${daysUntil(m.dueDate)<0?'700':'400'}">${fmtDate(m.dueDate)}</td>
+            <td style="color:${dueColor(m.dueDate,7)};font-weight:${m.dueDate&&daysUntil(m.dueDate)<0?'700':'400'}">${dateOrNotRecorded(m.dueDate)}</td>
             <td>${m.estimatedHours}h</td>
             <td>${m.cost>0?'$'+m.cost.toLocaleString():'TBD'}</td>
             <td>${statusChip(m.status)}</td>
@@ -1097,10 +1082,11 @@ function renderJourneyPanel(){
   el.innerHTML=`
     <div class="alert bl"><strong>Journey Plan Policy:</strong> All long-haul dispatches require an approved journey plan before departure. Plan must include route, check-in schedule, weather acknowledgement, and rest verification. Plans on advisory routes require HSE Manager approval.</div>
     <div class="card">
-      <div class="ch"><div class="ct">Active Journey Plans — Today</div><div class="ca" onclick="openNewJourneyPlan()">+ New Plan</div></div>
+      <div class="ch"><div class="ct">Active Journey Plans — Today</div><div class="ca" style="cursor:not-allowed;opacity:.5" title="Not available yet">+ New Plan</div></div>
       <div style="overflow-x:auto"><table class="tbl">
         <thead><tr><th>Plan ID</th><th>Driver</th><th>Vehicle</th><th>Route</th><th>Departure</th><th>ETA</th><th>Route Status</th><th>Fatigue</th><th>Approved</th></tr></thead>
         <tbody>
+          ${journeyPlans.length===0?'<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted)">No data yet</td></tr>':''}
           ${journeyPlans.map(jp=>`<tr onclick="openJourneyDetail('${jp.id}')">
             <td style="color:var(--accent);font-weight:600">${jp.id}</td>
             <td style="font-weight:600">${jp.driver}</td>
@@ -1118,32 +1104,8 @@ function renderJourneyPanel(){
   `;
 }
 
-function openNewJourneyPlan(){
-  showModal('New Journey Plan',`
-    <div class="fgrid">
-      <div class="fg"><div class="fl">Driver</div><select class="fi fi-sel" id="jp-driver"><option>Diallo Mensah</option><option>Patrick Whitehorse</option><option>Ana Reyes</option></select></div>
-      <div class="fg"><div class="fl">Vehicle</div><select class="fi fi-sel">${vehicles.filter(v=>v.status!=='Restricted').map(v=>`<option>${v.unit}</option>`).join('')}</select></div>
-    </div>
-    <div class="fgrid">
-      <div class="fg"><div class="fl">Origin</div><select class="fi fi-sel"><option>Calgary Hub</option><option>Edmonton Hub</option><option>Red Deer</option></select></div>
-      <div class="fg"><div class="fl">Destination</div><input class="fi" id="jp-dest" placeholder="e.g. Fort McMurray"></div>
-    </div>
-    <div class="fgrid">
-      <div class="fg"><div class="fl">Departure Time</div><input class="fi" type="time"></div>
-      <div class="fg"><div class="fl">Expected Arrival</div><input class="fi" type="time"></div>
-    </div>
-    <div class="fg"><div class="fl">Check-in Schedule</div><input class="fi" placeholder="e.g. Every 2 hours: 10:00, 12:00, 14:00"></div>
-    <div class="fg"><div class="fl">Driver acknowledges route conditions and confirms adequate rest</div>
-      <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;cursor:pointer" onclick="this.style.background='rgba(0,229,160,.05)';this.style.borderColor='rgba(0,229,160,.3)'">
-        <div style="width:16px;height:16px;border-radius:3px;border:2px solid var(--border)"></div>
-        Driver sign-off — I have reviewed conditions and confirm I am fit for duty
-      </div>
-    </div>
-  `,[
-    {label:'Submit Journey Plan',cls:'btn-p',action:"closeModal();showToast('success','Journey plan submitted — pending supervisor approval')"},
-    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
-  ]);
-}
+// Journey plans are not wired to the API yet, so there is no create form.
+function openNewJourneyPlan(){}
 
 function openJourneyDetail(id){
   const jp=journeyPlans.find(x=>x.id===id);
@@ -1166,12 +1128,7 @@ function openJourneyDetail(id){
   ].filter(Boolean));
 }
 
-function approveJP(id){
-  const jp=journeyPlans.find(x=>x.id===id);
-  if(jp){jp.approved=true;jp.approvedBy='HSE Manager';}
-  closeModal();renderAll();
-  showToast('success',`Journey plan ${id} approved — driver notified`);
-}
+function approveJP(){}
 
 // ─── EQUIPMENT PANEL ─────────────────────────────────────────
 function renderEquipPanel(){
@@ -1183,6 +1140,7 @@ function renderEquipPanel(){
       <div style="overflow-x:auto"><table class="tbl">
         <thead><tr><th>ID</th><th>Equipment</th><th>Type</th><th>Site</th><th>Certification</th><th>Last Inspection</th><th>Status</th></tr></thead>
         <tbody>
+          ${EQUIPMENT.length===0?'<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">No data yet</td></tr>':''}
           ${EQUIPMENT.map(e=>`<tr>
             <td style="color:var(--accent);font-weight:600">${e.id}</td>
             <td><div style="font-weight:600">${e.name}</div><div style="font-size:10.5px;color:var(--muted)">${e.capacity}</div></td>
@@ -1202,43 +1160,8 @@ function renderEquipPanel(){
 function renderAnalyticsPanel(){
   const el=document.getElementById('analyticsPanel');
   if(!el) return;
-  el.innerHTML=`
-    <div class="stats">
-      <div class="sc bl"><div class="sl">Fleet Utilization</div><div class="sv bl">71%</div><div class="sn up">↑ vs 64% last month</div></div>
-      <div class="sc gr"><div class="sl">Pre-Trip Pass Rate</div><div class="sv gr">86%</div><div class="sn">6 of 7 vehicles</div></div>
-      <div class="sc yw"><div class="sl">Avg Days Between Service</div><div class="sv yw">47</div><div class="sn">Target: 60 days</div></div>
-      <div class="sc or"><div class="sl">Maintenance Cost / Vehicle</div><div class="sv or">$620</div><div class="sn">Monthly average</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card">
-        <div class="ch"><div class="ct">Vehicle Incidents (12 months)</div></div>
-        <div class="cb">
-          ${[['Unit 08',0,'gr'],['Unit 14',1,'yw'],['Unit 22',0,'gr'],['Unit 31',0,'gr'],['Unit 07',1,'yw'],['Unit 19',0,'gr'],['Unit 03',0,'gr']].map(([u,i,c])=>`
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
-              <span>${u}</span>
-              <div style="display:flex;align-items:center;gap:6px">
-                <div class="pw" style="width:80px"><div class="pf" style="width:${i===0?0:30}%;background:var(--danger)"></div></div>
-                <span class="chip ${c}">${i} incident${i!==1?'s':''}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="card">
-        <div class="ch"><div class="ct">Deficiency Trend (12 months)</div></div>
-        <div class="cb">
-          <div style="display:flex;align-items:flex-end;gap:5px;height:80px">
-            ${[2,3,1,4,2,3,2,1,3,2,4,3].map((v,i)=>`
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
-                <div style="width:100%;border-radius:2px 2px 0 0;height:${v/4*100}%;background:${v>=4?'var(--danger)':v>=3?'var(--warn)':'var(--a3)'}"></div>
-                <div style="font-size:8.5px;color:var(--muted)">${['A','M','J','J','A','S','O','N','D','J','F','M'][i]}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+  // Analytics are not calculated yet. No literal numbers here.
+  el.innerHTML='<div class="card"><div class="cb" style="text-align:center;padding:32px;color:var(--muted)">No data yet</div></div>';
 }
 
 // ─── RESTRICTED & DISPATCHED ──────────────────────────────────
@@ -1280,7 +1203,7 @@ function renderDispatchedPanel(){
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">${statusChip(v.status)}<span class="chip bl">${v.driver}</span></div>
       </div>
       ${route?`<div class="alert ${route.status==='advisory'?'rd':route.status==='caution'?'yw':'gr'}" style="margin-bottom:8px;padding:7px 10px">Route: ${route.route} — ${route.condition}</div>`:''}
-      <div style="display:flex;gap:7px"><button class="btn btn-g btn-sm">Check In Status</button><button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">Vehicle Details</button></div>
+      <div style="display:flex;gap:7px"><button class="btn btn-g btn-sm" disabled title="Not available yet" onclick="event.stopPropagation()">Check In Status</button><button class="btn btn-g btn-sm" onclick="event.stopPropagation();openVehicleDetail('${v.id}')">Vehicle Details</button></div>
     </div>`;
   }).join('');
 }
@@ -1294,7 +1217,7 @@ function renderCertPanel(){
       rows.push({unit:v.unit,vehId:v.id,type:type.toUpperCase(),expiry:dt,days:daysUntil(dt)});
     });
   });
-  rows.sort((a,b)=>a.days-b.days);
+  rows.sort((a,b)=>(a.days===null)-(b.days===null)||a.days-b.days);
   el.innerHTML=`<div class="card"><div class="ch"><div class="ct">All Vehicle Certifications</div><div class="ca" onclick="exportCertReport()">Export</div></div>
     <div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Unit</th><th>Certification</th><th>Expiry Date</th><th>Days Remaining</th><th>Status</th></tr></thead>
@@ -1302,9 +1225,9 @@ function renderCertPanel(){
         ${rows.map(r=>`<tr onclick="openVehicleDetail('${r.vehId}')">
           <td style="font-weight:600">${r.unit}</td>
           <td>${r.type}</td>
-          <td style="font-weight:600;color:${certColor(r.expiry)}">${fmtDate(r.expiry)}</td>
-          <td>${r.days<0?`<span style="color:var(--danger);font-weight:700">${Math.abs(r.days)}d overdue</span>`:`${r.days}d`}</td>
-          <td><span class="chip ${r.days<0?'rd':r.days<30?'yw':r.days<60?'bl':'gr'}">${r.days<0?'EXPIRED':r.days<30?'Renew Now':r.days<60?'Due Soon':'Current'}</span></td>
+          <td style="font-weight:600;color:${certColor(r.expiry)}">${dateOrNotRecorded(r.expiry)}</td>
+          <td>${r.days===null?'':r.days<0?`<span style="color:var(--danger);font-weight:700">${Math.abs(r.days)}d overdue</span>`:`${r.days}d`}</td>
+          <td><span class="chip ${r.days===null?'gy':r.days<0?'rd':r.days<30?'yw':r.days<60?'bl':'gr'}">${r.days===null?'Not recorded':r.days<0?'EXPIRED':r.days<30?'Renew Now':r.days<60?'Due Soon':'Current'}</span></td>
         </tr>`).join('')}
       </tbody>
     </table></div>
@@ -1325,39 +1248,20 @@ function renderDeficPanel(){
           <td>${d.defic}</td>
           <td><span class="chip rd">High</span></td>
           <td><span class="chip rd">Open</span></td>
-          <td><button class="btn btn-gr btn-xs" onclick="resolveDefic('${d.vehId}','${d.defic}')">Resolve</button></td>
+          <td><button class="btn btn-gr btn-xs" disabled title="Not available yet">Resolve</button></td>
         </tr>`).join('')}
       </tbody>
     </table></div></div>
   `;
 }
 
-function resolveDefic(vehId, defic){
-  const v=vehicles.find(x=>x.id===vehId);
-  if(v){v.deficiencies=v.deficiencies.filter(d=>d!==defic);if(v.deficiencies.length===0&&v.status==='Restricted') v.status='Available';}
-  renderAll();showToast('success','Deficiency resolved — vehicle status updated');
-}
+// Resolving a defect is not wired to the API yet. No local "resolved" state, no success toast.
+function resolveDefic(){}
 
-function dispatchVehicle(id){
-  showModal('Dispatch Vehicle',`
-    <div class="fg"><div class="fl">Assign Driver</div><select class="fi fi-sel" id="disp-driver"><option>Patrick Whitehorse</option><option>Diallo Mensah</option><option>Ana Reyes</option></select></div>
-    <div class="fg"><div class="fl">Destination</div><input class="fi" id="disp-dest" placeholder="e.g. Fort McMurray, Edmonton Hub"></div>
-    <div class="fg"><div class="fl">Route</div><select class="fi fi-sel" id="disp-route"><option>Hwy 2 N</option><option>Hwy 2 S</option><option>Hwy 63 N</option><option>Hwy 16 W</option><option>Local</option></select></div>
-  `,[
-    {label:'Dispatch',cls:'btn-p',action:`doDispatch('${id}')`},
-    {label:'Cancel',cls:'btn-g',action:'closeModal()'}
-  ]);
-}
-
-function doDispatch(id){
-  const v=vehicles.find(x=>x.id===id);
-  const driver=document.getElementById('disp-driver')?.value||'Driver';
-  if(v){v.status='Dispatched';v.driver=driver.split(' — ')[0];v.site='En Route';}
-  closeModal();closeDrawer();renderAll();
-  showToast('success',`${v?.unit} dispatched — ${driver}`);
-}
-
-function issueAdvisory(){showToast('warn','Driver advisory issued — all active drivers notified of route conditions');}
+// Dispatch and driver advisories are not wired to the API yet. No success toast without a request.
+function dispatchVehicle(){}
+function doDispatch(){}
+function issueAdvisory(){}
 // Vehicle vs. equipment share one create form — only the type options differ.
 const ASSET_TYPE_OPTIONS = {
   vehicle:   [['semi','Class 1 Semi'],['truck','Class 3 Truck'],['truck','Service Truck'],['pickup','Pickup 4x4'],['van','Van'],['suv','SUV'],['tanker','Tanker'],['flatbed','Flatbed']],

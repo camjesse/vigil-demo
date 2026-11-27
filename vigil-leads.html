@@ -54,8 +54,9 @@ textarea{width:100%;min-height:52px;font-size:12px}
 
 <script>
 (function () {
-  // vigil_api_override in localStorage lets local testing point at a dev API.
-  const API = localStorage.getItem('vigil_api_override') || 'https://vigil-production-17ca.up.railway.app';
+  // vigil_api_override lets local testing point at a dev API. Local hosts only.
+  const LOCAL_HOST = ['localhost', '127.0.0.1'].includes(location.hostname) || location.hostname.endsWith('.localhost');
+  const API = (LOCAL_HOST && localStorage.getItem('vigil_api_override')) || 'https://vigil-production-17ca.up.railway.app';
   const STATUSES = ['new', 'contacted', 'demo_booked', 'demo_done', 'won', 'lost'];
   let session = null;
   try { session = JSON.parse(localStorage.getItem('vigil_session') || 'null'); } catch (e) {}
